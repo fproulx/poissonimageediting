@@ -1,3 +1,4 @@
+package ca.etsmtl.poisson;
 
 public class PoissonSolver {
 
