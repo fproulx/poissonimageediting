@@ -1,5 +1,7 @@
 package ca.etsmtl.poisson;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -98,6 +100,14 @@ public class PoissonPhotomontage {
 	
 	public BufferedImage createPhotomontage() {
 		validateInputImages();
+		
+		//  See http://java.sun.com/docs/books/tutorial/2d/advanced/compositing.html
+		BufferedImage buffer = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_BINARY); // Create a bitmask (0 or 255)
+		Graphics2D g2 = buffer.createGraphics();
+	    g2.setComposite(AlphaComposite.DstOut);
+	    g2.drawImage(null, null, 0, 0);
+	    g2.dispose();
+	    
 		return null;
 	}
 
