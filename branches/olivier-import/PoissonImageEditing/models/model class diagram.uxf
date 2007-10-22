@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><umlet_diagram><element><type>com.umlet.element.base.Class</type><coordinates><x>600</x><y>1120</y><w>260</w><h>50</h></coordinates><panel_attributes>ImageConversionUtilitiesTest
+--
+--
++testCreateFloatPixelArrayFromImage()
+bg=whitec</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>600</x><y>940</y><w>260</w><h>170</h></coordinates><panel_attributes>PoissonPhotomontageTest
+--
+--
++testValidateInputImage()
++testComputeGradientVectorField()
++testComputeDivergenceScalarField()
++testCopySelectionInDestinationImage()
++testCreateDestinationMask()
++testCreatePhotomontage()
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>50</x><y>1150</y><w>130</w><h>30</h></coordinates><panel_attributes>UnixGlobFileFilter
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>50</x><y>1110</y><w>100</w><h>30</h></coordinates><panel_attributes>FileTreeWalker
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>50</x><y>1070</y><w>100</w><h>30</h></coordinates><panel_attributes>FileTreeWalk
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>60</x><y>950</y><w>480</w><h>60</h></coordinates><panel_attributes>ImageConversionUtilities
+--
+_+createFloatPixelArrayFromImage(img: BufferedImage): FloatPixel[ ][ ] _
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>550</x><y>760</y><w>300</w><h>120</h></coordinates><panel_attributes>ComputationImage
+--
++pixels[ ][ ]: Pixel
++width: int
++height: int
+--
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>270</x><y>830</y><w>100</w><h>30</h></coordinates><panel_attributes>Pixel
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>390</x><y>830</y><w>100</w><h>30</h></coordinates><panel_attributes>VectorPixel
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>390</x><y>790</y><w>100</w><h>30</h></coordinates><panel_attributes>Vector2f
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>270</x><y>790</y><w>100</w><h>30</h></coordinates><panel_attributes>FloatPixel
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>40</x><y>520</y><w>810</w><h>220</h></coordinates><panel_attributes>PoissonPhotomontage
+--
++sourceImage: BufferedImage
++destinationImage: BufferedImage
++maskImage: BufferedImage
++destinationPosition: Point
+--
++initialize(srcImage: BufferedImage, maskImage: BufferedImage, destImage: BufferedImage, destPosition: Point)
+
+-validateInputImages(): boolean
+
+-computeGradientVectorField(img: ComputationImage&lt;FloatPixel&gt;): ComputationImage&lt;VectorPixel&gt;
+
+-computeDivergenceScalarField(img: ComputationImage&lt;VectorPixel&gt;): ComputationImage&lt;FloatPixel&gt;
+
+-copySelectionInDestinationImage(src: BufferedImage, mask: BufferedImage, dst: BufferedImage): BufferedImage
+
+-createDestinationMask(src: BufferedImage, mask: BufferedImage, dst: BufferedImage): BufferedImage
+
++createPhotomontage(): BufferedImage
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>140</x><y>360</y><w>720</w><h>130</h></coordinates><panel_attributes>/Photomontage/
+--
+--
++initialize(srcImage: BufferedImage, maskImage: BufferedImage, destImage: BufferedImage, destPosition: Point)
+
++createPhotomontage(): BufferedImage
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>40</x><y>280</y><w>120</w><h>30</h></coordinates><panel_attributes>UIController
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Class</type><coordinates><x>40</x><y>210</y><w>810</w><h>60</h></coordinates><panel_attributes>PhotomontageController
+--
+--
++executePhotomontage(srcImg: BufferedImage, dstImg: BufferedImage, maskImg: BufferedImage, dstPt: Point): BufferedImage
+bg=white</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Package</type><coordinates><x>590</x><y>910</y><w>280</w><h>290</h></coordinates><panel_attributes>test
+bg=orange</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Package</type><coordinates><x>30</x><y>910</y><w>550</w><h>290</h></coordinates><panel_attributes>util
+bg=orange</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>210</x><y>720</y><w>40</w><h>250</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;230;20;20</additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>650</x><y>720</y><w>40</w><h>60</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;40;20;20</additional_attributes></element><element><type>com.umlet.element.base.Package</type><coordinates><x>30</x><y>330</y><w>840</w><h>570</h></coordinates><panel_attributes>model
+bg=orange</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>480</x><y>780</y><w>90</w><h>40</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;20;70;20</additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>380</x><y>720</y><w>40</w><h>90</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;70;20;70</additional_attributes></element><element><type>com.umlet.element.base.Package</type><coordinates><x>40</x><y>1040</y><w>150</w><h>150</h></coordinates><panel_attributes>io
+bg=orange</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Package</type><coordinates><x>260</x><y>760</y><w>240</w><h>110</h></coordinates><panel_attributes>basetype
+bg=orange</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>420</x><y>250</y><w>40</w><h>130</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;110;20;20</additional_attributes></element><element><type>com.umlet.element.base.Package</type><coordinates><x>30</x><y>180</y><w>840</w><h>140</h></coordinates><panel_attributes>controller
+bg=orange</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>640</x><y>720</y><w>40</w><h>50</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;180;20;180</additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>410</x><y>470</y><w>40</w><h>70</h></coordinates><panel_attributes>lt=&lt;.</panel_attributes><additional_attributes>20;20;20;50</additional_attributes></element></umlet_diagram>

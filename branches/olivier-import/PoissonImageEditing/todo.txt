@@ -1,0 +1,6 @@
+Classe avec méthode
+- section vue
+- section model avec Tests
+
+séquence du UI au PoissonPhotoMontage (méthode private)
+

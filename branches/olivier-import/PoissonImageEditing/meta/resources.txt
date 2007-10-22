@@ -1,0 +1,9 @@
+Ze Paper: http://research.microsoft.com/vision/cambridge/papers/perez_siggraph03.pdf
+
+Graphe des papiers qui link
+http://portal.acm.org/citation.cfm?id=882262.882269
+
+scholar.google.com search for "Poisson Image Editing"
+
+Library pour le code mathématique méchant
+http://jscience.org/
