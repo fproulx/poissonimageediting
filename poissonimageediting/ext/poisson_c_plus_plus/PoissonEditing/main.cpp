@@ -49,7 +49,7 @@
 
 #include "Solver.h"
 #include <iostream>
-using std::cout;
+using namespace std;
 
 using imagelib::ImageBGRb;
 using imagelib::ImageLb;

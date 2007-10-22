@@ -45,7 +45,7 @@
 #include <map>
 using std::map;
 #include <iostream>
-using std::cout;
+using namespace std;
 
 #include <assert.h>
 
