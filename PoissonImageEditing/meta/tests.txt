@@ -1,0 +1,8 @@
+checker le plan de test
+
+Tests Unitaires autour des opérations importantes
+valider avec MatLab
+
+bien important de couvrir un ensemble de valeurs 0-255
+Cercle 127 - 128
+

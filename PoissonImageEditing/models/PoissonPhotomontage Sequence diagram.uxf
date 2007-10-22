@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><umlet_diagram><element><type>com.umlet.element.base.SequenceDiagram</type><coordinates><x>1350</x><y>90</y><w>1410</w><h>540</h></coordinates><panel_attributes>_Utilisateur_|_img:ImageFrame_|_monteur:PhotomontageController_|_poissonPhoto:PoissonPhotomontage_
+
+1-&gt;&gt;2:1,2:onMouseUp()
+2-&gt;2:1,2:detectDragAndDrop()
+2-&gt;&gt;3:1,2,3:executePhotoMontage(srcImg, dstImg, maskImg, dstPoint)
+3-&gt;&gt;4:1,2,3,4:&lt;&lt;create&gt;&gt;
+3-&gt;&gt;4:1,2,3,4:initialize(srcImg, dstImg, maskImg, dstPoint)
+3-&gt;&gt;4:1,2,3,4:createPhotomontage()
+4-&gt;4:1,2,3,4:validateInputImages()
+4-&gt;4:1,2,3,4:createDestinationMask()
+4-&gt;4:1,2,3,4:copySelectionInDestinationImage()
+4-&gt;4:1,2,3,4:computeGradientVectorField()
+4-&gt;4:1,2,3,4:computeDivergenceScalarField()
+4-&gt;&gt;3:1,2,3,4:image: BufferedImage
+3-&gt;&gt;2:1,2,3:image: BufferedImage
+2-&gt;2:1,2:redraw()
+2-&gt;1:1,2</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Note</type><coordinates><x>2570</x><y>0</y><w>270</w><h>70</h></coordinates><panel_attributes>La syntaxe ne supporte pas la création
+donc ici elle est représentée en utilisant
+&lt;&lt;create&gt;&gt;
+bg=yellow</panel_attributes><additional_attributes></additional_attributes></element><element><type>com.umlet.element.base.Relation</type><coordinates><x>2290</x><y>50</y><w>320</w><h>220</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>300;20;20;200</additional_attributes></element></umlet_diagram>
