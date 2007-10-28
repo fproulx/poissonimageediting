@@ -21,13 +21,11 @@ import javax.swing.JPanel;
  */
 public class ImageFrame extends JInternalFrame {
 
-    private BufferedImage image;
-    
+    private ImageHolder image;
     private boolean modified = false;
-    
-    private ImagesContainer container;
+    private ImageFramesContainer container;
 
-    public ImageFrame(String title, BufferedImage img,ImagesContainer container) {
+    public ImageFrame(String title, ImageHolder img, ImageFramesContainer container, PreviewContainer preview) {
         super(title, true, true, true);
 
         this.image = img;
@@ -36,33 +34,36 @@ public class ImageFrame extends JInternalFrame {
         JPanel panel = new JPanel();
         JLabel label = new JLabel();
 
-        label.setIcon(new ImageIcon(image));
+        label.setIcon(new ImageIcon(image.getOriginal()));
 
         panel.add(label);
         add(panel);
 
         //TODO add icon
-        
-        setSize(img.getWidth(), img.getHeight());
+        setSize(image.getOriginal().getWidth(), image.getOriginal().getHeight());
         setVisible(true);
         setAutoscrolls(true);
         setFocusable(true);
-        
+
         requestFocus();
-        
-        addInternalFrameListener(new ImageFrameEvents(this));
-        
-        System.out.println("ImageFrame.ImageFrame " + img.getWidth() + "x" + img.getHeight());
+
+        addInternalFrameListener(new ImageFrameEvents(this,preview));
+
+        System.out.println("ImageFrame.ImageFrame " + image.getOriginal().getWidth() + "x" + image.getOriginal().getHeight());
     }
 
     public boolean isModified() {
         return modified;
     }
-    
-    public BufferedImage getImage() {
+
+    public BufferedImage getBufferedImage() {
+        return image.getOriginal();
+    }
+          
+    public ImageHolder getImage() {
         return image;
     }
-    
+
     public void close() {
         container.remove(this);
     }

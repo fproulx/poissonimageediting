@@ -17,7 +17,7 @@ import java.util.Observable;
  *
  * @author ag95300
  */
-public class ImagesContainer extends Observable {
+public class ImageFramesContainer extends Observable {
     
     private List<ImageFrame> imageFrames = new ArrayList<ImageFrame>();
     
