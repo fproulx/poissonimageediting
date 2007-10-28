@@ -13,15 +13,19 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observer;
 import javax.swing.Timer;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
+import ui.PreviewContainer;
 
 /**
  * The application's main frame.
@@ -37,8 +41,9 @@ public class UIView extends FrameView implements Observer {
         
          //add the view to the list of observers
         container.addObserver(this);
+        previewcontainer.addObserver(this);
 
-        ImageBrowser imagebrowser = new ImageBrowser(container);
+        imagebrowser = new ImageBrowser(container, previewcontainer);
         JScrollPane scrollpane = new JScrollPane(imagebrowser);
         scrollpane.setLayout(new ScrollPaneLayout());
         scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -132,7 +137,10 @@ public class UIView extends FrameView implements Observer {
         preview = new javax.swing.JPanel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
+        openFileMenuItem = new javax.swing.JMenuItem();
+        saveMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
+        WindowsMenu = new javax.swing.JMenu();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
         statusPanel = new javax.swing.JPanel();
@@ -218,12 +226,36 @@ public class UIView extends FrameView implements Observer {
         fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
 
+        openFileMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        openFileMenuItem.setText(resourceMap.getString("openFileMenuItem.text")); // NOI18N
+        openFileMenuItem.setName("openFileMenuItem"); // NOI18N
+        openFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openFileMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(openFileMenuItem);
+
+        saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        saveMenuItem.setText(resourceMap.getString("saveMenuItem.text")); // NOI18N
+        saveMenuItem.setName("saveMenuItem"); // NOI18N
+        saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(saveMenuItem);
+
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(ui.UIApp.class).getContext().getActionMap(UIView.class, this);
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setName("exitMenuItem"); // NOI18N
         fileMenu.add(exitMenuItem);
 
         menuBar.add(fileMenu);
+
+        WindowsMenu.setText(resourceMap.getString("WindowsMenu.text")); // NOI18N
+        WindowsMenu.setName("WindowsMenu"); // NOI18N
+        menuBar.add(WindowsMenu);
 
         helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
         helpMenu.setName("helpMenu"); // NOI18N
@@ -273,14 +305,27 @@ public class UIView extends FrameView implements Observer {
         setMenuBar(menuBar);
         setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void openFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFileMenuItemActionPerformed
+       menuCtrl.openFile(imagebrowser);
+}//GEN-LAST:event_openFileMenuItemActionPerformed
+
+    private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuItemActionPerformed
+        //TODO
+        menuCtrl.saveFile(null);
+    }//GEN-LAST:event_saveMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu WindowsMenu;
     private javax.swing.JPanel browser;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JDesktopPane mdi;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenuItem openFileMenuItem;
     private javax.swing.JPanel preview;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JPanel rightpanel;
+    private javax.swing.JMenuItem saveMenuItem;
     private javax.swing.JScrollPane selections;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
@@ -293,35 +338,63 @@ public class UIView extends FrameView implements Observer {
     private int busyIconIndex = 0;
     private JDialog aboutBox;
     
-    private ImagesContainer container = new ImagesContainer();
+    private ImageFramesContainer container = new ImageFramesContainer();
+    
+    private PreviewContainer previewcontainer = new PreviewContainer();
+    
+    private MenuController menuCtrl = new MenuController();
+    
+    private ImageBrowser imagebrowser;
 
     public void update(Observable arg0, Object arg1) {
-        System.out.println("UIView.update");
         
-        //keep a copy of the components
-        ArrayList<ImageFrame> mdiframes = new ArrayList<ImageFrame>();
+        if(arg0 instanceof PreviewContainer) {
+            if(previewcontainer.getScaledImage() != null) {
+                System.out.println("UIView.update replace preview");
+                
+                BufferedImage img = previewcontainer.getScaledImage();
+                
+                JLabel label = new JLabel();
+                label.setIcon(new ImageIcon(img));
+                
+                preview.add(label);
+                preview.setVisible(true);
+                
+                preview.revalidate();
+            } else {
+                System.out.println("UIView.update remove preview");
+                preview.removeAll();
+            }
+        }
         
-        //remove old frames
-        if(mdi.getComponents().length > 0) {
-            for(int i = 0; i < mdi.getComponents().length;i++) {
-                ImageFrame frame = (ImageFrame)mdi.getComponent(i);
-                if(!container.contains(frame)) {
-                    mdi.remove(frame);
-                } else {
-                    mdiframes.add(frame);
+        
+        if(arg0 instanceof ImageFramesContainer) {
+            //keep a copy of the components
+            ArrayList<ImageFrame> mdiframes = new ArrayList<ImageFrame>();
+
+            //remove old frames
+            if(mdi.getComponents().length > 0) {
+                for(int i = 0; i < mdi.getComponents().length;i++) {
+                    ImageFrame frame = (ImageFrame)mdi.getComponent(i);
+                    if(!container.contains(frame)) {
+                        System.out.println("UIView.update remove frame");
+                        mdi.remove(frame);
+                    } else {
+                        mdiframes.add(frame);
+                    }
                 }
             }
-        }
-        
-        //add new frames
-        for(ImageFrame frame: container.getFrames()) {
-            if(!mdiframes.contains(frame)) {
-                System.out.println("UIView.update add frame");
-                mdi.add(frame);
-                mdi.getDesktopManager().activateFrame(frame);
+
+            //add new frames
+            for(ImageFrame frame: container.getFrames()) {
+                if(!mdiframes.contains(frame)) {
+                    System.out.println("UIView.update add frame");
+                    mdi.add(frame);
+                    mdi.getDesktopManager().activateFrame(frame);
+                }
             }
+
+            mdiframes = null;
         }
-        
-        mdiframes = null;
     }
 }

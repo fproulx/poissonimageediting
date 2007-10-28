@@ -2,8 +2,6 @@ package ui;
 
 import java.awt.Dimension;
 import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
@@ -16,17 +14,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.transitions.Effect;
-import org.jdesktop.animation.transitions.EffectsManager;
-import org.jdesktop.animation.transitions.EffectsManager.TransitionType;
-import org.jdesktop.animation.transitions.ScreenTransition;
-import org.jdesktop.animation.transitions.TransitionTarget;
-import org.jdesktop.animation.transitions.effects.CompositeEffect;
-import org.jdesktop.animation.transitions.effects.Move;
-import org.jdesktop.animation.transitions.effects.Scale;
 import org.jdesktop.tools.io.FileTreeWalk;
 import org.jdesktop.tools.io.FileTreeWalker;
 import org.jdesktop.tools.io.UnixGlobFileFilter;
@@ -77,31 +64,27 @@ import org.jdesktop.tools.io.UnixGlobFileFilter;
  *
  * @author Chet
  */
-public class ImageBrowser extends JComponent implements TransitionTarget, ChangeListener {
-
-    private static final int SLIDER_INCREMENT = 50;
-    int numPictures = 40;
-    JLabel[] label;
-    Animator animator = new Animator(500);
-    ScreenTransition transition = new ScreenTransition(this, this, animator);
+public class ImageBrowser extends JComponent {
+    
     Dimension newSize = new Dimension();
+    
     public static List<ImageHolder> images = new ArrayList<ImageHolder>();
-    static int currentSize = 175;
-    GradientPaint bgGradient = null;
-    int prevHeight = 0;
-    static JSlider slider = new JSlider(1, 8, 1);
-    static int numImages = 0;
+    
+    public static int currentSize = 175;
+    
+    private ImageFramesContainer container;
+    
+    private PreviewContainer preview;
 
     /** Creates a new instance of ImageBrowser */
-    public ImageBrowser(ImagesContainer container) {
+    public ImageBrowser(ImageFramesContainer container, PreviewContainer preview) {
+        this.container = container;
+        this.preview = preview;
+        
         setOpaque(true);
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        animator.setAcceleration(.1f);
-        animator.setDeceleration(.4f);
-
         loadImages();
-        label = new JLabel[images.size()];
 
         // For each image:
         // - set the icon at the current thumbnail size
@@ -111,31 +94,13 @@ public class ImageBrowser extends JComponent implements TransitionTarget, Change
         // instead of using image tricks. In this case, image tricks are
         // just fine. So the custom effect is purely an optimization here.
         for (int i = 0; i < images.size(); ++i) {
-            label[i] = new JLabel();
-            label[i].setIcon(new ImageIcon(images.get(i).getImage(currentSize)));
-
+            JLabel label = new JLabel();
+            label.setIcon(new ImageIcon(images.get(i).getImage(currentSize)));
+            
             //add listener for select image
-            label[i].addMouseListener(new ImageBrowserMouseListener(i, container));
-
-            add(label[i]);
-
-            Effect move = new Move();
-            Effect scale = new Scale();
-            CompositeEffect comp = new CompositeEffect(move);
-            comp.addEffect(scale);
-            comp.setRenderComponent(false);
-            EffectsManager.setEffect(label[i], comp, TransitionType.CHANGING);
-
-            slider.addMouseWheelListener(new MouseWheelListener() {
-
-                public void mouseWheelMoved(MouseWheelEvent e) {
-                    if (e.getWheelRotation() < 0) {
-                        slider.setValue(slider.getValue() + 1);
-                    } else {
-                        slider.setValue(slider.getValue() - 1);
-                    }
-                }
-            });
+            label.addMouseListener(new ImageBrowserMouseListener(images.get(i), container, preview));
+            
+            add(label);
         }
     }
 
@@ -162,7 +127,6 @@ public class ImageBrowser extends JComponent implements TransitionTarget, Change
             walker.walk(new FileTreeWalk() {
 
                 public void walk(File path) {
-                    numImages++;
                     try {
                         BufferedImage image = ImageIO.read(path);
                         images.add(new ImageHolder(image));
@@ -175,108 +139,18 @@ public class ImageBrowser extends JComponent implements TransitionTarget, Change
             System.out.println("Problem loading images: " + e);
         }
     }
+    
+    public void addImage(BufferedImage image) {
+        ImageHolder holder = new ImageHolder(image);
+        
+        JLabel label = new JLabel();
+        label.setIcon(new ImageIcon(holder.getScaledImage()));
 
-    /**
-     * TransitionTarget implementation: The setup for the next screen entails
-     * merely assigning a new icon to each JLabel with the new thumbnail
-     * size
-     */
-    public void setupNextScreen() {
-        for (int i = 0; i < images.size(); ++i) {
-            label[i].setIcon(new ImageIcon(images.get(i).getImage(currentSize)));
-        }
-        // revalidation is necessary for the LayoutManager to do its job
+        //add listener for select image
+        label.addMouseListener(new ImageBrowserMouseListener(holder, container, preview));
+
+        add(label);
+        
         revalidate();
-    }
-
-    /**
-     * This method handles changes in slider state, which can come from either
-     * mouse manipulation of the slider or right/left keyboard events. This
-     * event changes the current thumbnail size and starts the transition.
-     * We will then receive a callback to setupNextScreen() where we set up
-     * the GUI according to this new thumbnail size.
-     */
-    public void stateChanged(ChangeEvent ce) {
-        currentSize = slider.getValue() * 25;
-        if (!transition.getAnimator().isRunning()) {
-            transition.start();
-        }
-    }
-}
-
-/**
- * This is a utility class that holds our images at various scaled
- * sizes. The images are pre-scaled down by halves, using the progressive
- * bilinear technique. Thumbnails from these images are requested
- * from this class, which are created by down-scaling from the next-largest
- * pre-scaled size available.
- */
-class ImageHolder {
-
-    private List<BufferedImage> scaledImages = new ArrayList<BufferedImage>();
-    private static final int MIN_SIZE = 50;
-    private BufferedImage original;
-
-    /**
-     * Given any image, this constructor creates and stores down-scaled
-     * versions of this image down to some MIN_SIZE
-     */
-    ImageHolder(BufferedImage originalImage) {
-        this.original = originalImage;
-
-        int imageW = originalImage.getWidth();
-        int imageH = originalImage.getHeight();
-        scaledImages.add(originalImage);
-        BufferedImage prevImage = originalImage;
-        while (imageW > MIN_SIZE && imageH > MIN_SIZE) {
-            imageW = imageW >> 1;
-            imageH = imageH >> 1;
-            BufferedImage scaledImage = new BufferedImage(imageW, imageH, prevImage.getType());
-            Graphics2D g2d = scaledImage.createGraphics();
-            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2d.drawImage(prevImage, 0, 0, imageW, imageH, null);
-            g2d.dispose();
-            scaledImages.add(scaledImage);
-        }
-    }
-
-    public BufferedImage getOriginal() {
-        return original;
-    }
-
-    /**
-     * This method returns an image with the specified width. It finds
-     * the pre-scaled size with the closest/larger width and scales
-     * down from it, to provide a fast and high-quality scaed version
-     * at the requested size.
-     */
-    BufferedImage getImage(int width) {
-        for (BufferedImage scaledImage : scaledImages) {
-            int scaledW = scaledImage.getWidth();
-            // This is the one to scale from if:
-            // - the requested size is larger than this size
-            // - the requested size is between this size and
-            //   the next size down
-            // - this is the smallest (last) size
-            if (scaledW < width || ((scaledW >> 1) < width) || (scaledW >> 1) < MIN_SIZE) {
-                if (scaledW != width) {
-                    // Create new version scaled to this width
-                    // Set the width at this width, scale the
-                    // height proportional to the image width
-                    float scaleFactor = (float) width / scaledW;
-                    int scaledH = (int) (scaledImage.getHeight() * 
-                            scaleFactor + .5f);
-                    BufferedImage image = new BufferedImage(width, scaledH, scaledImage.getType());
-                    Graphics2D g2d = image.createGraphics();
-                    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                    g2d.drawImage(scaledImage, 0, 0, width, scaledH, null);
-                    g2d.dispose();
-                    scaledImage = image;
-                }
-                return scaledImage;
-            }
-        }
-        // shouldn't get here
-        return null;
     }
 }

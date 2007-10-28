@@ -19,9 +19,12 @@ import javax.swing.event.InternalFrameListener;
 public class ImageFrameEvents implements InternalFrameListener {
 
     private ImageFrame frame;
+    
+    private PreviewContainer preview;
 
-    public ImageFrameEvents(ImageFrame frame) {
+    public ImageFrameEvents(ImageFrame frame, PreviewContainer preview) {
         this.frame = frame;
+        this.preview = preview;
     }
 
     public void internalFrameOpened(InternalFrameEvent arg0) {
@@ -45,10 +48,10 @@ public class ImageFrameEvents implements InternalFrameListener {
     }
 
     public void internalFrameActivated(InternalFrameEvent arg0) {
-        //nothing...
+       preview.update(frame.getImage().getScaledImage());
     }
 
     public void internalFrameDeactivated(InternalFrameEvent arg0) {
-        //nothing...
+       preview.update(null);
     }
 }

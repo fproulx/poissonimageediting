@@ -18,18 +18,18 @@ import java.awt.event.MouseListener;
  */
 public class ImageBrowserMouseListener implements MouseListener {
 
-    private int i;
-    private ImagesContainer container;
+    private ImageHolder image;
+    private ImageFramesContainer container;
+    private PreviewContainer preview;
 
-    public ImageBrowserMouseListener(int i, ImagesContainer container) {
-        this.i = i;
+    public ImageBrowserMouseListener(ImageHolder image, ImageFramesContainer container, PreviewContainer preview) {
+        this.image = image;
         this.container = container;
+        this.preview = preview;
     }
 
     public void mouseClicked(MouseEvent arg0) {
-        System.out.println("mouseClicked " + i);
-
-        ImageFrame img = new ImageFrame("Untitled", ImageBrowser.images.get(i).getOriginal(), container);
+        ImageFrame img = new ImageFrame("Untitled", image, container, preview);
         container.add(img);
     }
 
