@@ -33,7 +33,7 @@ public class PhotomontageTest {
 			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(10, 10));
 			// Do the heavy lifting
 			BufferedImage output = photomontage.createPhotomontage();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
