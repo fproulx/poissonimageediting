@@ -11,39 +11,42 @@ package ui;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
-import ui.ImageBrowser;
 
 /**
- *
- * @author jeanphilippe
+ * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
+ *         <lebel.kim@gmail.com>, Jean-Philippe Plante
+ *         <jphilippeplante@gmail.com>, Francois Proulx
+ *         <francois.proulx@gmail.com>
  */
 public class MenuController {
 
-    public BufferedImage openFile(ImageBrowser browser) {
+	public BufferedImage openFile(ImageBrowser browser) {
 
-        BufferedImage image = null;
+		BufferedImage image = null;
 
-        String filename = File.separator + "Users";
-        JFileChooser fc = new JFileChooser(new File(filename));
+		String filename = File.separator + "Users";
+		JFileChooser fc = new JFileChooser(new File(filename));
 
-        // Show open dialog; this method does not return until the dialog is closed
-        fc.showOpenDialog(null);
+		// Show open dialog; this method does not return until the dialog is
+		// closed
+		fc.showOpenDialog(null);
 
-        try {
-            File file = fc.getSelectedFile();
-            if (file.exists() && file.canRead() && file.isFile()) {
-                image = ImageIO.read(file);
-                browser.addImage(image);
-            }
-        } catch (Exception e) {
-            System.out.println("Problem loading image: " + e);
-        }
+		try {
+			File file = fc.getSelectedFile();
+			if (file.exists() && file.canRead() && file.isFile()) {
+				image = ImageIO.read(file);
+				browser.addImage(image);
+			}
+		} catch (Exception e) {
+			System.out.println("Problem loading image: " + e);
+		}
 
-        return image;
-    }
+		return image;
+	}
 
-    public void saveFile(BufferedImage image) {
-    }
+	public void saveFile(BufferedImage image) {
+	}
 }

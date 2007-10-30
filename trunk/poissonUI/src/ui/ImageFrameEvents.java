@@ -13,45 +13,47 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 /**
- *
- * @author jeanphilippe
+ * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
+ *         <lebel.kim@gmail.com>, Jean-Philippe Plante
+ *         <jphilippeplante@gmail.com>, Francois Proulx
+ *         <francois.proulx@gmail.com>
  */
 public class ImageFrameEvents implements InternalFrameListener {
 
-    private ImageFrame frame;
-    
-    private PreviewContainer preview;
+	private ImageFrame frame;
 
-    public ImageFrameEvents(ImageFrame frame, PreviewContainer preview) {
-        this.frame = frame;
-        this.preview = preview;
-    }
+	private PreviewContainer preview;
 
-    public void internalFrameOpened(InternalFrameEvent arg0) {
-        //nothing...
-    }
+	public ImageFrameEvents(ImageFrame frame, PreviewContainer preview) {
+		this.frame = frame;
+		this.preview = preview;
+	}
 
-    public void internalFrameClosing(InternalFrameEvent arg0) {
-        //TODO ask save
-    }
+	public void internalFrameOpened(InternalFrameEvent arg0) {
+		// nothing...
+	}
 
-    public void internalFrameClosed(InternalFrameEvent arg0) {
-        frame.close();
-    }
+	public void internalFrameClosing(InternalFrameEvent arg0) {
+		// TODO ask save
+	}
 
-    public void internalFrameIconified(InternalFrameEvent arg0) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
+	public void internalFrameClosed(InternalFrameEvent arg0) {
+		frame.close();
+	}
 
-    public void internalFrameDeiconified(InternalFrameEvent arg0) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
+	public void internalFrameIconified(InternalFrameEvent arg0) {
+		throw new UnsupportedOperationException("Not supported.");
+	}
 
-    public void internalFrameActivated(InternalFrameEvent arg0) {
-       preview.update(frame.getImage().getScaledImage());
-    }
+	public void internalFrameDeiconified(InternalFrameEvent arg0) {
+		throw new UnsupportedOperationException("Not supported.");
+	}
 
-    public void internalFrameDeactivated(InternalFrameEvent arg0) {
-       preview.update(null);
-    }
+	public void internalFrameActivated(InternalFrameEvent arg0) {
+		preview.update(frame.getImage().getScaledImage());
+	}
+
+	public void internalFrameDeactivated(InternalFrameEvent arg0) {
+		preview.update(null);
+	}
 }
