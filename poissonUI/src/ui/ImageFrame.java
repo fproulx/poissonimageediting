@@ -10,65 +10,78 @@
 package ui;
 
 import java.awt.image.BufferedImage;
+
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- *
- * @author ag95300
+ * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
+ *         <lebel.kim@gmail.com>, Jean-Philippe Plante
+ *         <jphilippeplante@gmail.com>, Francois Proulx
+ *         <francois.proulx@gmail.com>
  */
 public class ImageFrame extends JInternalFrame {
 
-    private ImageHolder image;
-    private boolean modified = false;
-    private ImageFramesContainer container;
+	/**
+	 * generated serial uid
+	 */
+	private static final long serialVersionUID = -2677920466179585697L;
 
-    public ImageFrame(String title, ImageHolder img, ImageFramesContainer container, PreviewContainer preview) {
-        super(title, true, true, true);
+	private ImageHolder image;
 
-        this.image = img;
-        this.container = container;
+	private boolean modified = false;
 
-        JPanel panel = new JPanel();
-        JLabel label = new JLabel();
+	private ImageFramesContainer container;
 
-        label.setIcon(new ImageIcon(image.getOriginal()));
+	public ImageFrame(String title, ImageHolder img,
+			ImageFramesContainer container, PreviewContainer preview) {
+		super(title, true, true, true);
 
-        panel.add(label);
-        add(panel);
+		this.image = img;
+		this.container = container;
 
-        //TODO add icon
-        setSize(image.getOriginal().getWidth(), image.getOriginal().getHeight());
-        setVisible(true);
-        setAutoscrolls(true);
-        setFocusable(true);
+		JPanel panel = new JPanel();
+		JLabel label = new JLabel();
 
-        requestFocus();
+		label.setIcon(new ImageIcon(image.getOriginal()));
 
-        addInternalFrameListener(new ImageFrameEvents(this,preview));
-        
-        addMouseListener(new ImageMouseEvents());
+		panel.add(label);
+		add(panel);
 
-        addMouseMotionListener(new ImageMouseEvents());
-        
-        System.out.println("ImageFrame.ImageFrame " + image.getOriginal().getWidth() + "x" + image.getOriginal().getHeight());
-    }
+		// TODO add icon
+		setSize(image.getOriginal().getWidth(), image.getOriginal().getHeight());
+		setVisible(true);
+		setAutoscrolls(true);
+		setFocusable(true);
 
-    public boolean isModified() {
-        return modified;
-    }
+		requestFocus();
 
-    public BufferedImage getBufferedImage() {
-        return image.getOriginal();
-    }
-          
-    public ImageHolder getImage() {
-        return image;
-    }
+		addInternalFrameListener(new ImageFrameEvents(this, preview));
 
-    public void close() {
-        container.remove(this);
-    }
+		addMouseListener(new ImageFrameMouseEvents());
+
+		addMouseMotionListener(new ImageFrameMouseEvents());
+
+		System.out.println("ImageFrame.ImageFrame "
+				+ image.getOriginal().getWidth() + "x"
+				+ image.getOriginal().getHeight());
+	}
+
+	public boolean isModified() {
+		return modified;
+	}
+
+	public BufferedImage getBufferedImage() {
+		return image.getOriginal();
+	}
+
+	public ImageHolder getImage() {
+		return image;
+	}
+
+	public void close() {
+		container.remove(this);
+	}
 }
