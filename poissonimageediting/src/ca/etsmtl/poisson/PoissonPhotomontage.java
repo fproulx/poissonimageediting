@@ -1,10 +1,24 @@
 package ca.etsmtl.poisson;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
+import java.util.concurrent.ConcurrentHashMap;
+
+import no.uib.cipr.matrix.DenseVector;
+import no.uib.cipr.matrix.Matrices;
+import no.uib.cipr.matrix.Matrix;
+import no.uib.cipr.matrix.Vector;
+import no.uib.cipr.matrix.sparse.AbstractIterationMonitor;
+import no.uib.cipr.matrix.sparse.BiCG;
+import no.uib.cipr.matrix.sparse.CompRowMatrix;
+import no.uib.cipr.matrix.sparse.IterativeSolver;
+import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
+import no.uib.cipr.matrix.sparse.OutputIterationReporter;
+import ca.etsmtl.poisson.exceptions.ComputationException;
+import ca.etsmtl.poisson.exceptions.MaskTooLargeException;
 
 /**
  * 
@@ -14,6 +28,7 @@ import java.awt.image.BufferedImage;
 public class PoissonPhotomontage {
 	BufferedImage srcImage, maskImage, destImage;
 	Point destPosition;
+	private static final int ITERATIONS = 300;
 	
 	public PoissonPhotomontage(BufferedImage srcImage, BufferedImage maskImage, BufferedImage destImage, Point destPosition) {
 		setSourceImage(srcImage);
@@ -98,17 +113,177 @@ public class PoissonPhotomontage {
 		return divergenceScalarField;
 	}
 	
-	public BufferedImage createPhotomontage() {
+	public BufferedImage createPhotomontage() throws MaskTooLargeException, ComputationException, IterativeSolverNotConvergedException {
 		validateInputImages();
-		
-		//  See http://java.sun.com/docs/books/tutorial/2d/advanced/compositing.html
-		BufferedImage buffer = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_BINARY); // Create a bitmask (0 or 255)
-		Graphics2D g2 = buffer.createGraphics();
-	    g2.setComposite(AlphaComposite.DstOut);
-	    g2.drawImage(null, null, 0, 0);
-	    g2.dispose();
 	    
+	    int wSrc = srcImage.getWidth();
+	    int hSrc = srcImage.getHeight();
+	    
+	    int wDest = destImage.getWidth();
+	    int hDest = destImage.getHeight();
+	    
+	    int wMask = maskImage.getWidth();
+	    int hMask = maskImage.getHeight();
+	
+	    // Make sure that the mask fits in the destination area
+	    if(wSrc < wMask || hSrc < hMask || wDest < wMask || hDest < hMask) {
+	    	throw new MaskTooLargeException();
+	    }
+	    
+	    // Build a mapping between points in the destination image and the computed solutions 
+	    int N = 0;
+	    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
+	    for (int x = 1; x < wDest - 1; x++) {
+			for (int y = 1; y < hDest - 1; y++) {
+				// For each masked pixels
+				//TODO: Insert offset here ?
+				if(maskImage.getRGB(x, y) != 0) {
+					destToSolutionsMap.put(wDest * y + x, N);
+					// On our way, we'll know the number of solutions to compute
+					N++;
+				}
+			}
+	    }
+	    
+	    // Prepare a 3x3 Laplacian kernel for 2D convolution
+	    Kernel laplacian = new Kernel(3, 3, 
+	    		                      new float[] { 0, -1,  0,
+	    		                                   -1,  4, -1,
+	    		                                    0, -1,  0});
+	    // Prepare a 2D Laplacian convolution, don't compute the edges
+	    ConvolveOp laplacianConv = new ConvolveOp(laplacian, ConvolveOp.EDGE_NO_OP, null);
+	    // Compute the divergence of the destination image (i.e. by applying the Laplacian kernel)
+	    BufferedImage destDivergence = laplacianConv.filter(destImage, null);
+	    
+	    // Compute --> Ax = b
+	    
+	    // Prepare a NxN sparse matrix, that will contain the system linear of equations 
+	    Matrix A = new CompRowMatrix(N, N, null);
+	    // Prepare the right hand side vector, that will contain the conditions
+	    Vector b = new DenseVector(A.numColumns());
+	    	    
+	    int solutionRow = 0;
+	    // For each pixel in the cloned image (source image)
+	    for(int x = 0; x < wSrc; x++) {
+	    	for(int y = 0; y < hSrc; y++) {
+	    		if(maskImage.getRGB(x, y) != 0) {
+	    			/*
+	    			 * % the corresponding position in the destination image
+			            yd = y - yoff;
+			            xd = x - xoff; 
+	    			 */
+	    			
+	    			// Check the neighboring pixels
+	    			/*
+	    			if imMask(y-1, x) ~= 0
+		                % this pixel is already used
+		                % get the diagonal position of the pixel
+		                colIndex = imIndex(yd-1, xd);
+		                M(count, colIndex) = -1;
+		            else % at the top boundary
+		                b(count) = b(count) + imDest(yd-1, xd);
+		            end
+		            
+		            % if on the left
+		            if imMask(y, x-1) ~= 0
+		                colIndex = imIndex(yd, xd-1);
+		                M(count, colIndex) = -1;
+		            else % at the left boundary
+		                b(count) = b(count) + imDest(yd, xd-1);
+		            end            
+		            
+		            %------------------------------------------------------
+		            % now the harder case, since this is not allocated
+		            %------------------------------------------------------ 
+		            % if on the bottom            
+		            if imMask(y+1, x) ~= 0
+		                colIndex = imIndex(yd+1, xd);
+		                M(count, colIndex) = -1;
+		            else    % at the bottom boundary
+		                b(count) = b(count) + imDest(yd+1, xd);
+		            end
+		            
+		            % if on the right side
+		            if imMask(y, x+1) ~= 0
+		                colIndex = imIndex(yd, xd+1);
+		                M(count, colIndex) = -1;
+		            else    % at the right boundary
+		                b(count) = b(count) + imDest(yd, xd+1);
+		            end       
+		            
+		            M(count, count) = 4;
+		            
+		            % construct the guidance field	
+		            v = imLaplacian(y, x);
+			
+		            b(count) = b(count)+v;
+	    			*/
+	    			solutionRow++;
+	    		}
+	    	}
+	    }
+	    
+    	// WTF !?
+	    if(solutionRow != N)
+	    	throw new ComputationException();
+	    	 
+	    // Prepare the solution vector, that will contain the value of each computed pixel
+	    Vector x = Matrices.random(N);
+	    
+	    IterativeSolver solver = new BiCG(x);
+	    
+	    // Limit the solver iterations by setting up a custom monitor
+	    solver.setIterationMonitor(new SimpleIterationMonitor(ITERATIONS));
+	    solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
+	    
+	    // Start the solver
+	    long t0 = System.currentTimeMillis();
+	    solver.solve(A, b, x);
+	    long t1 = System.currentTimeMillis();
+
+	    double itps = ITERATIONS / ((t1-t0)/1000.);
+
+	    System.out.println("Iterations per second:\t" + itps);
+	    
+	    /*
+		% reshape x to become the pixel intensity of the region
+		% imRegion = reshape(x, widthRegion, heightRegion);
+		
+		%---------------------------------------------
+		% now fill in the solved values
+		%---------------------------------------------
+		imNew = imDest;
+		
+		fprintf('\nRetriving result, filling destination image\n');
+		tic
+		% now fill in the 
+		for y1 = 1:heightDest
+		    for x1 = 1:widthDest
+		        if imMask(y1+yoff, x1+xoff) ~= 0
+		            index = imIndex(y1, x1);
+		            imNew(y1, x1) = x(index);
+		        end
+		    end
+		end
+	     */
 		return null;
+	}
+	
+	private static class SimpleIterationMonitor extends AbstractIterationMonitor {
+
+		private int max;
+
+		public SimpleIterationMonitor(int max) {
+			this.max = max;
+		}
+
+		protected boolean convergedI(double r, Vector x) throws IterativeSolverNotConvergedException {
+			return convergedI(r);
+		}
+
+		protected boolean convergedI(double r) throws IterativeSolverNotConvergedException {
+			return iter >= max;
+		}
 	}
 
 }
