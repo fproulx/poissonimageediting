@@ -19,9 +19,9 @@ public class PhotomontageMain {
 	 */
 	public static void main(String[] args) {
 		// Paths to all the images
-		String srcImagePath = "";
-		String maskImagePath = "";
-		String destImagePath = "";
+		String srcImagePath = "resources/images/objects/duck.jpg";
+		String maskImagePath = "resources/images/masks/duck.png";
+		String destImagePath = "resources/images/backgrounds/green_lake_with_duck.jpg";
 		
 		try {
 			// Load all the images
