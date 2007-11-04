@@ -11,9 +11,11 @@ package ui;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
@@ -38,15 +40,45 @@ public class MenuController {
 			File file = fc.getSelectedFile();
 			if (file.exists() && file.canRead() && file.isFile()) {
 				image = ImageIO.read(file);
-				browser.addImage(image);
+				browser.addImage(image, file.getCanonicalPath());
 			}
 		} catch (Exception e) {
-			System.out.println("Problem loading image: " + e);
+			JOptionPane.showMessageDialog(null,
+				    "Error while open the image.",
+				    "Error while opening",
+				    JOptionPane.ERROR_MESSAGE);
 		}
 
 		return image;
 	}
 
 	public void saveFile(BufferedImage image) {
+		//create a new file chooser
+		String filename = File.separator + "Users";
+		JFileChooser fc = new JFileChooser(filename);
+		
+		//change dialog type to save
+		fc.setDialogType(JFileChooser.SAVE_DIALOG);
+		fc.setMultiSelectionEnabled(false);
+		fc.setDialogTitle("Untitled");
+
+		
+		int returnVal = fc.showSaveDialog(null);
+
+		try {
+			//if ok save the new image
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File myfile = fc.getSelectedFile();
+				ImageIO.write(image, "jpg", myfile);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+			JOptionPane.showMessageDialog(null,
+				    "Error while saving the new image.",
+				    "Error while saving",
+				    JOptionPane.ERROR_MESSAGE);
+		}
+
 	}
 }

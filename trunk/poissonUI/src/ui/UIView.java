@@ -391,7 +391,7 @@ public class UIView extends FrameView implements Observer {
 	}// GEN-LAST:event_saveMenuItemActionPerformed
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
-	private javax.swing.JMenu WindowsMenu;
+	protected static javax.swing.JMenu WindowsMenu;
 	private javax.swing.JPanel browser;
 	private javax.swing.JPanel mainPanel;
 	private javax.swing.JDesktopPane mdi;
@@ -420,7 +420,7 @@ public class UIView extends FrameView implements Observer {
 	private MenuController menuCtrl = new MenuController();
 
 	private ImageBrowser imagebrowser;
-
+	
 	public void update(Observable arg0, Object arg1) {
 
 		if (arg0 instanceof PreviewContainer) {
@@ -463,6 +463,10 @@ public class UIView extends FrameView implements Observer {
 			for (ImageFrame frame : container.getFrames()) {
 				if (!mdiframes.contains(frame)) {
 					System.out.println("UIView.update add frame");
+					
+					frame.setMenuItem(new WindowItem(frame, mdi));
+					
+					UIView.WindowsMenu.add(frame.getMenuItem());
 					mdi.add(frame);
 					mdi.getDesktopManager().activateFrame(frame);
 				}

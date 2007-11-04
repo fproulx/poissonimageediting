@@ -34,7 +34,7 @@ public class ImageBrowserMouseListener implements MouseListener {
 	}
 
 	public void mouseClicked(MouseEvent arg0) {
-		ImageFrame img = new ImageFrame("Untitled", image, container, preview);
+		ImageFrame img = new ImageFrame(image, container, preview);
 		container.add(img);
 	}
 
