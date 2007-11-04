@@ -70,7 +70,7 @@ public class PoissonPhotomontage {
 	}
 	
 	public boolean validateInputImages() {
-		if(srcImage != null && destImage != null && maskImage != null)
+		if(srcImage == null || destImage == null || maskImage == null)
 			return false;
 		
 		// Make sure that the mask fits in the destination area

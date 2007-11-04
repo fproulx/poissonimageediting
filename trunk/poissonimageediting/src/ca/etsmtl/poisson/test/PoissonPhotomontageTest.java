@@ -3,8 +3,10 @@ package ca.etsmtl.poisson.test;
 
 import static org.junit.Assert.assertTrue;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
@@ -22,6 +24,7 @@ public class PoissonPhotomontageTest {
 	// file references
 	private final String dstImagePath = "validateInput/dst.png";
 	private final String srcSmallImagePath = "validateInput/src-small.png";
+	private final String maskValidImagePath = "validateInput/mask-valid.png";
 	
 	// the class being tested
 	private PoissonPhotomontage poissonPhotomontage;
@@ -36,21 +39,25 @@ public class PoissonPhotomontageTest {
 	}
 	
 	// TODO tested method should be extracted into a class with several methods for each assert of this test method
-	// Frank ton code pue
-	@Test public void validateInputImages() {
+	@Test public void validateInputImages() throws IOException {
 		
 		// Input valid data and expect correct result
 		// imgSrc < imgDst
 		// imgMask == imgSrc
-		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));
 		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
+		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));
+		BufferedImage maskImage = ImageIO.read(new File(testImgPath+maskValidImagePath));
+		Point dstPt = new Point(15,21); // arbitrary values
 		
-		poissonPhotomontage = new PoissonPhotomontage(dstImage,srcSmallImage);
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
 		assertTrue(poissonPhotomontage.validateInputImages()); 
 		
-		// Input a too big source image and expect False
+		// Input a too big source image : expect False
 		
-		// Input a the source image at a destination point that will have the source image go outside destination image and expect false
+		// Destination Point outside of dstImage
+		
+		// Input the source image at a destination point that will have the source image go outside destination image : expect false
+		// FIXME we will have to test this, maybe the poisson editing accept that kind of stuff (will have to be reflected in the algorithm's implementation)
 		
 		// Input a mask that is not only composed of 1 and 0 and expect False
 		
@@ -58,10 +65,6 @@ public class PoissonPhotomontageTest {
 		
 		// Destination image must not have the mask pasted so that a mask value of 1 touches the destination image edges
 		
-		
-		assertTrue(false);
-		
-		assertTrue(true);
 	}
 	
 }
