@@ -11,6 +11,7 @@ package ui;
 
 import java.awt.image.BufferedImage;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -35,9 +36,11 @@ public class ImageFrame extends JInternalFrame {
 
 	private ImageFramesContainer container;
 
-	public ImageFrame(String title, ImageHolder img,
+	private WindowItem menuitem;
+
+	public ImageFrame(ImageHolder img,
 			ImageFramesContainer container, PreviewContainer preview) {
-		super(title, true, true, true);
+		super(img.getFilename(), true, true, true);
 
 		this.image = img;
 		this.container = container;
@@ -45,25 +48,26 @@ public class ImageFrame extends JInternalFrame {
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel();
 
+		//etre sur qu'il y a aucune bordure
+		panel.setBorder(BorderFactory.createEmptyBorder());
+		label.setBorder(BorderFactory.createEmptyBorder());
 		label.setIcon(new ImageIcon(image.getOriginal()));
 
 		panel.add(label);
 		add(panel);
-
-		// TODO add icon
-		setSize(image.getOriginal().getWidth(), image.getOriginal().getHeight());
+		
+		setSize(image.getOriginal().getWidth()+30, image.getOriginal().getHeight()+60);
 		setVisible(true);
 		setAutoscrolls(true);
 		setFocusable(true);
-
+		
 		requestFocus();
 
 		addInternalFrameListener(new ImageFrameEvents(this, preview));
 
-		addMouseListener(new ImageFrameMouseEvents());
-
-		addMouseMotionListener(new ImageFrameMouseEvents());
-
+		label.addMouseListener(new ImageFrameMouseEvents());
+		label.addMouseMotionListener(new ImageFrameMouseEvents());
+		
 		System.out.println("ImageFrame.ImageFrame "
 				+ image.getOriginal().getWidth() + "x"
 				+ image.getOriginal().getHeight());
@@ -82,6 +86,15 @@ public class ImageFrame extends JInternalFrame {
 	}
 
 	public void close() {
+		UIView.WindowsMenu.remove(menuitem);
 		container.remove(this);
+	}
+
+	public WindowItem getMenuItem() {
+		return menuitem;
+	}
+	
+	public void setMenuItem(WindowItem item) {
+		menuitem = item;
 	}
 }

@@ -24,9 +24,12 @@ public class ImageHolder {
 	private BufferedImage scaledImage;
 
 	private BufferedImage original;
+	
+	private String filename = "Untitled";
 
-	public ImageHolder(BufferedImage originalImage) {
+	public ImageHolder(BufferedImage originalImage, String filename) {
 		this.original = originalImage;
+		this.filename = filename;
 		this.scaledImage = getImage(ImageBrowser.currentSize);
 	}
 
@@ -56,5 +59,19 @@ public class ImageHolder {
 		g2d.dispose();
 
 		return img;
+	}
+
+	/**
+	 * @return the filename
+	 */
+	public String getFilename() {
+		return filename;
+	}
+
+	/**
+	 * @param filename the filename to set
+	 */
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 }

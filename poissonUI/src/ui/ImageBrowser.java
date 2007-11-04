@@ -119,7 +119,7 @@ public class ImageBrowser extends JComponent {
 				public void walk(File path) {
 					try {
 						BufferedImage image = ImageIO.read(path);
-						images.add(new ImageHolder(image));
+						images.add(new ImageHolder(image, path.getCanonicalPath()));
 					} catch (Exception e) {
 						System.out.println("Problem loading images: " + e);
 					}
@@ -135,8 +135,8 @@ public class ImageBrowser extends JComponent {
 	 * 
 	 * @param image
 	 */
-	public void addImage(BufferedImage image) {
-		ImageHolder holder = new ImageHolder(image);
+	public void addImage(BufferedImage image, String filename) {
+		ImageHolder holder = new ImageHolder(image, filename);
 
 		JLabel label = new JLabel();
 		label.setIcon(new ImageIcon(holder.getScaledImage()));

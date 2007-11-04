@@ -44,6 +44,7 @@ public class ImageFrameMouseEvents implements MouseListener,
 
 	public void mouseDragged(MouseEvent e) {
 		if (!selection.contains(e.getPoint())) {
+			System.out.println("mouseDragged at " + e.getPoint());
 			selection.add(e.getPoint());
 		}
 	}
