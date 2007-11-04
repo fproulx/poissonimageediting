@@ -69,7 +69,7 @@ public class PoissonPhotomontage {
 		this.destPosition = destPosition;
 	}
 	
-	private boolean validateInputImages() {
+	public boolean validateInputImages() {
 		return false;
 	}
 	
