@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
  * @author fproulx
  *
  */
-public class PhotomontageTest {
+public class PhotomontageMain {
 
 	/**
 	 * @param args
