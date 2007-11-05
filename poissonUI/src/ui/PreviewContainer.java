@@ -30,6 +30,11 @@ public class PreviewContainer extends Observable {
 		return scaledImage;
 	}
 
+	/**
+	 * Met à jour la composante qui contient le "preview"
+	 * 
+	 * @param scaledImage est l'image "resizé"
+	 */
 	public void update(BufferedImage scaledImage) {
 		System.out.println("PreviewContainer.update");
 

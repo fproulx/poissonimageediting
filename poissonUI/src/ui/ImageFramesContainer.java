@@ -15,31 +15,49 @@ import java.util.Observable;
 
 /**
  * 
- * @author ag95300
+ * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
+ *         <lebel.kim@gmail.com>, Jean-Philippe Plante
+ *         <jphilippeplante@gmail.com>, Francois Proulx
+ *         <francois.proulx@gmail.com>
  */
 public class ImageFramesContainer extends Observable {
 
 	private List<ImageFrame> imageFrames = new ArrayList<ImageFrame>();
 
-	public void add(ImageFrame img) {
-		System.out.println("ImagesContainer.add");
-
+	/**
+	 * Ajoute un imageframe dans la liste
+	 * @param frame est un imageframe
+	 */
+	public void add(ImageFrame frame) {
 		// add it and notify the observers
-		if (!contains(img) && img != null) {
-			imageFrames.add(img);
+		if (!contains(frame) && frame != null) {
+			imageFrames.add(frame);
+			
+			//notify observers
 			setChanged();
 			notifyObservers(imageFrames);
 		}
 	}
 
+	/**
+	 * Enleve un imageframe dans la liste
+	 * @param frame est un imageframe
+	 */
 	public void remove(ImageFrame frame) {
 		if (imageFrames.contains(frame) && frame != null) {
 			imageFrames.remove(frame);
+			
+			//notify observers
 			setChanged();
 			notifyObservers(imageFrames);
 		}
 	}
 
+	/**
+	 * Vérifie si le frame est contenu dans la liste
+	 * @param frame
+	 * @return si la fenetre de l'image est dans la liste
+	 */
 	public boolean contains(ImageFrame frame) {
 		// check if its in the imageframe list
 		for (ImageFrame myframe : imageFrames) {
@@ -50,6 +68,10 @@ public class ImageFramesContainer extends Observable {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @return la liste des frames
+	 */
 	public List<ImageFrame> getFrames() {
 		return imageFrames;
 	}

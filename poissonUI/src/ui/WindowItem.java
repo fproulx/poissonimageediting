@@ -14,6 +14,11 @@ public class WindowItem extends JMenuItem {
 	
 	private JDesktopPane mdi;
 	
+	/**
+	 * Constructeur
+	 * @param imageframe est l'image
+	 * @param mdi est la composante qui contient le desktop manager 
+	 */
 	public WindowItem(ImageFrame imageframe, JDesktopPane mdi) {
 		super();
 		
@@ -28,10 +33,11 @@ public class WindowItem extends JMenuItem {
 		});
 	}
 	
+	/**
+	 * Changer le focus sur l'image
+	 */
 	protected void changeWindow() {
 		imageframe.requestFocus();		
-		mdi.getDesktopManager().activateFrame(imageframe);		
-		
-		System.out.println("request focus");
+		mdi.getDesktopManager().activateFrame(imageframe);
 	}
 }

@@ -33,10 +33,18 @@ public class ImageHolder {
 		this.scaledImage = getImage(ImageBrowser.currentSize);
 	}
 
+	/**
+	 * 
+	 * @return l'image resizé
+	 */
 	public BufferedImage getScaledImage() {
 		return scaledImage;
 	}
 
+	/**
+	 * 
+	 * @return l'image original
+	 */
 	public BufferedImage getOriginal() {
 		return original;
 	}
