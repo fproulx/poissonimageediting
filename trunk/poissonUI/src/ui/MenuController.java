@@ -25,6 +25,12 @@ import javax.swing.JOptionPane;
  */
 public class MenuController {
 
+	/**
+	 * Ouverture d'une image
+	 * 
+	 * @param browser est le conteneur d'images pour l'ajouter
+	 * @return l'image ouverte
+	 */
 	public BufferedImage openFile(ImageBrowser browser) {
 
 		BufferedImage image = null;
@@ -52,6 +58,11 @@ public class MenuController {
 		return image;
 	}
 
+	/**
+	 * Sauvegarde de l'image sur le disque
+	 * 
+	 * @param image a sauvegardé sur le disque
+	 */
 	public void saveFile(BufferedImage image) {
 		//create a new file chooser
 		String filename = File.separator + "Users";
