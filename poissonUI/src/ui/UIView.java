@@ -191,10 +191,10 @@ public class UIView extends FrameView implements Observer {
 				preview);
 		preview.setLayout(previewLayout);
 		previewLayout.setHorizontalGroup(previewLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 186,
+				org.jdesktop.layout.GroupLayout.LEADING).add(0, 180,
 				Short.MAX_VALUE));
 		previewLayout.setVerticalGroup(previewLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 108,
+				org.jdesktop.layout.GroupLayout.LEADING).add(0, 160,
 				Short.MAX_VALUE));
 
 		org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(
@@ -385,7 +385,9 @@ public class UIView extends FrameView implements Observer {
 
 	private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveMenuItemActionPerformed
 		// TODO
-		menuCtrl.saveFile(null);
+		if(mdi.getSelectedFrame() != null) {
+			menuCtrl.saveFile(null);
+		}		
 	}// GEN-LAST:event_saveMenuItemActionPerformed
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
