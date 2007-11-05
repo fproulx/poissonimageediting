@@ -24,7 +24,10 @@ public class PoissonPhotomontageTest {
 	// file references
 	private final String dstImagePath = "validateInput/dst.png";
 	private final String srcSmallImagePath = "validateInput/src-small.png";
+	private final String srcBigImagePath = "validateInput/src-toobig.png";
 	private final String maskValidImagePath = "validateInput/mask-valid.png";
+	private final String maskInvalidImagePath = "validateInput/mask-invalid.png";
+	private final String maskFullImagePath = "validateInput/mask-full.png";
 	
 	// the class being tested
 	private PoissonPhotomontage poissonPhotomontage;
@@ -47,24 +50,48 @@ public class PoissonPhotomontageTest {
 		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
 		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));
 		BufferedImage maskImage = ImageIO.read(new File(testImgPath+maskValidImagePath));
-		Point dstPt = new Point(15,21); // arbitrary values
+		Point dstPt = new Point(15,21); // arbitrary valid values
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
 		assertTrue(poissonPhotomontage.validateInputImages()); 
 		
 		// Input a too big source image : expect False
+		BufferedImage srcTooBigImage = ImageIO.read(new File(testImgPath+srcBigImagePath));
 		
-		// Destination Point outside of dstImage
+		poissonPhotomontage = new PoissonPhotomontage(srcTooBigImage,maskImage,dstImage,dstPt);
+		//assertTrue(!poissonPhotomontage.validateInputImages());
+		
+		// Destination Point outside of dstImage : expect False
+		dstPt = new Point(300,150);
+		
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
+		//assertTrue(!poissonPhotomontage.validateInputImages());
 		
 		// Input the source image at a destination point that will have the source image go outside destination image : expect false
 		// FIXME we will have to test this, maybe the poisson editing accept that kind of stuff (will have to be reflected in the algorithm's implementation)
+		// Make sure you blow the dstImage size
+		// test  + src < max dst
+		// testx + 128 < 286
+		// testy + 100 < 218
+		// This point should blow up dstImage
+		dstPt = new Point(120,150);
 		
-		// Input a mask that is not only composed of 1 and 0 and expect False
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
+		//assertTrue(!poissonPhotomontage.validateInputImages());
 		
-		// Input a source image and a mask of different size and expect False
+		// Input a source image and a mask of different size : expect False
+		BufferedImage invalidMaskImage = ImageIO.read(new File(testImgPath+maskInvalidImagePath));
+		dstPt = new Point(15,21); // arbitrary valid values
+		
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,invalidMaskImage,dstImage,dstPt);
+		//assertTrue(!poissonPhotomontage.validateInputImages());
 		
 		// Destination image must not have the mask pasted so that a mask value of 1 touches the destination image edges
+		BufferedImage fullMaskImage = ImageIO.read(new File(testImgPath+maskFullImagePath));
+		dstPt = new Point(0,0); // paste full mask on 0,0
 		
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,fullMaskImage,dstImage,dstPt);
+		assertTrue(!poissonPhotomontage.validateInputImages());
 	}
 	
 }
