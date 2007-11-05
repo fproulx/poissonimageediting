@@ -1,4 +1,4 @@
-package ca.etsmtl.poisson.test;
+package ca.etsmtl.poisson;
 
 
 import static org.junit.Assert.assertTrue;
@@ -19,7 +19,7 @@ import ca.etsmtl.poisson.PoissonPhotomontage;
 public class PoissonPhotomontageTest {
 	
 	// top-level path
-	private final String testImgPath = "resources/images/tests/"; 	
+	private final String testImgPath = "resources/images/tests/";
 
 	// file references
 	private final String dstImagePath = "validateInput/dst.png";

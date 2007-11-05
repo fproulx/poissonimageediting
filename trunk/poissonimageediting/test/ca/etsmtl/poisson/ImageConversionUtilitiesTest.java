@@ -1,4 +1,4 @@
-package ca.etsmtl.poisson.test;
+package ca.etsmtl.poisson;
 
 
 import static org.junit.Assert.*;
