@@ -83,6 +83,19 @@ public class PoissonPhotomontage {
 		return true;
 	}
 	
+	public boolean validateDestinationPosition() {
+		// Make sure that the specified destination offset fits
+		// the solver requirements and is inside the destination image.
+		if(destPosition == null || 
+		   destPosition.x == 0 ||
+		   destPosition.y == 0 ||
+		   destPosition.x >= destImage.getWidth() -1 ||
+		   destPosition.y >= destImage.getHeight() -1)
+			return false;
+		
+		return true;
+	}
+	
 	public ComputationImage<VectorPixel> computeGradientVectorField(ComputationImage<FloatPixel> img) {
 		int w = img.getWidth();
 		int h = img.getHeight();
