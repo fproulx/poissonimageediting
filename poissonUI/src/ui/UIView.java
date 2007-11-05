@@ -13,10 +13,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.Timer;
@@ -184,19 +182,19 @@ public class UIView extends FrameView implements Observer {
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(ui.UIApp.class).getContext().getResourceMap(
 						UIView.class);
-		preview.setBorder(javax.swing.BorderFactory
-				.createTitledBorder(resourceMap
-						.getString("preview.border.title"))); // NOI18N
+		//preview.setBorder(javax.swing.BorderFactory
+		//		.createTitledBorder(resourceMap
+		//				.getString("preview.border.title"))); // NOI18N
 		preview.setName("preview"); // NOI18N
 
 		org.jdesktop.layout.GroupLayout previewLayout = new org.jdesktop.layout.GroupLayout(
 				preview);
 		preview.setLayout(previewLayout);
 		previewLayout.setHorizontalGroup(previewLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 184,
+				org.jdesktop.layout.GroupLayout.LEADING).add(0, 186,
 				Short.MAX_VALUE));
 		previewLayout.setVerticalGroup(previewLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 107,
+				org.jdesktop.layout.GroupLayout.LEADING).add(0, 108,
 				Short.MAX_VALUE));
 
 		org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(
@@ -424,22 +422,15 @@ public class UIView extends FrameView implements Observer {
 	public void update(Observable arg0, Object arg1) {
 
 		if (arg0 instanceof PreviewContainer) {
-			if (previewcontainer.getScaledImage() != null) {
+			BufferedImage img = previewcontainer.getScaledImage();
+			
+			//clean old preview
+			preview.getGraphics().clearRect(0, 0, preview.getWidth(), preview.getHeight());
+			
+			if(img != null) {
 				System.out.println("UIView.update replace preview");
-
-				BufferedImage img = previewcontainer.getScaledImage();
-
-				JLabel label = new JLabel();
-				label.setIcon(new ImageIcon(img));
-
-				preview.add(label);
-				preview.setVisible(true);
-
-				preview.revalidate();
-			} else {
-				System.out.println("UIView.update remove preview");
-				preview.removeAll();
-			}
+				preview.getGraphics().drawImage(img,0,0,null);
+			} 			
 		}
 
 		if (arg0 instanceof ImageFramesContainer) {
