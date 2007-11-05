@@ -59,13 +59,13 @@ public class PoissonPhotomontageTest {
 		BufferedImage srcTooBigImage = ImageIO.read(new File(testImgPath+srcBigImagePath));
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcTooBigImage,maskImage,dstImage,dstPt);
-		//assertTrue(!poissonPhotomontage.validateInputImages());
+		assertTrue(!poissonPhotomontage.validateInputImages());
 		
 		// Destination Point outside of dstImage : expect False
 		dstPt = new Point(300,150);
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
-		//assertTrue(!poissonPhotomontage.validateInputImages());
+		assertTrue(!poissonPhotomontage.validateInputImages());
 		
 		// Input the source image at a destination point that will have the source image go outside destination image : expect false
 		// FIXME we will have to test this, maybe the poisson editing accept that kind of stuff (will have to be reflected in the algorithm's implementation)
@@ -77,14 +77,14 @@ public class PoissonPhotomontageTest {
 		dstPt = new Point(120,150);
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
-		//assertTrue(!poissonPhotomontage.validateInputImages());
+		assertTrue(!poissonPhotomontage.validateInputImages());
 		
 		// Input a source image and a mask of different size : expect False
 		BufferedImage invalidMaskImage = ImageIO.read(new File(testImgPath+maskInvalidImagePath));
 		dstPt = new Point(15,21); // arbitrary valid values
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,invalidMaskImage,dstImage,dstPt);
-		//assertTrue(!poissonPhotomontage.validateInputImages());
+		assertTrue(!poissonPhotomontage.validateInputImages());
 		
 		// Destination image must not have the mask pasted so that a mask value of 1 touches the destination image edges
 		BufferedImage fullMaskImage = ImageIO.read(new File(testImgPath+maskFullImagePath));
