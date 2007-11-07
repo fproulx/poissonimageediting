@@ -151,11 +151,10 @@ public class PoissonPhotomontage {
 		    // Build a mapping between points in the destination image and the computed solutions 
 		    int N = 0;
 		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
-		    for (int x = 1; x < wDest - 1; x++) {
-				for (int y = 1; y < hDest - 1; y++) {
-					// For each masked pixels
-					//TODO: Insert offset here ?
-					if(maskImage.getRGB(x, y) != 0) {
+		    for (int x = destPosition.x; x < destPosition.x + wMask; x++) {
+				for (int y = destPosition.y; y < destPosition.y + hMask; y++) {
+					// For each masked pixels over the offset position
+					if(maskImage.getRGB(x - destPosition.x, y - destPosition.y) != 0) {
 						destToSolutionsMap.put(wDest * y + x, N);
 						// On our way, we'll know the number of solutions to compute
 						N++;
@@ -171,14 +170,16 @@ public class PoissonPhotomontage {
 		    // Prepare a 2D Laplacian convolution, don't compute the edges
 		    ConvolveOp laplacianConv = new ConvolveOp(laplacian, ConvolveOp.EDGE_NO_OP, null);
 		    // Compute the divergence of the destination image (i.e. by applying the Laplacian kernel)
-		    BufferedImage destDivergence = laplacianConv.filter(destImage, null);
+		    BufferedImage destDivergence = new BufferedImage(destImage.getWidth(), destImage.getHeight(), destImage.getType());
+		    laplacianConv.filter(destImage, destDivergence);
 		    
+		    //TODO: Continue.
+		    new MatrixVectorWriter();
 		    // Compute --> Ax = b
 		    
-		    // Prepare a NxN sparse matrix, that will contain the system linear of equations 
-		    Matrix A = new CompRowMatrix(N, N, null);
+		    
 		    // Prepare the right hand side vector, that will contain the conditions
-		    Vector b = new DenseVector(A.numColumns());
+		    Vector b = new DenseVector(N);
 		    	    
 		    int solutionRow = 0;
 		    // For each pixel in the cloned image (source image)
@@ -244,6 +245,9 @@ public class PoissonPhotomontage {
 	    	// WTF !?
 		    if(solutionRow != N)
 		    	throw new ComputationException();
+		    
+		    // Prepare a NxN sparse matrix, that will contain the system linear of equations 
+		    Matrix A = new CompRowMatrix(new MatrixVectorReader(new BufferedReader()));
 		    	 
 		    // Prepare the solution vector, that will contain the value of each computed pixel
 		    Vector x = Matrices.random(N);
