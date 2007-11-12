@@ -78,12 +78,37 @@ public class PoissonPhotomontageTest {
 		assertTrue(!poissonPhotomontage.validateDestinationPosition());
 	}
 	
-	// TODO tested method should be extracted into a class with several methods for each assert of this test method
+	@Test public void validateMask() throws IOException {
+		
+		// Input a source image and a mask of different size : expect False
+		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
+		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));
+		BufferedImage invalidMaskImage = ImageIO.read(new File(testImgPath+maskInvalidImagePath));
+		Point dstPt = new Point(15,21); // arbitrary valid values
+		
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,invalidMaskImage,dstImage,dstPt);
+		assertTrue(!poissonPhotomontage.validateMask());
+		
+		// Destination image must not have the mask pasted so that a mask value of 1 touches the destination image edges
+		BufferedImage fullMaskImage = ImageIO.read(new File(testImgPath+maskFullImagePath));
+		dstPt = new Point(0,0); // paste full mask on 0,0
+		
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,fullMaskImage,dstImage,dstPt);
+		assertTrue(!poissonPhotomontage.validateMask());
+		
+		// Send in a valid mask : expect True
+		BufferedImage maskImage = ImageIO.read(new File(testImgPath+maskValidImagePath));
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
+		assertTrue(poissonPhotomontage.validateMask());
+
+	}
+	
 	@Test public void validateInputImages() throws IOException {
 		
 		// Input valid data and expect correct result
 		// imgSrc < imgDst
 		// imgMask == imgSrc
+		// dst point inside target image
 		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
 		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));
 		BufferedImage maskImage = ImageIO.read(new File(testImgPath+maskValidImagePath));
@@ -91,20 +116,6 @@ public class PoissonPhotomontageTest {
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
 		assertTrue(poissonPhotomontage.validateInputImages()); 
-		
-		// Input a source image and a mask of different size : expect False
-		BufferedImage invalidMaskImage = ImageIO.read(new File(testImgPath+maskInvalidImagePath));
-		dstPt = new Point(15,21); // arbitrary valid values
-		
-		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,invalidMaskImage,dstImage,dstPt);
-		assertTrue(!poissonPhotomontage.validateInputImages());
-		
-		// Destination image must not have the mask pasted so that a mask value of 1 touches the destination image edges
-		BufferedImage fullMaskImage = ImageIO.read(new File(testImgPath+maskFullImagePath));
-		dstPt = new Point(0,0); // paste full mask on 0,0
-		
-		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,fullMaskImage,dstImage,dstPt);
-		assertTrue(!poissonPhotomontage.validateInputImages());
 	}
 	
 }
