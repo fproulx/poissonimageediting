@@ -178,7 +178,7 @@ public class UIView extends FrameView implements Observer {
 
 		selections.setFocusable(false);
 		selections.setName("selections"); // NOI18N
-
+		
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(ui.UIApp.class).getContext().getResourceMap(
 						UIView.class);
@@ -401,7 +401,7 @@ public class UIView extends FrameView implements Observer {
 	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JPanel rightpanel;
 	private javax.swing.JMenuItem saveMenuItem;
-	private javax.swing.JScrollPane selections;
+	public static javax.swing.JScrollPane selections;
 	private javax.swing.JLabel statusAnimationLabel;
 	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;
