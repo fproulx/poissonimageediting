@@ -70,51 +70,96 @@ public class PoissonPhotomontage {
 	}
 	
 	public boolean validateInputImages() {
-		if(srcImage == null || destImage == null || maskImage == null)
+		
+		boolean isValid;
+		
+		isValid = validateSourceImageSize();
+		isValid = validateDestinationPosition();
+		isValid = validateMask();
+		
+		return isValid;
+	}
+	
+	/**
+	 * Validate mask
+	 * @return true: valid false: invalid
+	 */
+	public boolean validateMask() {
+		if (maskImage == null || destImage == null)
 			return false;
 		
-		//TODO < should be <>
 		// Make sure that the mask fits in the destination area
-	    if(srcImage.getWidth() < maskImage.getWidth() || 
-	       srcImage.getHeight() < maskImage.getHeight() || 
-	       destImage.getWidth() < maskImage.getWidth() || 
-	       destImage.getHeight() < maskImage.getHeight())
+	    if(destImage.getWidth() < maskImage.getWidth() || 
+	 	   destImage.getHeight() < maskImage.getHeight())
 	    	return false;
 	    
-		return true;
+		// Input a source image and a mask of different size
+	    if(srcImage.getWidth() != maskImage.getWidth() ||
+	       srcImage.getHeight() != maskImage.getHeight())
+	    	return false;
+	    
+		// Destination image must not have the mask pasted so that a mask value of 0 touches the destination image edges
+	    // verify for non-zeros values on top and bottom edges 
+	    for(int x=0; x<maskImage.getWidth()-1; x++) {
+	    	// Alpha 255 Red 0 Green 0 Blue 0 => 0xFF000000
+	    	if (maskImage.getRGB(x, 0) != 0xFF000000 ||
+	    		maskImage.getRGB(x, maskImage.getHeight()-1) != 0xFF000000)
+	    		return false;
+	    }
+	    	
+	    // verify for non-zeros values on left and right edges 
+    	for(int y=0; y<maskImage.getHeight()-1; y++) {
+	    	// Alpha 255 Red 0 Green 0 Blue 0 => 0xFF000000
+    		if (maskImage.getRGB(0, y) != 0xFF000000 ||
+		    	maskImage.getRGB(maskImage.getWidth()-1, y) != 0xFF000000)
+		    		return false;
+    	}
+	    
+	    return true;
 	}
 	
 	/**
 	 * Validate Source Image correctness
-	 * @return
+	 * @return true: valid false: invalid
 	 */
 	public boolean validateSourceImageSize() {
+		
+		if (srcImage == null)
+			return false;
 
 		// Source must be smaller or equal than the destination image
-		if (srcImage.getWidth() <= destImage.getWidth() &&
-			srcImage.getHeight() <= destImage.getHeight()) {
-			return true;
+		if (srcImage.getWidth() > destImage.getWidth() ||
+			srcImage.getHeight() > destImage.getHeight()) {
+			return false;
 		}
-		return false;
+		
+		return true;
 	}
 	
+	/**
+	 * Validate validation points
+	 * @return true: valid false: invalid
+	 */
 	public boolean validateDestinationPosition() {
+		
+		if (destPosition == null)
+			return false;
 		
 		// Make sure that the specified destination offset fits
 		// the solver requirements and is inside the destination image.
-		if(destPosition != null && 
-		   destPosition.x >= 0 &&
-		   destPosition.y >= 0 &&
-		   destPosition.x <= destImage.getWidth() -1 &&
-		   destPosition.y <= destImage.getHeight() -1) {
+		if(destPosition == null || 
+		   destPosition.x >= 0 ||
+		   destPosition.y >= 0 ||
+		   destPosition.x <= destImage.getWidth() -1 ||
+		   destPosition.y <= destImage.getHeight() -1)
+			return false;
 		
-			// Destination Point + Source image must not be taller than Destination Image
-			if ((destPosition.x + srcImage.getWidth())  <= destImage.getWidth() &&
-				(destPosition.y + srcImage.getHeight()) <= destImage.getHeight())
-				return true;
-		}
+		// Destination Point + Source image must not be taller than Destination Image
+		if ((destPosition.x + srcImage.getWidth())  > destImage.getWidth() ||
+			(destPosition.y + srcImage.getHeight()) > destImage.getHeight())
+			return false;
 		
-		return false;
+		return true;
 	}
 	
 	public ComputationImage<VectorPixel> computeGradientVectorField(ComputationImage<FloatPixel> img) {
