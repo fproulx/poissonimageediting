@@ -6,6 +6,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Stack;
 
+import javax.swing.JComponent;
+import javax.swing.TransferHandler;
+
 /**
  * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
@@ -22,6 +25,9 @@ public class ImageFrameMouseEvents implements MouseListener,
 	public void mouseClicked(MouseEvent e) {
 		System.out.println("Mouse clicked (# of clicks: " + e.getClickCount()
 				+ ")");
+		
+		//TODO clean image et points selectionner
+		//selection.clear();
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -36,6 +42,13 @@ public class ImageFrameMouseEvents implements MouseListener,
 		System.out.println("Mouse pressed; # of clicks: " + e.getClickCount());
 		selection.add(e.getPoint());
 		System.out.println("Pressed" + e.getPoint());
+		
+		//TODO
+		//if(!selection.isEmpty()) {
+			JComponent c = (JComponent)e.getSource();
+	        TransferHandler handler = c.getTransferHandler();
+	        handler.exportAsDrag(c, e, TransferHandler.COPY);
+		//}
 	}
 
 	public void mouseReleased(MouseEvent e) {

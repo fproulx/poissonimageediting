@@ -9,6 +9,7 @@
 
 package ui;
 
+import java.awt.dnd.DropTarget;
 import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
@@ -16,6 +17,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import ui.dnd.ImageSelectionDrop;
+import ui.dnd.ImageSelectionHandler;
 
 /**
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
@@ -63,14 +67,16 @@ public class ImageFrame extends JInternalFrame {
 		
 		requestFocus();
 
-		addInternalFrameListener(new ImageFrameEvents(this, preview));
-
-		label.addMouseListener(new ImageFrameMouseEvents());
-		label.addMouseMotionListener(new ImageFrameMouseEvents());
+		ImageFrameEvents ife = new ImageFrameEvents(this, preview);
+		ImageFrameMouseEvents ifme = new ImageFrameMouseEvents();
+		ImageSelectionDrop isd = new ImageSelectionDrop();
 		
-		System.out.println("ImageFrame.ImageFrame "
-				+ image.getOriginal().getWidth() + "x"
-				+ image.getOriginal().getHeight());
+		
+		addInternalFrameListener(ife);
+		label.addMouseListener(ifme);		
+		label.addMouseMotionListener(ifme);		
+		label.setTransferHandler(new ImageSelectionHandler("icon",ifme));
+		label.setDropTarget(new DropTarget(UIView.selections,isd));	
 	}
 
 	public boolean isModified() {
