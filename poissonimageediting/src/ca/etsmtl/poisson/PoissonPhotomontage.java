@@ -1,19 +1,12 @@
 package ca.etsmtl.poisson;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -34,6 +27,8 @@ import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 import no.uib.cipr.matrix.sparse.OutputIterationReporter;
 import ca.etsmtl.poisson.exceptions.ComputationException;
+
+import com.Ostermiller.util.CircularByteBuffer;
 
 /**
  * 
@@ -356,81 +351,62 @@ public class PoissonPhotomontage {
 		    	i++;
 		    }
 		    
-		    // Prepare to dump matrix data in the row compressed format
-		    ByteArrayOutputStream rawMatrixOutput = new ByteArrayOutputStream();
-		    BufferedOutputStream rawMatrixOutputBuffer = new BufferedOutputStream(rawMatrixOutput);
-		    MatrixVectorWriter matrixWriter = new MatrixVectorWriter(rawMatrixOutputBuffer);
-		    /*MatrixVectorWriter matrixWriter = null;
-			try {
-				matrixWriter = new MatrixVectorWriter(new BufferedWriter(new FileWriter("foo.out")));
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}*/
+		    // Prepare a circular byte buffer that will contain the data in memory
+		    CircularByteBuffer rawMatrixByteBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+		    
 		    // Write the metadata and actual data
+		    MatrixVectorWriter matrixWriter = new MatrixVectorWriter(rawMatrixByteBuffer.getOutputStream());
 		    matrixWriter.printMatrixInfo(new MatrixInfo(true, MatrixInfo.MatrixField.Integer, MatrixInfo.MatrixSymmetry.General));
 		    matrixWriter.printMatrixSize(new MatrixSize(N, N, matrixDataList.size()));
 		    matrixWriter.printCoordinate(rowsArray, colsArray, valuesArray, 1);
-		    
-		    byte[] rawByteArray = rawMatrixOutput.toByteArray();
 		    matrixWriter.close();
-		    //System.exit(0);
-		    // Prepare to read the raw data from the compressed format
-		    ByteArrayInputStream rawMatrixInput = new ByteArrayInputStream(rawByteArray);
-		    BufferedReader rawMatrixReader = new BufferedReader(new InputStreamReader(rawMatrixInput));
 		    
-		    /*
-		    rawMatrixReader = null;
-			try {
-				rawMatrixReader = new BufferedReader(new FileReader(new File("foo.out")));
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}*/
+		    // Prepare to read the raw data from the compressed format
+		    BufferedReader rawMatrixReader = new BufferedReader(new InputStreamReader(rawMatrixByteBuffer.getInputStream()));
 		    
 			try {
 				// Prepare a NxN sparse matrix, that will contain the system linear of equations
 				Matrix A = new CompRowMatrix(new MatrixVectorReader(rawMatrixReader));
 				
 				// Prepare the solution vector, that will contain the value of each computed pixel
-			    Vector x = Matrices.random(N);
+			    Vector solutionsVector = Matrices.random(N);
 			    
 			    // Run a Bi-Conjugate iterative solver to compute Ax = b
-			    IterativeSolver solver = new BiCG(x);
+			    IterativeSolver solver = new BiCG(solutionsVector);
 			    
 			    // Limit the solver iterations by setting up a custom monitor
 			    solver.setIterationMonitor(new SimpleIterationMonitor(ITERATIONS));
 			    solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
 			    
-			    System.exit(0);
 			    // Start the solver
 			    long t0 = System.currentTimeMillis();
-			    solver.solve(A, b, x);
+			    solver.solve(A, b, solutionsVector);
 			    long t1 = System.currentTimeMillis();
 
 			    double itps = ITERATIONS / ((t1-t0)/1000.);
 
 			    System.out.println("Iterations per second:\t" + itps);
-			    
-			    /*
-				%---------------------------------------------
-				% now fill in the solved values
-				%---------------------------------------------
-				imNew = imDest;
-				
-				fprintf('\nRetriving result, filling destination image\n');
-				tic
-				% now fill in the 
-				for y1 = 1:heightDest
-				    for x1 = 1:widthDest
-				        if imMask(y1+yoff, x1+xoff) ~= 0
-				            index = imIndex(y1, x1);
-				            imNew(y1, x1) = x(index);
-				        end
-				    end
-				end
-			     */
-				return null;
+
+				// Copy the destination into the montage (the background)
+				BufferedImage finalImage = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g2d = (Graphics2D) finalImage.getGraphics();
+				g2d.drawImage(destImage, 0, 0, null);
+
+				// For each pixel in the cloned image (source image)
+				for (int x = 1; x < wSrc - 1; x++) {
+					for (int y = 1; y < hSrc - 1; y++) {
+						if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
+							// Move to the corresponding position in the
+							// destination image
+							int xDest = x + xOffset;
+							int yDest = y + yOffset;
+							
+							finalImage.setRGB(xDest, yDest, (int) Math.round(solutionsVector.get(destToSolutionsMap.get(wDest * yDest + xDest))));
+						}
+					}
+				}
+
+				return finalImage;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
