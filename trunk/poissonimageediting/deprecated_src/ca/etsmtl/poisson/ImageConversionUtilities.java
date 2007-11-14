@@ -1,5 +1,6 @@
 package ca.etsmtl.poisson;
 
+
 import java.awt.image.BufferedImage;
 
 /**
