@@ -10,11 +10,14 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ca.etsmtl.poisson.PoissonPhotomontage;
+import ca.etsmtl.poisson.exceptions.ComputationException;
 
 public class PoissonPhotomontageTest {
 	
@@ -116,6 +119,18 @@ public class PoissonPhotomontageTest {
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
 		assertTrue(poissonPhotomontage.validateInputImages()); 
+	}
+	
+	@Test public void createPhotoMontage() throws IOException, ComputationException, IterativeSolverNotConvergedException {
+		
+		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
+		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));
+		BufferedImage maskImage = ImageIO.read(new File(testImgPath+maskValidImagePath));
+		Point dstPt = new Point(15,21); // arbitrary valid values
+		
+		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
+		//TODO: Create assertEquals --> supporting BufferedImage comparison
+		Assert.assertNotNull(poissonPhotomontage.createPhotomontage());
 	}
 	
 }

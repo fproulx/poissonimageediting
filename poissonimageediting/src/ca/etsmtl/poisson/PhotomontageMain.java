@@ -3,7 +3,6 @@ package ca.etsmtl.poisson;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
@@ -18,16 +17,19 @@ public class PhotomontageMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// Paths to all the images
-		String srcImagePath = "resources/images/objects/duck.jpg";
-		String maskImagePath = "resources/images/masks/duck.png";
-		String destImagePath = "resources/images/backgrounds/green_lake_with_duck.jpg";
+		// top-level path
+		String testImgPath = "resources/images/tests/";
+
+		// file references
+		String dstImagePath = "validateInput/dst.png";
+		String srcSmallImagePath = "validateInput/src-small.png";
+		String maskValidImagePath = "validateInput/mask-valid.png";	
 		
 		try {
 			// Load all the images
-			BufferedImage srcImage = ImageIO.read(new File(srcImagePath));
-			BufferedImage maskImage = ImageIO.read(new File(maskImagePath));
-			BufferedImage destImage = ImageIO.read(new File(destImagePath));
+			BufferedImage srcImage = ImageIO.read(new File(testImgPath + srcSmallImagePath));
+			BufferedImage maskImage = ImageIO.read(new File(testImgPath + maskValidImagePath));
+			BufferedImage destImage = ImageIO.read(new File(testImgPath + dstImagePath));
 
 			// Setup the Poisson solver
 			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(10, 10));
@@ -36,6 +38,7 @@ public class PhotomontageMain {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		
 		
 	}
