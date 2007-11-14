@@ -1,5 +1,6 @@
 package ca.etsmtl.poisson;
 
+
 public abstract class Pixel<T> {
 	final public T r, g, b;
 	

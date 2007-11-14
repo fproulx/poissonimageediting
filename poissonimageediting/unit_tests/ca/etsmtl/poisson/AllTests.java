@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	@RunWith(Suite.class)
 	@SuiteClasses(value={
 		ImageConversionUtilitiesTest.class,
-		PoissonPhotomontageTest.class,
+		IntegrationTest.class,
 	})
 	
 	public class AllTests {

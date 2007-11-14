@@ -13,7 +13,7 @@ import javax.swing.JFrame;
  * @author fproulx
  *
  */
-public class PhotomontageMain extends JFrame {
+public class IntegrationTest extends JFrame {
 
 	BufferedImage srcImage;
 	BufferedImage maskImage;
@@ -24,11 +24,11 @@ public class PhotomontageMain extends JFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		PhotomontageMain f = new PhotomontageMain();
+		IntegrationTest f = new IntegrationTest();
 		f.compute();
 	}
 	
-	public PhotomontageMain() {
+	public IntegrationTest() {
 		setSize(1024, 768);
 		setLocationRelativeTo(null);
 		setVisible(true);

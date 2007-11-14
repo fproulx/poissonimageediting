@@ -1,5 +1,6 @@
 package ca.etsmtl.poisson;
 
+
 public class ComputationImage<T extends Pixel<?>> {
 	T[][] pixels;
 	int width, height;
