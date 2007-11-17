@@ -4,37 +4,58 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * 
  * @author fproulx
  *
  */
-public class IntegrationTest extends JFrame {
+interface DataComputer<T> {
+	public T computeData();
+	public void addComputationListener(ComputationListener<T> cl);
+	public void notifyComputationListeners(T o);
+}
 
-	BufferedImage srcImage;
-	BufferedImage maskImage;
-	BufferedImage destImage;
+public class IntegrationTest implements DataComputer<BufferedImage> {
 	BufferedImage output;
+	List<ComputationListener<BufferedImage>> computationListeners = new ArrayList<ComputationListener<BufferedImage>>();
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		IntegrationTest f = new IntegrationTest();
-		f.compute();
+		IntegrationTest test = new IntegrationTest();
+		test.computeData();
 	}
 	
 	public IntegrationTest() {
-		setSize(1024, 768);
-		setLocationRelativeTo(null);
-		setVisible(true);
+		final DataComputer<BufferedImage> self = this;
+		SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+            	ComputationResultsDisplay frame = new ComputationResultsDisplay(self);
+            	addComputationListener(frame);
+                frame.setVisible(true);
+            }
+        });
 	}
 	
-	public void compute() {
+	public void addComputationListener(ComputationListener<BufferedImage> listener) {
+		computationListeners.add(listener);
+	}
+	
+	public void notifyComputationListeners(BufferedImage o) {
+		if(computationListeners != null) {
+			for(ComputationListener<BufferedImage> cl: computationListeners) {
+				cl.onComputationCompleted(output);
+			}
+		}	
+	}
+	
+	public BufferedImage computeData() {
 		// top-level path
 		String testImgPath = "resources/images/tests/";
 
@@ -45,28 +66,66 @@ public class IntegrationTest extends JFrame {
 		
 		try {
 			// Load all the images
-			srcImage = ImageIO.read(new File(testImgPath + srcSmallImagePath));
-			maskImage = ImageIO.read(new File(testImgPath + maskValidImagePath));
-			destImage = ImageIO.read(new File(testImgPath + dstImagePath));
+			BufferedImage srcImage = ImageIO.read(new File(testImgPath + srcSmallImagePath));
+			BufferedImage maskImage = ImageIO.read(new File(testImgPath + maskValidImagePath));
+			BufferedImage destImage = ImageIO.read(new File(testImgPath + dstImagePath));
 
 			// Setup the Poisson solver
 			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(10, 10));
 			// Do the heavy lifting
 			output = photomontage.createPhotomontage();
-			repaint();
-			
+			return output;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void paint(Graphics g) {
-		if(output != null) {
-			g.drawImage(srcImage, 0, 0, null);
-			g.drawImage(maskImage, 0, srcImage.getHeight(), null);
-			g.drawImage(destImage, 0, destImage.getHeight() + srcImage.getHeight(), null);
-			g.drawImage(output, destImage.getWidth(), 0, null);
+		finally {
+			notifyComputationListeners(output);
 		}
+		
+		return null;
 	}
 
+}
+
+interface ComputationListener<T> {
+	public void onComputationCompleted(T o);
+}
+
+class ComputationResultsDisplay extends JFrame implements ComputationListener<BufferedImage> {
+	private static final long serialVersionUID = -602143731782699959L;
+	private JPanel displayPanel = new JPanel();
+	private volatile BufferedImage computedImage;
+	
+	public ComputationResultsDisplay(DataComputer<BufferedImage> dc) {
+		dc.addComputationListener(this);
+		initComponents();
+	}
+	
+	public void initComponents() {
+		setSize(1024, 768);
+		setLocationRelativeTo(null);
+		
+		displayPanel = new JPanel() {
+			public void paint(Graphics g) {
+				if(computedImage != null) {
+					synchronized(computedImage) {
+						g.drawImage(computedImage, 0, 0, null);
+					}
+				}
+			}
+		};
+		add(displayPanel);
+	}
+
+	public void onComputationCompleted(BufferedImage o) {
+		if(computedImage != null) {
+			synchronized(computedImage) {
+				computedImage = (BufferedImage) o;
+			}
+		}
+		else {
+			computedImage = (BufferedImage) o;
+		}
+		repaint();
+	}
 }

@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import no.uib.cipr.matrix.DenseVector;
@@ -43,7 +44,6 @@ import no.uib.cipr.matrix.sparse.BiCG;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
-import no.uib.cipr.matrix.sparse.OutputIterationReporter;
 import ca.etsmtl.poisson.exceptions.ComputationException;
 
 import com.Ostermiller.util.CircularByteBuffer;
@@ -58,6 +58,7 @@ public class PoissonPhotomontage {
 	Point destPosition;
 	private static final int ITERATIONS = 300;
 	private static final int MASK_BACKGROUND = 0xFF000000;
+	private static final int OPAQUE_BACKGROUND = 0xFF000000;
 	
 	public PoissonPhotomontage(BufferedImage srcImage, BufferedImage maskImage, BufferedImage destImage, Point destPosition) {
 		setSourceImage(srcImage);
@@ -191,41 +192,45 @@ public class PoissonPhotomontage {
 		return true;
 	}
 	
+	//TODO: Refactor as protected (after JUnit)
+	public Map<Integer, Integer> createSolutionsMap() {
+		int N = 0;
+		ConcurrentHashMap<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
+		for (int x = 1; x < srcImage.getWidth() - 1; x++) {
+			for (int y = 1; y < srcImage.getHeight() - 1; y++) {
+				if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
+					// Move to the corresponding position in the destination image
+					destToSolutionsMap.put(destImage.getWidth() * (y + destPosition.y) + (x + destPosition.x), N);
+					// On our way, we'll know the number of solutions to compute
+					N++;
+				}
+			}
+	    }
+		return destToSolutionsMap;
+	}
+	
 	public BufferedImage createPhotomontage() throws ComputationException, IterativeSolverNotConvergedException {
 		// Make sure the input images fit the requirements
 		if(validateInputImages()) {
-			int wSrc = srcImage.getWidth();
-		    int hSrc = srcImage.getHeight();
+			final int wSrc = srcImage.getWidth();
+		    final int hSrc = srcImage.getHeight();
 		    
-		    int wDest = destImage.getWidth();
+		    final int wDest = destImage.getWidth();
+		   
+		    final int xOffset = destPosition.x;
+		    final int yOffset = destPosition.y;
 		    
-		    int wMask = maskImage.getWidth();
-		    int hMask = maskImage.getHeight();
-		    
-		    int xOffset = destPosition.x;
-		    int yOffset = destPosition.y;
-		    
-		    // Build a mapping between points in the destination image and the computed solutions 
-		    int N = 0;
-		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
-		    for (int x = destPosition.x; x < destPosition.x + wMask; x++) {
-				for (int y = destPosition.y; y < destPosition.y + hMask; y++) {
-					// For each masked pixels over the offset position
-					if(maskImage.getRGB(x - destPosition.x, y - destPosition.y) != MASK_BACKGROUND) {
-						destToSolutionsMap.put(wDest * y + x, N);
-						// On our way, we'll know the number of solutions to compute
-						N++;
-					}
-				}
-		    }
-		    
+		    // Build a mapping between points in the destination image and the computed solutions
+		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
+		    int N = destToSolutionsMap.size();
+			
 		    // Prepare a 3x3 Laplacian kernel for 2D convolution
-		    Kernel laplacian = new Kernel(3, 3, 
+		    final Kernel laplacian = new Kernel(3, 3, 
 		    		                      new float[] { 0, -1,  0,
 		    		                                   -1,  4, -1,
 		    		                                    0, -1,  0});
 		    // Prepare a 2D Laplacian convolution, don't compute the edges
-		    ConvolveOp laplacianConv = new ConvolveOp(laplacian, ConvolveOp.EDGE_NO_OP, null);
+		    final ConvolveOp laplacianConv = new ConvolveOp(laplacian, ConvolveOp.EDGE_NO_OP, null);
 		    // Compute the divergence of the destination image (i.e. by applying the Laplacian kernel)
 		    BufferedImage destDivergence = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		    laplacianConv.filter(destImage, destDivergence);
@@ -249,53 +254,53 @@ public class PoissonPhotomontage {
 		    	for(int y = 1; y < hSrc - 1; y++) {
 		    		if(maskImage.getRGB(x, y) != MASK_BACKGROUND) {
 		    			// Move to the corresponding position in the destination image
-		    			int xd = x + xOffset;
-		    			int yd = y + yOffset;
+		    			int xDest = x + xOffset;
+		    			int yDest = y + yOffset;
 		    			
 		    			// Check the neighboring pixels
 		    			
 		    			// If the pixel ABOVE is also part of the mask
 		    			if(maskImage.getRGB(x, y-1) != MASK_BACKGROUND) {
 		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * (yd - 1) + xd), -1));
+		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * (yDest - 1) + xDest), -1));
 		    			}
 		    			else { // TOP boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(xd, yd - 1) & 0x00FF0000) >> 16);
+		    				b.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & 0x00FF0000) >> 16);
 		    			}
 		    			
 		    			// If the pixel ON THE LEFT is also part of the mask
 		    			if(maskImage.getRGB(x - 1, y) != MASK_BACKGROUND) {
 		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * yd + (xd - 1)), -1));
+		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * yDest + (xDest - 1)), -1));
 		    			}
 		    			else { // LEFT boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(xd - 1, yd) & 0x00FF0000) >> 16);
+		    				b.add(solutionRow, (destImage.getRGB(xDest - 1, yDest) & 0x00FF0000) >> 16);
 		    			}
 		    			
 		    			// If the pixel AT THE BOTTOM is also part of the mask
 		    			if(maskImage.getRGB(x, y + 1) != MASK_BACKGROUND) {
 		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * (yd + 1) + xd), -1));
+		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * (yDest + 1) + xDest), -1));
 		    			}
 		    			else { // BOTTOM boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(x, yd + 1) & 0x00FF0000) >> 16);
+		    				b.add(solutionRow, (destImage.getRGB(x, yDest + 1) & 0x00FF0000) >> 16);
 		    			}
 		    			
 		    			// If the pixel ON THE RIGHT is also part of the mask
 		    			if(maskImage.getRGB(x + 1, y) != MASK_BACKGROUND) {
 		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * yd + (xd + 1)), -1));
+		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * yDest + (xDest + 1)), -1));
 		    			}
 		    			else { // RIGHT boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(xd + 1, yd) & 0x00FF0000) >> 16);
+		    				b.add(solutionRow, (destImage.getRGB(xDest + 1, yDest) & 0x00FF0000) >> 16);
 		    			}
 
 		    			// Set the condition on the diagonal
@@ -354,7 +359,7 @@ public class PoissonPhotomontage {
 			    
 			    // Limit the solver iterations by setting up a custom monitor
 			    solver.setIterationMonitor(new SimpleIterationMonitor(ITERATIONS));
-			    solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
+			    //solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
 			    
 			    // Start the solver
 			    long t0 = System.currentTimeMillis();
@@ -363,7 +368,7 @@ public class PoissonPhotomontage {
 
 			    double itps = ITERATIONS / ((t1-t0)/1000.);
 
-			    System.out.println("Iterations per second:\t" + itps);
+			    //System.out.println("Iterations per second:\t" + itps);
 
 				// Copy the destination into the montage (the background)
 				BufferedImage finalImage = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -378,8 +383,9 @@ public class PoissonPhotomontage {
 							// destination image
 							int xDest = x + xOffset;
 							int yDest = y + yOffset;
-							
-							finalImage.setRGB(xDest, yDest, (int) Math.round(solutionsVector.get(destToSolutionsMap.get(wDest * yDest + xDest))));
+							//System.out.printf("%d, %d\r\n", xDest, yDest);
+							int rgb = OPAQUE_BACKGROUND | ((int) Math.round(solutionsVector.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << 16;
+							finalImage.setRGB(xDest, yDest, rgb);
 						}
 					}
 				}
@@ -406,18 +412,17 @@ public class PoissonPhotomontage {
 	}
 	
 	private static class SimpleIterationMonitor extends AbstractIterationMonitor {
-
-		private int max;
+		private final int max;
 
 		public SimpleIterationMonitor(int max) {
 			this.max = max;
 		}
 
-		protected boolean convergedI(double r, Vector x) throws IterativeSolverNotConvergedException {
+		protected boolean convergedI(final double r, final Vector x) throws IterativeSolverNotConvergedException {
 			return convergedI(r);
 		}
 
-		protected boolean convergedI(double r) throws IterativeSolverNotConvergedException {
+		protected boolean convergedI(final double r) throws IterativeSolverNotConvergedException {
 			return iter >= max;
 		}
 	}
