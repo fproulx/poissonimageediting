@@ -71,7 +71,7 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 			BufferedImage destImage = ImageIO.read(new File(testImgPath + dstImagePath));
 
 			// Setup the Poisson solver
-			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(10, 10));
+			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(95, 95));
 			// Do the heavy lifting
 			output = photomontage.createPhotomontage();
 			return output;
