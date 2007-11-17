@@ -49,7 +49,9 @@ import ca.etsmtl.poisson.exceptions.ComputationException;
 
 import com.Ostermiller.util.CircularByteBuffer;
 
-import static ca.etsmtl.util.ColorChannels.*;
+import ca.etsmtl.util.ColorChannel;
+import static ca.etsmtl.util.ColorChannel.*;
+
 
 /**
  * 
@@ -224,15 +226,16 @@ public class PoissonPhotomontage {
 	 * @param yDest
 	 * @param xDelta
 	 * @param yDelta
+	 * @param channel
 	 */
-	public void addPoissonEquationToMatrix(List<MatrixCell> matrixDataList, Vector rhsVector, int solutionRow, Map<Integer, Integer> solutionsMap, int x, int y, int xDest, int yDest, int xDelta, int yDelta) {
+	public void addPoissonEquationToMatrix(List<MatrixCell> matrixDataList, Vector rhsVector, int solutionRow, Map<Integer, Integer> solutionsMap, int x, int y, int xDest, int yDest, int xDelta, int yDelta, ColorChannel channel) {
 		if(maskImage.getRGB(x + xDelta, y + yDelta) != MASK_BACKGROUND) {
 			// This pixel is already used, get the diagonal position of the pixel
 			matrixDataList.add(new MatrixCell(solutionRow, solutionsMap.get(destImage.getWidth() * (yDest + yDelta) + (xDest + xDelta)), -1));
 		}
 		else {
 			// rightHandSide[solutionRow] += value
-			rhsVector.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & RED.mask()) >> RED.shift());
+			rhsVector.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & channel.mask()) >> channel.shift());
 		}
 	}
 	
@@ -276,65 +279,32 @@ public class PoissonPhotomontage {
 		    Vector rhsVector = new DenseVector(N);
 		    
 		    int solutionRow = 0;
+		    int xDest, yDest;
+		    ColorChannel channel = RED;
 		    // For each pixel in the cloned image (source image)
 		    for(int x = 1; x < wSrc - 1; x++) {
 		    	for(int y = 1; y < hSrc - 1; y++) {
 		    		if(maskImage.getRGB(x, y) != MASK_BACKGROUND) {
 		    			// Move to the corresponding position in the destination image
-		    			int xDest = x + xOffset;
-		    			int yDest = y + yOffset;
+		    			xDest = x + xOffset;
+		    			yDest = y + yOffset;
 		    			
-		    			// Check the neighboring pixels
+		    			// Add Poisson equation, as needed, for each of the four neighbors
 		    			
-		    			// If the pixel ABOVE is also part of the mask
-		    			if(maskImage.getRGB(x, y-1) != MASK_BACKGROUND) {
-		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * (yDest - 1) + xDest), -1));
-		    			}
-		    			else { // TOP boundary
-		    				// b[solutionRow] += value
-		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				rhsVector.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & 0x00FF0000) >> 16);
-		    			}
-		    			
-		    			// If the pixel ON THE LEFT is also part of the mask
-		    			if(maskImage.getRGB(x - 1, y) != MASK_BACKGROUND) {
-		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * yDest + (xDest - 1)), -1));
-		    			}
-		    			else { // LEFT boundary
-		    				// b[solutionRow] += value
-		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				rhsVector.add(solutionRow, (destImage.getRGB(xDest - 1, yDest) & 0x00FF0000) >> 16);
-		    			}
-		    			
-		    			// If the pixel AT THE BOTTOM is also part of the mask
-		    			if(maskImage.getRGB(x, y + 1) != MASK_BACKGROUND) {
-		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * (yDest + 1) + xDest), -1));
-		    			}
-		    			else { // BOTTOM boundary
-		    				// b[solutionRow] += value
-		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				rhsVector.add(solutionRow, (destImage.getRGB(x, yDest + 1) & 0x00FF0000) >> 16);
-		    			}
-		    			
-		    			// If the pixel ON THE RIGHT is also part of the mask
-		    			if(maskImage.getRGB(x + 1, y) != MASK_BACKGROUND) {
-		    				// This pixel is already used, get the diagonal position of the pixel
-		    				matrixDataList.add(new MatrixCell(solutionRow, destToSolutionsMap.get(wDest * yDest + (xDest + 1)), -1));
-		    			}
-		    			else { // RIGHT boundary
-		    				// b[solutionRow] += value
-		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				rhsVector.add(solutionRow, (destImage.getRGB(xDest + 1, yDest) & 0x00FF0000) >> 16);
-		    			}
+		    			// Top neighbor
+		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, 0, -1, channel);
+		    			// Left neighbor
+		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, -1, 0, channel);
+		    			// Bottom neighbor
+		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, 0, +1, channel);
+		    			// Right neighbor
+		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, +1, 0, channel);
 
 		    			// Set the condition on the diagonal
 	    				matrixDataList.add(new MatrixCell(solutionRow, solutionRow, 4));
 	    				
 	    				// Construct the guidance field
-	    				rhsVector.add(solutionRow, (destDivergence.getRGB(x, y) & 0x00FF0000) >> 16);
+	    				rhsVector.add(solutionRow, (destDivergence.getRGB(x, y) & channel.mask()) >> channel.shift());
 
 	    				// Increment to the next row
 		    			solutionRow++;
@@ -408,8 +378,9 @@ public class PoissonPhotomontage {
 						if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
 							// Move to the corresponding position in the
 							// destination image
-							int xDest = x + xOffset;
-							int yDest = y + yOffset;
+							xDest = x + xOffset;
+							yDest = y + yOffset;
+							
 							//System.out.printf("%d, %d\r\n", xDest, yDest);
 							int rgb = OPAQUE_BACKGROUND | ((int) Math.round(solutionsVector.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << 16;
 							finalImage.setRGB(xDest, yDest, rgb);
