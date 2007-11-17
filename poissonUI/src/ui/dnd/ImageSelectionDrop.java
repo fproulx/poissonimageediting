@@ -5,6 +5,17 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 
+/**
+ * Classe ImageSelectionDrop implémente les événements d'un droptarget listener
+ * 
+ * TODO implémentation drag-n-drop
+ * 
+ * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
+ *         <lebel.kim@gmail.com>, Jean-Philippe Plante
+ *         <jphilippeplante@gmail.com>, Francois Proulx
+ *         <francois.proulx@gmail.com>
+ * 
+ */
 public class ImageSelectionDrop implements DropTargetListener {
 
 	public void dragEnter(DropTargetDragEvent dtde) {

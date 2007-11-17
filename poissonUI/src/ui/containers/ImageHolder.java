@@ -7,13 +7,17 @@
  * and open the template in the editor.
  */
 
-package ui;
+package ui.containers;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
+import ui.ImageBrowser;
+
 /**
+ * Classe ImageHolder contient l'image original ainsi que le preview
+ * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  *         <lebel.kim@gmail.com>, Jean-Philippe Plante
  *         <jphilippeplante@gmail.com>, Francois Proulx
@@ -35,7 +39,7 @@ public class ImageHolder {
 
 	/**
 	 * 
-	 * @return l'image resizé
+	 * @return l'image redimensionné
 	 */
 	public BufferedImage getScaledImage() {
 		return scaledImage;
@@ -52,9 +56,9 @@ public class ImageHolder {
 	/**
 	 * This method returns an image with the specified width. It finds the
 	 * pre-scaled size with the closest/larger width and scales down from it, to
-	 * provide a fast and high-quality scaed version at the requested size.
+	 * provide a fast and high-quality scaled version at the requested size.
 	 */
-	BufferedImage getImage(int width) {
+	public BufferedImage getImage(int width) {
 		float scaleFactor = (float) width / original.getWidth();
 		int scaledH = (int) (original.getHeight() * scaleFactor);
 

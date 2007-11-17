@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package ui;
+package ui.controllers;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,7 +17,11 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import ui.ImageBrowser;
+
 /**
+ * Classe MenuController s'occupe des actions des menus
+ * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  *         <lebel.kim@gmail.com>, Jean-Philippe Plante
  *         <jphilippeplante@gmail.com>, Francois Proulx
@@ -35,24 +39,25 @@ public class MenuController {
 
 		BufferedImage image = null;
 
-		String filename = File.separator + "Users";
+		//creation du filechooser pour ouvrir une image
+		String filename = File.separator + "Users"; //TODO path default...
 		JFileChooser fc = new JFileChooser(new File(filename));
-
-		// Show open dialog; this method does not return until the dialog is
-		// closed
 		fc.showOpenDialog(null);
 
 		try {
+			//Lire l'image avec un ImageIO et l'ajouter au image browser
 			File file = fc.getSelectedFile();
 			if (file.exists() && file.canRead() && file.isFile()) {
 				image = ImageIO.read(file);
 				browser.addImage(image, file.getCanonicalPath());
 			}
 		} catch (Exception e) {
+			//message d'erreur
 			JOptionPane.showMessageDialog(null,
 				    "Error while open the image.",
 				    "Error while opening",
 				    JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
 		}
 
 		return image;
@@ -64,31 +69,30 @@ public class MenuController {
 	 * @param image a sauvegardé sur le disque
 	 */
 	public void saveFile(BufferedImage image) {
-		//create a new file chooser
+		//creation du filechooser pour sauvegarder une image
 		String filename = File.separator + "Users";
 		JFileChooser fc = new JFileChooser(filename);
 		
-		//change dialog type to save
+		//changer le type de dialog pour la sauvegarde
 		fc.setDialogType(JFileChooser.SAVE_DIALOG);
 		fc.setMultiSelectionEnabled(false);
 		fc.setDialogTitle("Untitled");
 
-		
+		//code de retour
 		int returnVal = fc.showSaveDialog(null);
 
 		try {
-			//if ok save the new image
+			//si ok sauvegarder l'image avec le nom
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File myfile = fc.getSelectedFile();
 				ImageIO.write(image, "jpg", myfile);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			
 			JOptionPane.showMessageDialog(null,
 				    "Error while saving the new image.",
 				    "Error while saving",
 				    JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
 		}
 
 	}

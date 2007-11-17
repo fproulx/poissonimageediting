@@ -16,6 +16,11 @@ import org.jdesktop.tools.io.FileTreeWalk;
 import org.jdesktop.tools.io.FileTreeWalker;
 import org.jdesktop.tools.io.UnixGlobFileFilter;
 
+import ui.containers.ImageFramesContainer;
+import ui.containers.ImageHolder;
+import ui.containers.PreviewContainer;
+import ui.events.ImageBrowserMouseListener;
+
 /*
  * ImageBrowser.java
  *
@@ -51,7 +56,8 @@ import org.jdesktop.tools.io.UnixGlobFileFilter;
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * Based on a demo of the AnimatedTransitions library uses a layout manager to
+ * 
+ * Image Browser based on a demo of the AnimatedTransitions library uses a layout manager to
  * assist in setting up the next screen that the application transitions to.
  * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
@@ -131,9 +137,10 @@ public class ImageBrowser extends JComponent {
 	}
 
 	/**
-	 * Add a image in the image browser panel
+	 * Ajoute une image dans le image browser
 	 * 
-	 * @param image
+	 * @param image est l'image en bufferedimage à ajouter
+	 * @param filename est le path de l'image
 	 */
 	public void addImage(BufferedImage image, String filename) {
 		ImageHolder holder = new ImageHolder(image, filename);

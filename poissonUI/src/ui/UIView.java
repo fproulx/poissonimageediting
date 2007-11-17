@@ -25,6 +25,11 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
+import ui.containers.ImageFramesContainer;
+import ui.containers.PreviewContainer;
+import ui.containers.WindowItem;
+import ui.controllers.MenuController;
+
 /**
  * The application's main frame.
  */
@@ -33,14 +38,18 @@ public class UIView extends FrameView implements Observer {
 	public UIView(SingleFrameApplication app) {
 		super(app);
 
+		// initialisation de tous les components
 		initComponents();
 
+		// création du image browser
 		ImageBrowser.currentSize = 180;
 
-		// add the view to the list of observers
+		// ajouter UIView en temps que observer pour les containers de image
+		// frame et du preview
 		container.addObserver(this);
 		previewcontainer.addObserver(this);
 
+		// paramétriser le imageframe et ajouter à l'interface
 		imagebrowser = new ImageBrowser(container, previewcontainer);
 		JScrollPane scrollpane = new JScrollPane(imagebrowser);
 		scrollpane.setLayout(new ScrollPaneLayout());
@@ -178,13 +187,10 @@ public class UIView extends FrameView implements Observer {
 
 		selections.setFocusable(false);
 		selections.setName("selections"); // NOI18N
-		
+
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(ui.UIApp.class).getContext().getResourceMap(
 						UIView.class);
-		//preview.setBorder(javax.swing.BorderFactory
-		//		.createTitledBorder(resourceMap
-		//				.getString("preview.border.title"))); // NOI18N
 		preview.setName("preview"); // NOI18N
 
 		org.jdesktop.layout.GroupLayout previewLayout = new org.jdesktop.layout.GroupLayout(
@@ -385,9 +391,9 @@ public class UIView extends FrameView implements Observer {
 
 	private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveMenuItemActionPerformed
 		// TODO
-		if(mdi.getSelectedFrame() != null) {
+		if (mdi.getSelectedFrame() != null) {
 			menuCtrl.saveFile(null);
-		}		
+		}
 	}// GEN-LAST:event_saveMenuItemActionPerformed
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
@@ -413,28 +419,38 @@ public class UIView extends FrameView implements Observer {
 	private int busyIconIndex = 0;
 	private JDialog aboutBox;
 
+	// image frame container
 	private ImageFramesContainer container = new ImageFramesContainer();
 
+	// preview container
 	private PreviewContainer previewcontainer = new PreviewContainer();
 
+	// ui menu controller
 	private MenuController menuCtrl = new MenuController();
 
+	// image browser
 	private ImageBrowser imagebrowser;
-	
-	public void update(Observable arg0, Object arg1) {
 
+	/**
+	 * Update des observers
+	 */
+	public void update(Observable arg0, Object arg1) {
+		// pour le preview
 		if (arg0 instanceof PreviewContainer) {
 			BufferedImage img = previewcontainer.getScaledImage();
-			
-			//clean old preview
-			preview.getGraphics().clearRect(0, 0, preview.getWidth(), preview.getHeight());
-			
-			if(img != null) {
+
+			// clean vieux preview
+			preview.getGraphics().clearRect(0, 0, preview.getWidth(),
+					preview.getHeight());
+
+			// remplacer le preview
+			if (img != null) {
 				System.out.println("UIView.update replace preview");
-				preview.getGraphics().drawImage(img,0,0,null);
-			} 			
+				preview.getGraphics().drawImage(img, 0, 0, null);
+			}
 		}
 
+		// update pour le container de imageframe
 		if (arg0 instanceof ImageFramesContainer) {
 			// keep a copy of the components
 			ArrayList<ImageFrame> mdiframes = new ArrayList<ImageFrame>();
@@ -444,7 +460,6 @@ public class UIView extends FrameView implements Observer {
 				for (int i = 0; i < mdi.getComponents().length; i++) {
 					ImageFrame frame = (ImageFrame) mdi.getComponent(i);
 					if (!container.contains(frame)) {
-						System.out.println("UIView.update remove frame");
 						mdi.remove(frame);
 					} else {
 						mdiframes.add(frame);
@@ -455,16 +470,17 @@ public class UIView extends FrameView implements Observer {
 			// add new frames
 			for (ImageFrame frame : container.getFrames()) {
 				if (!mdiframes.contains(frame)) {
-					System.out.println("UIView.update add frame");
-					
+					// ajouter item dans le menu window
 					frame.setMenuItem(new WindowItem(frame, mdi));
-					
 					UIView.WindowsMenu.add(frame.getMenuItem());
+
+					// ajouter le frame dans le desktop et activer le frame
 					mdi.add(frame);
 					mdi.getDesktopManager().activateFrame(frame);
 				}
 			}
 
+			// clean mdi frames
 			mdiframes = null;
 		}
 	}

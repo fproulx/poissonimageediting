@@ -7,10 +7,13 @@
  * and open the template in the editor.
  */
 
-package ui;
+package ui.events;
 
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
+
+import ui.ImageFrame;
+import ui.containers.PreviewContainer;
 
 /**
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
