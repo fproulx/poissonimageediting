@@ -1,6 +1,7 @@
 package ca.etsmtl.poisson;
 
 
+import static ca.etsmtl.poisson.CustomAssert.assertBufferedImageEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.awt.Point;
@@ -13,12 +14,12 @@ import javax.imageio.ImageIO;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import ca.etsmtl.poisson.exceptions.ComputationException;
 
+//FIXME change all assertTrue with ! in it to assertFalse
 public class PoissonPhotomontageTest {
 	
 	// top-level path
@@ -31,6 +32,7 @@ public class PoissonPhotomontageTest {
 	private final String maskValidImagePath = "validateInput/mask-valid.png";
 	private final String maskInvalidImagePath = "validateInput/mask-invalid.png";
 	private final String maskFullImagePath = "validateInput/mask-full.png";
+	private final String goatTestResult = "blackbox/goat-result.png";
 	
 	// the class being tested
 	private PoissonPhotomontage poissonPhotomontage;
@@ -121,16 +123,30 @@ public class PoissonPhotomontageTest {
 		assertTrue(poissonPhotomontage.validateInputImages()); 
 	}
 	
+	/**
+	 * These tests were made using an external Poisson editing implementation. 
+	 * We used a MatLab implementation located in ext/poisson_matlab/main and 
+	 * mainchevre. Then we compare each pixel of createPhotomontage's resulting 
+	 * image and the matlab program's with a certain tolerance level.  
+	 * 
+	 * @throws IOException
+	 * @throws ComputationException
+	 * @throws IterativeSolverNotConvergedException
+	 */
 	@Test public void createPhotoMontage() throws IOException, ComputationException, IterativeSolverNotConvergedException {
 		
 		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
 		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));
 		BufferedImage maskImage = ImageIO.read(new File(testImgPath+maskValidImagePath));
-		Point dstPt = new Point(15,21); // arbitrary valid values
+		
+		// MatLab's result
+		BufferedImage matlabResult = ImageIO.read(new File(testImgPath+goatTestResult));				
+		
+		// Insertion point of 95,95 in our external test scenario
+		Point dstPt = new Point(95,95); // arbitrary valid values
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
-		//TODO: Create assertEquals --> supporting BufferedImage comparison
-		Assert.assertNotNull(poissonPhotomontage.createPhotomontage());
+		assertBufferedImageEquals(matlabResult, poissonPhotomontage.createPhotomontage(), 5);
 	}
 	
 }
