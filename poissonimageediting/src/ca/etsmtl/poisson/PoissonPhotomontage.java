@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,6 +48,8 @@ import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 import ca.etsmtl.poisson.exceptions.ComputationException;
 
 import com.Ostermiller.util.CircularByteBuffer;
+
+import static ca.etsmtl.util.ColorChannels.*;
 
 /**
  * 
@@ -209,6 +212,30 @@ public class PoissonPhotomontage {
 		return destToSolutionsMap;
 	}
 	
+	/**
+	 * 
+	 * @param matrixDataList
+	 * @param rhsVector
+	 * @param solutionRow
+	 * @param solutionsMap
+	 * @param x
+	 * @param y
+	 * @param xDest
+	 * @param yDest
+	 * @param xDelta
+	 * @param yDelta
+	 */
+	public void addPoissonEquationToMatrix(List<MatrixCell> matrixDataList, Vector rhsVector, int solutionRow, Map<Integer, Integer> solutionsMap, int x, int y, int xDest, int yDest, int xDelta, int yDelta) {
+		if(maskImage.getRGB(x + xDelta, y + yDelta) != MASK_BACKGROUND) {
+			// This pixel is already used, get the diagonal position of the pixel
+			matrixDataList.add(new MatrixCell(solutionRow, solutionsMap.get(destImage.getWidth() * (yDest + yDelta) + (xDest + xDelta)), -1));
+		}
+		else {
+			// rightHandSide[solutionRow] += value
+			rhsVector.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & RED.mask()) >> RED.shift());
+		}
+	}
+	
 	public BufferedImage createPhotomontage() throws ComputationException, IterativeSolverNotConvergedException {
 		// Make sure the input images fit the requirements
 		if(validateInputImages()) {
@@ -243,10 +270,10 @@ public class PoissonPhotomontage {
 		     */
 		    
 		    // This array will be used to prepare the sparse matrix (initial size N)
-		    ArrayList<MatrixCell> matrixDataList = new ArrayList<MatrixCell>(N);
+		    List<MatrixCell> matrixDataList = new ArrayList<MatrixCell>(N);
 		    	    
 		    // Prepare the right hand side vector, that will contain the conditions
-		    Vector b = new DenseVector(N);
+		    Vector rhsVector = new DenseVector(N);
 		    
 		    int solutionRow = 0;
 		    // For each pixel in the cloned image (source image)
@@ -267,7 +294,7 @@ public class PoissonPhotomontage {
 		    			else { // TOP boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & 0x00FF0000) >> 16);
+		    				rhsVector.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & 0x00FF0000) >> 16);
 		    			}
 		    			
 		    			// If the pixel ON THE LEFT is also part of the mask
@@ -278,7 +305,7 @@ public class PoissonPhotomontage {
 		    			else { // LEFT boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(xDest - 1, yDest) & 0x00FF0000) >> 16);
+		    				rhsVector.add(solutionRow, (destImage.getRGB(xDest - 1, yDest) & 0x00FF0000) >> 16);
 		    			}
 		    			
 		    			// If the pixel AT THE BOTTOM is also part of the mask
@@ -289,7 +316,7 @@ public class PoissonPhotomontage {
 		    			else { // BOTTOM boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(x, yDest + 1) & 0x00FF0000) >> 16);
+		    				rhsVector.add(solutionRow, (destImage.getRGB(x, yDest + 1) & 0x00FF0000) >> 16);
 		    			}
 		    			
 		    			// If the pixel ON THE RIGHT is also part of the mask
@@ -300,14 +327,14 @@ public class PoissonPhotomontage {
 		    			else { // RIGHT boundary
 		    				// b[solutionRow] += value
 		    				//TODO: WARNING RED VALUE ONLY FOR NOW !
-		    				b.add(solutionRow, (destImage.getRGB(xDest + 1, yDest) & 0x00FF0000) >> 16);
+		    				rhsVector.add(solutionRow, (destImage.getRGB(xDest + 1, yDest) & 0x00FF0000) >> 16);
 		    			}
 
 		    			// Set the condition on the diagonal
 	    				matrixDataList.add(new MatrixCell(solutionRow, solutionRow, 4));
 	    				
 	    				// Construct the guidance field
-	    				b.add(solutionRow, (destDivergence.getRGB(x, y) & 0x00FF0000) >> 16);
+	    				rhsVector.add(solutionRow, (destDivergence.getRGB(x, y) & 0x00FF0000) >> 16);
 
 	    				// Increment to the next row
 		    			solutionRow++;
@@ -363,7 +390,7 @@ public class PoissonPhotomontage {
 			    
 			    // Start the solver
 			    long t0 = System.currentTimeMillis();
-			    solver.solve(A, b, solutionsVector);
+			    solver.solve(A, rhsVector, solutionsVector);
 			    long t1 = System.currentTimeMillis();
 
 			    double itps = ITERATIONS / ((t1-t0)/1000.);
