@@ -7,13 +7,16 @@
  * and open the template in the editor.
  */
 
-package ui;
+package ui.containers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import ui.ImageFrame;
+
 /**
+ * Classe ImageFramesContainer contient la liste des imageframes
  * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  *         <lebel.kim@gmail.com>, Jean-Philippe Plante

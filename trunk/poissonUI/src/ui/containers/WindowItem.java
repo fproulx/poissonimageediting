@@ -1,7 +1,9 @@
-package ui;
+package ui.containers;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JMenuItem;
+
+import ui.ImageFrame;
 
 public class WindowItem extends JMenuItem {
 
@@ -16,6 +18,7 @@ public class WindowItem extends JMenuItem {
 	
 	/**
 	 * Constructeur
+	 * 
 	 * @param imageframe est l'image
 	 * @param mdi est la composante qui contient le desktop manager 
 	 */

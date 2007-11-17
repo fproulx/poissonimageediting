@@ -2,7 +2,7 @@ package ui.dnd;
 
 import javax.swing.TransferHandler;
 
-import ui.ImageFrameMouseEvents;
+import ui.events.ImageFrameMouseEvents;
 
 public class ImageSelectionHandler extends TransferHandler {
 

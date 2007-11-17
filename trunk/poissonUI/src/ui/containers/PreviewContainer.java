@@ -7,12 +7,14 @@
  * and open the template in the editor.
  */
 
-package ui;
+package ui.containers;
 
 import java.awt.image.BufferedImage;
 import java.util.Observable;
 
 /**
+ * Classe PreviewContainer contient l'image redimensionné
+ * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  *         <lebel.kim@gmail.com>, Jean-Philippe Plante
  *         <jphilippeplante@gmail.com>, Francois Proulx
@@ -22,6 +24,9 @@ public class PreviewContainer extends Observable {
 
 	private BufferedImage scaledImage;
 
+	/**
+	 * Constructeur
+	 */
 	public PreviewContainer() {
 
 	}

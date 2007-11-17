@@ -7,12 +7,20 @@
  * and open the template in the editor.
  */
 
-package ui;
+package ui.events;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import ui.ImageFrame;
+import ui.containers.ImageFramesContainer;
+import ui.containers.ImageHolder;
+import ui.containers.PreviewContainer;
+
 /**
+ * Classe ImageBrowserMouseListener est l'implémentation les événements de la
+ * souris sur le paneau de l'image browser
+ * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  *         <lebel.kim@gmail.com>, Jean-Philippe Plante
  *         <jphilippeplante@gmail.com>, Francois Proulx
@@ -26,6 +34,12 @@ public class ImageBrowserMouseListener implements MouseListener {
 
 	private PreviewContainer preview;
 
+	/**
+	 * 
+	 * @param image est le container
+	 * @param container
+	 * @param preview
+	 */
 	public ImageBrowserMouseListener(ImageHolder image,
 			ImageFramesContainer container, PreviewContainer preview) {
 		this.image = image;
