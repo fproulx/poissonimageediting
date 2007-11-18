@@ -16,6 +16,8 @@ import ui.ImageFrame;
 import ui.containers.PreviewContainer;
 
 /**
+ * Classe ImageFrameEvents implémente les événements du ImageFrame
+ * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  *         <lebel.kim@gmail.com>, Jean-Philippe Plante
  *         <jphilippeplante@gmail.com>, Francois Proulx
