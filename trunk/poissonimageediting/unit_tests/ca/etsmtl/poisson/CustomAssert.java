@@ -2,7 +2,7 @@ package ca.etsmtl.poisson;
 
 import java.awt.image.BufferedImage;
 import static org.junit.Assert.fail;
-import static ca.etsmtl.util.ColorChannels.*;
+import static ca.etsmtl.util.ColorChannel.*;
 
 public class CustomAssert {
 
