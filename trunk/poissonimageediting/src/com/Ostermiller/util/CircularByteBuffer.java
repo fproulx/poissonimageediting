@@ -34,9 +34,6 @@ import java.io.IOException;
  * <p>
  * This class is thread safe.
  *
- * @see CircularCharBuffer
- * @see CircularObjectBuffer
- *
  * @author Stephen Ostermiller http://ostermiller.org/contact.pl?regarding=Java+Utilities
  * @since ostermillerutils 1.00.00
  */
