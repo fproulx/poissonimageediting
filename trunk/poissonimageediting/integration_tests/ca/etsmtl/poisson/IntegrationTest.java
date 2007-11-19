@@ -58,20 +58,18 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 	}
 	
 	public BufferedImage computeData() {
-		// top-level path
-		String testImgPath = "resources/images/tests/";
-
-		// file references
-		String dstImagePath = "validateInput/dst.png";
-		String srcSmallImagePath = "validateInput/src-small.png";
-		String maskValidImagePath = "validateInput/mask-valid.png";	
-		
 		try {
+			BufferedImage srcImage, maskImage, destImage;
+			/*
 			// Load all the images
-			BufferedImage srcImage = ImageIO.read(new File(testImgPath + srcSmallImagePath));
-			BufferedImage maskImage = ImageIO.read(new File(testImgPath + maskValidImagePath));
-			BufferedImage destImage = ImageIO.read(new File(testImgPath + dstImagePath));
-
+			srcImage = ImageIO.read(new File("resources/images/objects/duck.jpg"));
+			maskImage = ImageIO.read(new File("resources/images/masks/duck.png"));
+			destImage = ImageIO.read(new File("resources/images/backgrounds/green_lake_with_duck.png"));
+			 */
+			srcImage = ImageIO.read(new File("resources/images/tests/validateInput/src-small.png"));
+			maskImage = ImageIO.read(new File("resources/images/tests/validateInput/mask-best.png"));
+			destImage = ImageIO.read(new File("resources/images/tests/validateInput/dst.png"));
+			
 			// Setup the Poisson solver
 			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(95, 95));
 			

@@ -198,6 +198,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		    } catch (InterruptedException e) {
 		    	throw new ComputationException("The parralel computation tasks got abrutly interrupted.");
 			} catch (ExecutionException e) {
+				e.printStackTrace();
 				throw new ComputationException("The parralel execution of a task got abrutly interrupted.");
 			}
 		}
