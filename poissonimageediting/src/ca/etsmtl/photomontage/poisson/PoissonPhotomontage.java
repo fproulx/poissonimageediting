@@ -49,7 +49,7 @@ import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 import ca.etsmtl.matrix.MatrixCell;
 import ca.etsmtl.matrix.MatrixSolverIterationMonitor;
-import ca.etsmtl.photomontage.Photomontage;
+import ca.etsmtl.photomontage.AbstractPhotomontage;
 import ca.etsmtl.photomontage.exceptions.ComputationException;
 import ca.etsmtl.util.ColorChannel;
 
@@ -61,7 +61,7 @@ import com.Ostermiller.util.CircularByteBuffer;
  * @author fproulx <francois.proulx@gmail.com>
  * @since 1.0
  */
-public class PoissonPhotomontage implements Photomontage {
+public class PoissonPhotomontage extends AbstractPhotomontage {
 	/**
 	 * The target number of iterations for the iterative matrix solver.
 	 */
@@ -74,30 +74,20 @@ public class PoissonPhotomontage implements Photomontage {
 	 * The bitmask for opaque pixels (the value for the alpha channel is 0xFF).
 	 */
 	private static final int OPAQUE_BACKGROUND = 0xFF000000;
-	/**
-	 * The Source, Mask and Destination images which will be used to create the {@code Photomontage}.
-	 */
-	private final BufferedImage srcImage, maskImage, destImage;
-	/**
-	 * The target position of the cloned image in the destination image.  
-	 */
-	private final Point destPosition;
 
 	/**
-	 * Constructs a {@code Photomontage} and sets the required fields to compute the resulting image.
+	 * Constructs a concrete implementation of {@code Photomontage} 
+	 * and sets the required fields to compute the resulting image.
 	 * 
 	 * @param srcImage The Source image (to be seamlessly cloned in the {@code Photomontage}).
 	 * @param maskImage The Mask image used to specify the pixels of the Source image to be used.
 	 * @param destImage The Destination image onto which the Source image will be cloned.
 	 * @param destPosition The target position of the cloned image.
 	 */
-	public PoissonPhotomontage(final BufferedImage srcImage, final BufferedImage maskImage, final BufferedImage destImage, final Point destPosition) {
-		this.srcImage = srcImage;
-		this.maskImage = maskImage;
-		this.destImage = destImage;
-		this.destPosition = destPosition;
+	public PoissonPhotomontage(BufferedImage srcImage, BufferedImage maskImage, BufferedImage destImage, Point destPosition) {
+		super(srcImage, maskImage, destImage, destPosition);
 	}
-
+	
 	/**
 	 * Adds a new coefficient to the "Poisson equation with Dirichlet boundary conditions" 
 	 * in the list of cells to be included in the matrix used to compute the solution to the photomontage.
