@@ -18,7 +18,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ca.etsmtl.poisson.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.ComputationException;
+import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 
 public class PoissonPhotomontageTest {
 	

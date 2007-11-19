@@ -15,11 +15,11 @@
  * GNU General Public License for more details.
  */
 
-package ca.etsmtl.poisson;
+package ca.etsmtl.photomontage;
 
 import java.awt.image.BufferedImage;
 
-import ca.etsmtl.poisson.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.ComputationException;
 
 /**
  * This is a generalized interface to every Photomontage implementation

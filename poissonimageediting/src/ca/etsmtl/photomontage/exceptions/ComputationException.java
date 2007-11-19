@@ -16,7 +16,7 @@
  *
  */
 
-package ca.etsmtl.poisson.exceptions;
+package ca.etsmtl.photomontage.exceptions;
 
 public class ComputationException extends Exception {
 	private static final long serialVersionUID = -1982069004778632902L;
