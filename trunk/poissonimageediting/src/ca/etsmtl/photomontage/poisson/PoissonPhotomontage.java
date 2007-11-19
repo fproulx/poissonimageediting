@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  */
 
-package ca.etsmtl.poisson;
+package ca.etsmtl.photomontage.poisson;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -49,7 +49,8 @@ import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 import ca.etsmtl.matrix.MatrixCell;
 import ca.etsmtl.matrix.MatrixSolverIterationMonitor;
-import ca.etsmtl.poisson.exceptions.ComputationException;
+import ca.etsmtl.photomontage.Photomontage;
+import ca.etsmtl.photomontage.exceptions.ComputationException;
 import ca.etsmtl.util.ColorChannel;
 
 import com.Ostermiller.util.CircularByteBuffer;

@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
+
 /**
  * 
  * @author fproulx
