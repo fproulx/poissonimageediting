@@ -22,10 +22,11 @@ import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 interface DataComputer<T> {
 	public T computeData();
 	public void addComputationListener(ComputationListener<T> cl);
-	public void notifyComputationListeners(T o);
+	public void notifyComputationListeners(T s, T m, T o);
 }
 
 public class IntegrationTest implements DataComputer<BufferedImage> {
+	BufferedImage srcImage, maskImage, destImage;
 	BufferedImage output;
 	List<ComputationListener<BufferedImage>> computationListeners = new ArrayList<ComputationListener<BufferedImage>>();
 	
@@ -49,29 +50,32 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 		computationListeners.add(listener);
 	}
 	
-	public void notifyComputationListeners(BufferedImage o) {
+	public void notifyComputationListeners(BufferedImage src, BufferedImage mask, BufferedImage out) {
 		if(computationListeners != null) {
 			for(ComputationListener<BufferedImage> cl: computationListeners) {
-				cl.onComputationCompleted(output);
+				cl.onComputationCompleted(src, mask, output);
 			}
 		}	
 	}
 	
 	public BufferedImage computeData() {
 		try {
-			BufferedImage srcImage, maskImage, destImage;
 			/*
 			// Load all the images
 			srcImage = ImageIO.read(new File("resources/images/objects/duck.jpg"));
 			maskImage = ImageIO.read(new File("resources/images/masks/duck.png"));
 			destImage = ImageIO.read(new File("resources/images/backgrounds/green_lake_with_duck.png"));
-			 */
+			 
 			srcImage = ImageIO.read(new File("resources/images/tests/validateInput/src-small.png"));
 			maskImage = ImageIO.read(new File("resources/images/tests/validateInput/mask-best.png"));
 			destImage = ImageIO.read(new File("resources/images/tests/validateInput/dst.png"));
+			*/
+			srcImage = ImageIO.read(new File("resources/images/objects/F16.png"));
+			maskImage = ImageIO.read(new File("resources/images/masks/F16mask.png"));
+			destImage = ImageIO.read(new File("resources/images/backgrounds/F16Target.jpg"));
 			
 			// Setup the Poisson solver
-			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(95, 95));
+			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(215, 150));
 			
 			// Do the heavy lifting
 			long t0 = System.nanoTime();
@@ -86,22 +90,21 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 			e.printStackTrace();
 		}
 		finally {
-			notifyComputationListeners(output);
+			notifyComputationListeners(srcImage, maskImage, output);
 		}
 		
 		return null;
 	}
-
 }
 
 interface ComputationListener<T> {
-	public void onComputationCompleted(T o);
+	public void onComputationCompleted(T t1, T t2, T t3);
 }
 
 class ComputationResultsDisplay extends JFrame implements ComputationListener<BufferedImage> {
 	private static final long serialVersionUID = -602143731782699959L;
 	private JPanel displayPanel = new JPanel();
-	private volatile BufferedImage computedImage;
+	private volatile BufferedImage s, m, computedImage;
 	
 	public ComputationResultsDisplay(DataComputer<BufferedImage> dc) {
 		dc.addComputationListener(this);
@@ -116,7 +119,9 @@ class ComputationResultsDisplay extends JFrame implements ComputationListener<Bu
 			public void paint(Graphics g) {
 				if(computedImage != null) {
 					synchronized(computedImage) {
-						g.drawImage(computedImage, 0, 0, null);
+						g.drawImage(s, 0, 0, null);
+						g.drawImage(m, 0, s.getHeight(), null);
+						g.drawImage(computedImage, s.getWidth(), 0, null);
 					}
 				}
 			}
@@ -124,7 +129,7 @@ class ComputationResultsDisplay extends JFrame implements ComputationListener<Bu
 		add(displayPanel);
 	}
 
-	public void onComputationCompleted(BufferedImage o) {
+	public void onComputationCompleted(BufferedImage s, BufferedImage m, BufferedImage o) {
 		if(computedImage != null) {
 			synchronized(computedImage) {
 				computedImage = (BufferedImage) o;
@@ -133,6 +138,8 @@ class ComputationResultsDisplay extends JFrame implements ComputationListener<Bu
 		else {
 			computedImage = (BufferedImage) o;
 		}
+		this.s = s;
+		this.m = m;
 		repaint();
 	}
 }
