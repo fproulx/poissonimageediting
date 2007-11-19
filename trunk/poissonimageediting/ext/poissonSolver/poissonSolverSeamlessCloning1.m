@@ -20,10 +20,12 @@ laplacian = [0 1 0; 1 -4 1; 0 1 0];
 % height and width of both the source image and the destination image
 [heightSrc widthSrc] = size(imSrc);
 [heightDest widthDest] = size(imDest);
-[heightMask widthMask] = size(imMask);
+%[heightMask widthMask] = size(imMask);
+heightMask = 100;
+widthMask = 128;
 
 % check if the mask is too big
-if heightSrc < heightMask | widthSrc < widthMask | heightDest < heightMask | widthDest < widthMask
+if heightSrc < heightMask || widthSrc < widthMask || heightDest < heightMask || widthDest < widthMask
     fprintf('Error - the mask is too big\n');    
 end
 
@@ -36,6 +38,7 @@ yoff = offset(2);
 % for sparse matrix allocation
 % --------------------------------------------
 n = size(find(imMask), 1);
+n = n / 3;
 
 %---------------------------------------------
 % sparse matrix allocation
@@ -57,11 +60,12 @@ tic
 
 count = 0;
 % now fill in the 
-for y = 1:heightDest
-    for x = 1:widthDest
-        if imMask(y+yoff, x+xoff) ~= 0
-            count = count + 1;            
-            imIndex(y, x) = count;
+for y = 1:heightSrc
+    for x = 1:widthSrc
+        if imMask(y, x) ~= 0
+            count = count + 1;     
+            imIndex(y + yoff, x + xoff) = count;
+            %fprintf('%d %d -->  %d\n', x+ xoff, y+yoff,  count);
         end
     end
 end
@@ -81,12 +85,14 @@ end
 tic
 
 % construct the laplacian image.
+test = -laplacian;
+
 imLaplacian = conv2(imSrc, -laplacian, 'same');
 
 % matrix row count
 count = 0; % count is the row index
-for y = 1:heightSrc
-    for x = 1:widthSrc
+for y = 2:heightSrc - 1
+    for x = 2:widthSrc - 1
 
         % if the mask is not zero, then add to the matrix
         if imMask(y, x) ~= 0
@@ -95,8 +101,8 @@ for y = 1:heightSrc
             count = count + 1;   
             
             % the corresponding position in the destination image
-            yd = y - yoff;
-            xd = x - xoff; 
+            yd = y + yoff;
+            xd = x + xoff; 
              
             %------------------------------------------------------
             % if Neighbourhood(p) is in the interia of the region
@@ -146,14 +152,18 @@ for y = 1:heightSrc
             
             % construct the guidance field	
             v = imLaplacian(y, x);
-	
+            
+            if(x == 121 && y == 84)                
+                fprintf('(%d,%d) %d = %d\n', x, y, count, v);
+            end
+            
             b(count) = b(count)+v;
 
         end
     end
 end
 
-if count ~= n
+if count ~= n / 3
     fprintf('Error - wrong matrix size\n');
 end
 
@@ -176,11 +186,11 @@ imNew = imDest;
 fprintf('\nRetriving result, filling destination image\n');
 tic
 % now fill in the 
-for y1 = 1:heightDest
-    for x1 = 1:widthDest
-        if imMask(y1+yoff, x1+xoff) ~= 0
-            index = imIndex(y1, x1);
-            imNew(y1, x1) = x(index);
+for y1 = 1:heightSrc
+    for x1 = 1:widthSrc
+        if imMask(y1, x1) ~= 0
+            index = imIndex(y1+yoff, x1+xoff);
+            imNew(y1+yoff, x1+xoff) = x(index);
         end
     end
 end

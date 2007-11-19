@@ -80,7 +80,7 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 			output = photomontage.createPhotomontage();
 			long t1 = System.nanoTime();
 			
-			// 4656528000 ns --> 4 s
+			// 2573864000 ns --> 2.573864 s
 			System.out.printf("%d ns --> %f s\r\n", t1 - t0, (t1 - t0) / Math.pow(10, 9));
 			
 			return output;
