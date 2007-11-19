@@ -21,8 +21,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -43,7 +41,7 @@ import no.uib.cipr.matrix.io.MatrixInfo;
 import no.uib.cipr.matrix.io.MatrixSize;
 import no.uib.cipr.matrix.io.MatrixVectorReader;
 import no.uib.cipr.matrix.io.MatrixVectorWriter;
-import no.uib.cipr.matrix.sparse.BiCG;
+import no.uib.cipr.matrix.sparse.CG;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
@@ -117,6 +115,20 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 			rhsVector.add(solutionRow, (destImage.getRGB(xDest + xDelta, yDest + yDelta) & channel.mask()) >> channel.shift());
 		}
 	}
+	
+	/**
+	 * Clamps the given value between 0 and 255 (to fit in an integer ARGB)
+	 * 
+	 * @return The clamped value.
+	 */
+	protected int clampValue(int value) {
+		int newValue = value;
+         if (value < 0)
+        	 newValue = 0;
+         else if (value > 255)
+        	 newValue = 255;
+	      return newValue;
+	}
 
 	/**
 	 * Creates the actual resulting photomontage image out of the resulting solution vectors.
@@ -130,27 +142,16 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		    // Build a mapping between points in the destination image and the computed solutions.
 		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
 		    
-		    // Prepare a 3x3 Laplacian kernel for 2D convolution.
-		    Kernel laplacian = new Kernel(3, 3, 
-		    		                      new float[] { 0, -1,  0,
-		    		                                   -1,  4, -1,
-		    		                                    0, -1,  0});
-		    // Prepare a 2D Laplacian convolution operator, don't compute the edges.
-		    ConvolveOp laplacianConv = new ConvolveOp(laplacian, ConvolveOp.EDGE_NO_OP, null);
-		    // Compute the divergence field of the destination image (i.e. by applying the Laplacian kernel).
-		    BufferedImage destDivergence = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		    laplacianConv.filter(destImage, destDivergence);
-		    
 		    try {
 		    	// Prepare a parallel execution barrier (for a total of three tasks).
 		    	CountDownLatch barrier = new CountDownLatch(3);
 		    	
 		    	// Prepare and launch threads for each of the computation tasks
-		    	FutureTask<Vector> computeTaskVectorRed = solvePoissonEquationsForChannel(destToSolutionsMap, destDivergence, ColorChannel.RED, barrier);
+		    	FutureTask<Vector> computeTaskVectorRed = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.RED, barrier);
 		    	new Thread(computeTaskVectorRed).start();
-		    	FutureTask<Vector> computeTaskVectorGreen = solvePoissonEquationsForChannel(destToSolutionsMap, destDivergence, ColorChannel.GREEN, barrier);
+		    	FutureTask<Vector> computeTaskVectorGreen = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.GREEN, barrier);
 		    	new Thread(computeTaskVectorGreen).start();
-		    	FutureTask<Vector> computeTaskVectorBlue = solvePoissonEquationsForChannel(destToSolutionsMap, destDivergence, ColorChannel.BLUE, barrier);
+		    	FutureTask<Vector> computeTaskVectorBlue = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.BLUE, barrier);
 		    	new Thread(computeTaskVectorBlue).start();
 		    	
 		    	// Wait for all the tasks to be completed.
@@ -177,10 +178,10 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 							xDest = x + destPosition.x;
 							yDest = y + destPosition.y;
 							
-							// Add up all the channels to compute the value of the pixel.
-							rgb = ((int) Math.round(solutionsVectorRed.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.RED.shift() |
-							      ((int) Math.round(solutionsVectorGreen.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.GREEN.shift() |
-							      ((int) Math.round(solutionsVectorBlue.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.BLUE.shift() |
+							// Add up all the channels to compute the value of the pixel (while making sure the values fit in a byte so that they don't collide when shifted).
+							rgb = clampValue((int) Math.round(solutionsVectorRed.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.RED.shift() |
+							      clampValue((int) Math.round(solutionsVectorGreen.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.GREEN.shift() |
+							      clampValue((int) Math.round(solutionsVectorBlue.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.BLUE.shift() |
 							      OPAQUE_BACKGROUND;
 							
 							// Replace the original pixel with the computed one.
@@ -245,14 +246,13 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	 * Run the iterative matrix solver for a given ColorChannel.
 	 *  
 	 * @param destToSolutionsMap The mapping.
-	 * @param destDivergence The divergence field (Laplacian).
 	 * @param channel The color channel to compute.
 	 * 
 	 * @return A FutureTask that will compute the solution vector (containing the computed pixel values).
 	 * @throws ComputationException
 	 * @throws IterativeSolverNotConvergedException
 	 */
-	protected FutureTask<Vector> solvePoissonEquationsForChannel(final Map<Integer, Integer> destToSolutionsMap, final BufferedImage destDivergence, final ColorChannel channel, final CountDownLatch doneSignal) throws ComputationException, IterativeSolverNotConvergedException {
+	protected FutureTask<Vector> solvePoissonEquationsForChannel(final Map<Integer, Integer> destToSolutionsMap, final ColorChannel channel, final CountDownLatch doneSignal) throws ComputationException, IterativeSolverNotConvergedException {
 		return new FutureTask<Vector>(new Callable<Vector>() {
 			public Vector call() throws ComputationException, IterativeSolverNotConvergedException {
 				// Get the number of rows in the squared matrix. 
@@ -274,7 +274,9 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 				// A counter to keep track of the solution row to check.
 				int solutionRow = 0;
 				int xDest, yDest;
-
+				// This will contain the divergence field
+				int div;
+				
 				// For each pixel in the cloned image (source image).
 				for(int x = 1; x < srcImage.getWidth() - 1; x++) {
 					for(int y = 1; y < srcImage.getHeight() - 1; y++) {
@@ -297,9 +299,18 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 							// Set the coefficient on the diagonal
 							matrixDataList.add(new MatrixCell(solutionRow, solutionRow, 4));
 							
+							// Compute the divergence on the fly
+							div = - ((srcImage.getRGB(x - 1, y) & channel.mask()) >> channel.shift()) + 
+							      - ((srcImage.getRGB(x, y - 1) & channel.mask()) >> channel.shift()) + 
+							      - ((srcImage.getRGB(x + 1, y) & channel.mask()) >> channel.shift()) + 
+							      - ((srcImage.getRGB(x, y + 1) & channel.mask()) >> channel.shift()) 
+							      + 4 * ((srcImage.getRGB(x, y) & channel.mask()) >> channel.shift());
+
+							//System.out.printf("%s (%d,%d) = %d --> %d\r\n", channel.name(), x+1, y+1, ((srcImage.getRGB(x, y) & channel.mask()) >> channel.shift()), div);
+							
 							// Construct the guidance field by adding the color intensity (by channel) to the right-hand side vector.
 							// Notice the the add() method uses the compound addition operator (i.e. rightHandSide[solutionRow] += value).
-							rhsVector.add(solutionRow, (destDivergence.getRGB(xDest, yDest) & channel.mask()) >> channel.shift());
+							rhsVector.add(solutionRow, div);
 
 							// Increment the counter to the next row.
 							solutionRow++;
@@ -347,9 +358,9 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 					// Prepare the solution vector that will contain the value of each computed pixel
 					// Shuffle some random data around to speed up the convergence of the solution.
 					solutionsVector = Matrices.random(N);
-				    
-				    // Run a Bi-Conjugate iterative solver to compute Ax = b
-				    IterativeSolver solver = new BiCG(solutionsVector);
+
+				    // Choose a conjugate iterative solver to compute Ax = b
+				    IterativeSolver solver = new CG(solutionsVector);
 				    
 				    // Limit the solver iterations by setting up a custom monitor
 				    solver.setIterationMonitor(new MatrixSolverIterationMonitor(SOLVER_ITERATIONS));
