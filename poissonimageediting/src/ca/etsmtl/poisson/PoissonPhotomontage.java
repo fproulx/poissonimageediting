@@ -13,7 +13,6 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
  */
 
 package ca.etsmtl.poisson;
@@ -40,79 +39,316 @@ import no.uib.cipr.matrix.io.MatrixInfo;
 import no.uib.cipr.matrix.io.MatrixSize;
 import no.uib.cipr.matrix.io.MatrixVectorReader;
 import no.uib.cipr.matrix.io.MatrixVectorWriter;
-import no.uib.cipr.matrix.sparse.AbstractIterationMonitor;
 import no.uib.cipr.matrix.sparse.BiCG;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
+import ca.etsmtl.matrix.MatrixCell;
+import ca.etsmtl.matrix.MatrixSolverIterationMonitor;
 import ca.etsmtl.poisson.exceptions.ComputationException;
+import ca.etsmtl.util.ColorChannel;
 
 import com.Ostermiller.util.CircularByteBuffer;
 
-import ca.etsmtl.util.ColorChannel;
-import static ca.etsmtl.util.ColorChannel.*;
-
-
 /**
+ * This is an implementation of the "Poisson Image Editing" algorithm
+ * {@link http://research.microsoft.com/vision/cambridge/papers/perez_siggraph03.pdf} 
  * 
- * @author fproulx
- *
+ * @author François Proulx <francois.proulx@gmail.com>
+ * @since 1.0
  */
-public class PoissonPhotomontage {
-	BufferedImage srcImage, maskImage, destImage;
-	Point destPosition;
-	private static final int ITERATIONS = 300;
+public class PoissonPhotomontage implements Photomontage {
+	/**
+	 * The target number of iterations for the iterative matrix solver.
+	 */
+	private static final int SOLVER_ITERATIONS = 300;
+	/**
+	 * The bitmask representing the non-selected parts of the mask as a set of ARGB integer pixels.
+	 */
 	private static final int MASK_BACKGROUND = 0xFF000000;
+	/**
+	 * The bitmask for opaque pixels (the value for the alpha channel is 0xFF).
+	 */
 	private static final int OPAQUE_BACKGROUND = 0xFF000000;
-	
-	public PoissonPhotomontage(BufferedImage srcImage, BufferedImage maskImage, BufferedImage destImage, Point destPosition) {
-		setSourceImage(srcImage);
-		setMaskImage(maskImage);
-		setDestinationImage(destImage);
-		setDestinationPosition(destPosition);
-	}
+	/**
+	 * The Source, Mask and Destination images which will be used to create the {@code Photomontage}.
+	 */
+	private final BufferedImage srcImage, maskImage, destImage;
+	/**
+	 * The target position of the cloned image in the destination image.  
+	 */
+	private final Point destPosition;
 
-	public BufferedImage getSourceImage() {
-		return srcImage;
-	}
-
-	public void setSourceImage(BufferedImage srcImage) {
+	/**
+	 * Constructs a {@code Photomontage} and sets the required fields to compute the resulting image.
+	 * 
+	 * @param srcImage The Source image (to be seamlessly cloned in the {@code Photomontage}).
+	 * @param maskImage The Mask image used to specify the pixels of the Source image to be used.
+	 * @param destImage The Destination image onto which the Source image will be cloned.
+	 * @param destPosition The target position of the cloned image.
+	 */
+	public PoissonPhotomontage(final BufferedImage srcImage, final BufferedImage maskImage, final BufferedImage destImage, final Point destPosition) {
 		this.srcImage = srcImage;
-	}
-
-	public BufferedImage getMaskImage() {
-		return maskImage;
-	}
-
-	public void setMaskImage(BufferedImage maskImage) {
 		this.maskImage = maskImage;
+		this.destImage = destImage;
+		this.destPosition = destPosition;
 	}
 
+	/**
+	 * 
+	 * @param matrixDataList
+	 * @param rhsVector
+	 * @param solutionRow
+	 * @param solutionsMap
+	 * @param x
+	 * @param y
+	 * @param xDest
+	 * @param yDest
+	 * @param xDelta
+	 * @param yDelta
+	 * @param channel
+	 */
+	public void addPoissonEquationToMatrix(List<MatrixCell> matrixDataList, Vector rhsVector, int solutionRow, Map<Integer, Integer> solutionsMap, int x, int y, int xDest, int yDest, int xDelta, int yDelta, ColorChannel channel) {
+		if(maskImage.getRGB(x + xDelta, y + yDelta) != MASK_BACKGROUND) {
+			// This pixel is already used, get the diagonal position of the pixel
+			matrixDataList.add(new MatrixCell(solutionRow, solutionsMap.get(destImage.getWidth() * (yDest + yDelta) + (xDest + xDelta)), -1));
+		}
+		else {
+			// rightHandSide[solutionRow] += value
+			rhsVector.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & channel.mask()) >> channel.shift());
+		}
+	}
+
+	public BufferedImage createPhotomontage() throws ComputationException {
+		// Make sure the input images fit the requirements
+		if(validateInputImages()) {
+		    // Build a mapping between points in the destination image and the computed solutions
+		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
+		    
+		    // Prepare a 3x3 Laplacian kernel for 2D convolution
+		    final Kernel laplacian = new Kernel(3, 3, 
+		    		                      new float[] { 0, -1,  0,
+		    		                                   -1,  4, -1,
+		    		                                    0, -1,  0});
+		    // Prepare a 2D Laplacian convolution, don't compute the edges
+		    final ConvolveOp laplacianConv = new ConvolveOp(laplacian, ConvolveOp.EDGE_NO_OP, null);
+		    // Compute the divergence of the destination image (i.e. by applying the Laplacian kernel)
+		    BufferedImage destDivergence = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		    laplacianConv.filter(destImage, destDivergence);
+		    
+		    try {
+				Vector solutionsVectorRed = solvePoissonEquationsForChannel(destToSolutionsMap, destDivergence, ColorChannel.RED);
+				Vector solutionsVectorGreen = solvePoissonEquationsForChannel(destToSolutionsMap, destDivergence, ColorChannel.GREEN);
+				Vector solutionsVectorBlue = solvePoissonEquationsForChannel(destToSolutionsMap, destDivergence, ColorChannel.BLUE);
+				
+				// Copy the destination into the montage (the background)
+				BufferedImage finalImage = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				Graphics2D g2d = (Graphics2D) finalImage.getGraphics();
+				g2d.drawImage(destImage, 0, 0, null);
+
+				// For each pixel in the cloned image (source image)
+				int xDest, yDest;
+				int rgb;
+				int wDest = destImage.getWidth();
+				for (int x = 1; x < srcImage.getWidth() - 1; x++) {
+					for (int y = 1; y < srcImage.getHeight() - 1; y++) {
+						if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
+							// Move to the corresponding position in the destination image
+							xDest = x + destPosition.x;
+							yDest = y + destPosition.y;
+							
+							// Build the seamlessly cloned pixel
+							rgb = ((int) Math.round(solutionsVectorRed.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.RED.shift() |
+							      ((int) Math.round(solutionsVectorGreen.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.GREEN.shift() |
+							      ((int) Math.round(solutionsVectorBlue.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.BLUE.shift() |
+							      OPAQUE_BACKGROUND;
+							
+							finalImage.setRGB(xDest, yDest, rgb);
+						}
+					}
+				}
+				
+				return finalImage;
+		    }
+		    catch(IterativeSolverNotConvergedException e) {
+		    	throw new ComputationException("The iterative matrix solver could not converge to the solution.");
+		    }
+		}
+		else {
+			throw new ComputationException("One or more of the input images (either source, mask or destination) do not meet the requirements.");
+		}
+	}
+	
+	//TODO: Refactor as protected (after JUnit)
+	public Map<Integer, Integer> createSolutionsMap() {
+		int N = 0;
+		ConcurrentHashMap<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
+		for (int x = 1; x < srcImage.getWidth() - 1; x++) {
+			for (int y = 1; y < srcImage.getHeight() - 1; y++) {
+				if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
+					// Move to the corresponding position in the destination image
+					destToSolutionsMap.put(destImage.getWidth() * (y + destPosition.y) + (x + destPosition.x), N);
+					// On our way, we'll know the number of solutions to compute
+					N++;
+				}
+			}
+	    }
+		return destToSolutionsMap;
+	}
+	
 	public BufferedImage getDestinationImage() {
 		return destImage;
 	}
-
-	public void setDestinationImage(BufferedImage destImage) {
-		this.destImage = destImage;
-	}
-
+	
 	public Point2D getDestinationPosition() {
 		return destPosition;
 	}
-
-	public void setDestinationPosition(Point destPosition) {
-		this.destPosition = destPosition;
+	
+	public BufferedImage getMaskImage() {
+		return maskImage;
 	}
 	
+	public BufferedImage getSourceImage() {
+		return srcImage;
+	}
+	
+	/**
+	 * @param destToSolutionsMap
+	 * @param destDivergence
+	 * @param channel
+	 * @return
+	 * @throws ComputationException
+	 * @throws IterativeSolverNotConvergedException
+	 */
+	protected Vector solvePoissonEquationsForChannel(Map<Integer, Integer> destToSolutionsMap, BufferedImage destDivergence, ColorChannel channel) throws ComputationException, IterativeSolverNotConvergedException {
+		int N = destToSolutionsMap.size();
+		
+		/*
+	     * WARNING : This part of the algorithm is a bit tricky to understand, 
+	     * mostly because of the nature of sparse matrices, we cannot create them
+	     * interactively. Thus, we need to create temporary arrays to accumulate its
+	     * actual content. This is the reason why we need to use ArrayList's.
+	     */
+	    
+		// This array will be used to prepare the sparse matrix (initial size N)
+		List<MatrixCell> matrixDataList = new ArrayList<MatrixCell>(N);
+			    
+		// Prepare the right hand side vector, that will contain the conditions
+		Vector rhsVector = new DenseVector(N);
+		
+		int solutionRow = 0;
+		int xDest, yDest;
+
+		// For each pixel in the cloned image (source image)
+		for(int x = 1; x < srcImage.getWidth() - 1; x++) {
+			for(int y = 1; y < srcImage.getHeight() - 1; y++) {
+				if(maskImage.getRGB(x, y) != MASK_BACKGROUND) {
+					// Move to the corresponding position in the destination image
+					xDest = x + destPosition.x;
+					yDest = y + destPosition.y;
+					
+					// Add Poisson equation, as needed, for each of the four neighbors
+					
+					// Top neighbor
+					addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, 0, -1, channel);
+					// Left neighbor
+					addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, -1, 0, channel);
+					// Bottom neighbor
+					addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, 0, +1, channel);
+					// Right neighbor
+					addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, +1, 0, channel);
+
+					// Set the condition on the diagonal
+					matrixDataList.add(new MatrixCell(solutionRow, solutionRow, 4));
+					
+					// Construct the guidance field
+					rhsVector.add(solutionRow, (destDivergence.getRGB(x, y) & channel.mask()) >> channel.shift());
+
+					// Increment to the next row
+					solutionRow++;
+				}
+			}
+		}
+		
+		// Something wrong happened
+		if(solutionRow != N)
+			throw new ComputationException(String.format("(solutionRow != N) --> (%d != %d) ", solutionRow, N));
+		
+		// Prepare three primitives int[] array that will be used to load the data
+		int[] rowsArray = new int[matrixDataList.size()];
+		int[] colsArray = new int[matrixDataList.size()];
+		int[] valuesArray = new int[matrixDataList.size()];
+		
+		// For each non-zero cells in the sparse matrix, initialize the primitives arrays
+		int i = 0;
+		for(MatrixCell cell: matrixDataList) {
+			rowsArray[i] = cell.row;
+			colsArray[i] = cell.col;
+			valuesArray[i] = cell.value;
+			
+			i++;
+		}
+		
+		// Prepare a circular byte buffer that will contain the data in memory
+		CircularByteBuffer rawMatrixByteBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+		
+		// Write the metadata and actual data
+		MatrixVectorWriter matrixWriter = new MatrixVectorWriter(rawMatrixByteBuffer.getOutputStream());
+		matrixWriter.printMatrixInfo(new MatrixInfo(true, MatrixInfo.MatrixField.Integer, MatrixInfo.MatrixSymmetry.General));
+		matrixWriter.printMatrixSize(new MatrixSize(N, N, matrixDataList.size()));
+		matrixWriter.printCoordinate(rowsArray, colsArray, valuesArray, 1);
+		matrixWriter.close();
+		
+		// Prepare to read the raw data from the compressed format
+		BufferedReader rawMatrixReader = new BufferedReader(new InputStreamReader(rawMatrixByteBuffer.getInputStream()));
+		
+		Vector solutionsVector = null;
+		try {
+			// Prepare a NxN sparse matrix, that will contain the system linear of equations
+			Matrix A = new CompRowMatrix(new MatrixVectorReader(rawMatrixReader));
+			
+			// Prepare the solution vector, that will contain the value of each computed pixel
+			solutionsVector = Matrices.random(N);
+		    
+		    // Run a Bi-Conjugate iterative solver to compute Ax = b
+		    IterativeSolver solver = new BiCG(solutionsVector);
+		    
+		    // Limit the solver iterations by setting up a custom monitor
+		    solver.setIterationMonitor(new MatrixSolverIterationMonitor(SOLVER_ITERATIONS));
+		    //solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
+		    
+		    // Start the solver
+		    solver.solve(A, rhsVector, solutionsVector);
+		} 
+		catch (IOException e) {}
+		
+		return solutionsVector;
+	}
+	
+	/**
+	 * Validate validation points
+	 * @return true: valid false: invalid
+	 */
+	public boolean validateDestinationPosition() {
+		// Make sure that the specified destination offset fits
+		// the solver requirements and is inside the destination image.
+		if(destPosition == null || 
+		   destPosition.x <= 0 ||
+		   destPosition.y <= 0 ||
+		   destPosition.x >= destImage.getWidth() -1 ||
+		   destPosition.y >= destImage.getHeight() -1)
+			return false;
+		
+		// Destination Point + Source image must not be taller than Destination Image
+		if ((destPosition.x + srcImage.getWidth())  > destImage.getWidth() ||
+			(destPosition.y + srcImage.getHeight()) > destImage.getHeight())
+			return false;
+		
+		return true;
+	}
+
 	public boolean validateInputImages() {
-		
-		boolean isValid;
-		
-		isValid = validateSourceImageSize();
-		isValid = validateDestinationPosition();
-		isValid = validateMask();
-		
-		return isValid;
+		return validateSourceImageSize() && validateDestinationPosition() && validateMask();
 	}
 	
 	/**
@@ -170,260 +406,5 @@ public class PoissonPhotomontage {
 		
 		return true;
 	}
-	
-	/**
-	 * Validate validation points
-	 * @return true: valid false: invalid
-	 */
-	public boolean validateDestinationPosition() {
-		
-		if (destPosition == null)
-			return false;
-		
-		// Make sure that the specified destination offset fits
-		// the solver requirements and is inside the destination image.
-		if(destPosition == null || 
-		   destPosition.x >= 0 ||
-		   destPosition.y >= 0 ||
-		   destPosition.x <= destImage.getWidth() -1 ||
-		   destPosition.y <= destImage.getHeight() -1)
-			return false;
-		
-		// Destination Point + Source image must not be taller than Destination Image
-		if ((destPosition.x + srcImage.getWidth())  > destImage.getWidth() ||
-			(destPosition.y + srcImage.getHeight()) > destImage.getHeight())
-			return false;
-		
-		return true;
-	}
-	
-	//TODO: Refactor as protected (after JUnit)
-	public Map<Integer, Integer> createSolutionsMap() {
-		int N = 0;
-		ConcurrentHashMap<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
-		for (int x = 1; x < srcImage.getWidth() - 1; x++) {
-			for (int y = 1; y < srcImage.getHeight() - 1; y++) {
-				if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
-					// Move to the corresponding position in the destination image
-					destToSolutionsMap.put(destImage.getWidth() * (y + destPosition.y) + (x + destPosition.x), N);
-					// On our way, we'll know the number of solutions to compute
-					N++;
-				}
-			}
-	    }
-		return destToSolutionsMap;
-	}
-	
-	/**
-	 * 
-	 * @param matrixDataList
-	 * @param rhsVector
-	 * @param solutionRow
-	 * @param solutionsMap
-	 * @param x
-	 * @param y
-	 * @param xDest
-	 * @param yDest
-	 * @param xDelta
-	 * @param yDelta
-	 * @param channel
-	 */
-	public void addPoissonEquationToMatrix(List<MatrixCell> matrixDataList, Vector rhsVector, int solutionRow, Map<Integer, Integer> solutionsMap, int x, int y, int xDest, int yDest, int xDelta, int yDelta, ColorChannel channel) {
-		if(maskImage.getRGB(x + xDelta, y + yDelta) != MASK_BACKGROUND) {
-			// This pixel is already used, get the diagonal position of the pixel
-			matrixDataList.add(new MatrixCell(solutionRow, solutionsMap.get(destImage.getWidth() * (yDest + yDelta) + (xDest + xDelta)), -1));
-		}
-		else {
-			// rightHandSide[solutionRow] += value
-			rhsVector.add(solutionRow, (destImage.getRGB(xDest, yDest - 1) & channel.mask()) >> channel.shift());
-		}
-	}
-	
-	public BufferedImage createPhotomontage() throws ComputationException, IterativeSolverNotConvergedException {
-		// Make sure the input images fit the requirements
-		if(validateInputImages()) {
-			final int wSrc = srcImage.getWidth();
-		    final int hSrc = srcImage.getHeight();
-		    
-		    final int wDest = destImage.getWidth();
-		   
-		    final int xOffset = destPosition.x;
-		    final int yOffset = destPosition.y;
-		    
-		    // Build a mapping between points in the destination image and the computed solutions
-		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
-		    int N = destToSolutionsMap.size();
-			
-		    // Prepare a 3x3 Laplacian kernel for 2D convolution
-		    final Kernel laplacian = new Kernel(3, 3, 
-		    		                      new float[] { 0, -1,  0,
-		    		                                   -1,  4, -1,
-		    		                                    0, -1,  0});
-		    // Prepare a 2D Laplacian convolution, don't compute the edges
-		    final ConvolveOp laplacianConv = new ConvolveOp(laplacian, ConvolveOp.EDGE_NO_OP, null);
-		    // Compute the divergence of the destination image (i.e. by applying the Laplacian kernel)
-		    BufferedImage destDivergence = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		    laplacianConv.filter(destImage, destDivergence);
-		    
-		    /*
-		     * WARNING : This part of the algorithm is a bit tricky to understand, 
-		     * mostly because of the nature of sparse matrices, we cannot create them
-		     * interactively. Thus, we need to create temporary arrays to accumulate its
-		     * actual content. This is the reason why we need to use ArrayList's.
-		     */
-		    
-		    // This array will be used to prepare the sparse matrix (initial size N)
-		    List<MatrixCell> matrixDataList = new ArrayList<MatrixCell>(N);
-		    	    
-		    // Prepare the right hand side vector, that will contain the conditions
-		    Vector rhsVector = new DenseVector(N);
-		    
-		    int solutionRow = 0;
-		    int xDest, yDest;
-		    ColorChannel channel = RED;
-		    // For each pixel in the cloned image (source image)
-		    for(int x = 1; x < wSrc - 1; x++) {
-		    	for(int y = 1; y < hSrc - 1; y++) {
-		    		if(maskImage.getRGB(x, y) != MASK_BACKGROUND) {
-		    			// Move to the corresponding position in the destination image
-		    			xDest = x + xOffset;
-		    			yDest = y + yOffset;
-		    			
-		    			// Add Poisson equation, as needed, for each of the four neighbors
-		    			
-		    			// Top neighbor
-		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, 0, -1, channel);
-		    			// Left neighbor
-		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, -1, 0, channel);
-		    			// Bottom neighbor
-		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, 0, +1, channel);
-		    			// Right neighbor
-		    			addPoissonEquationToMatrix(matrixDataList, rhsVector, solutionRow, destToSolutionsMap, x, y, xDest, yDest, +1, 0, channel);
-
-		    			// Set the condition on the diagonal
-	    				matrixDataList.add(new MatrixCell(solutionRow, solutionRow, 4));
-	    				
-	    				// Construct the guidance field
-	    				rhsVector.add(solutionRow, (destDivergence.getRGB(x, y) & channel.mask()) >> channel.shift());
-
-	    				// Increment to the next row
-		    			solutionRow++;
-		    		}
-		    	}
-		    }
-		    
-	    	// Something wrong happened
-		    if(solutionRow != N)
-		    	throw new ComputationException(String.format("(solutionRow != N) --> (%d != %d) ", solutionRow, N));
-		    
-		    // Prepare three primitives int[] array that will be used to load the data
-		    int[] rowsArray = new int[matrixDataList.size()];
-		    int[] colsArray = new int[matrixDataList.size()];
-		    int[] valuesArray = new int[matrixDataList.size()];
-		    
-		    // For each non-zero cells in the sparse matrix, initialize the primitives arrays
-		    int i = 0;
-		    for(MatrixCell cell: matrixDataList) {
-		    	rowsArray[i] = cell.row;
-		    	colsArray[i] = cell.col;
-		    	valuesArray[i] = cell.value;
-		    	
-		    	i++;
-		    }
-		    
-		    // Prepare a circular byte buffer that will contain the data in memory
-		    CircularByteBuffer rawMatrixByteBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
-		    
-		    // Write the metadata and actual data
-		    MatrixVectorWriter matrixWriter = new MatrixVectorWriter(rawMatrixByteBuffer.getOutputStream());
-		    matrixWriter.printMatrixInfo(new MatrixInfo(true, MatrixInfo.MatrixField.Integer, MatrixInfo.MatrixSymmetry.General));
-		    matrixWriter.printMatrixSize(new MatrixSize(N, N, matrixDataList.size()));
-		    matrixWriter.printCoordinate(rowsArray, colsArray, valuesArray, 1);
-		    matrixWriter.close();
-		    
-		    // Prepare to read the raw data from the compressed format
-		    BufferedReader rawMatrixReader = new BufferedReader(new InputStreamReader(rawMatrixByteBuffer.getInputStream()));
-		    
-			try {
-				// Prepare a NxN sparse matrix, that will contain the system linear of equations
-				Matrix A = new CompRowMatrix(new MatrixVectorReader(rawMatrixReader));
-				
-				// Prepare the solution vector, that will contain the value of each computed pixel
-			    Vector solutionsVector = Matrices.random(N);
-			    
-			    // Run a Bi-Conjugate iterative solver to compute Ax = b
-			    IterativeSolver solver = new BiCG(solutionsVector);
-			    
-			    // Limit the solver iterations by setting up a custom monitor
-			    solver.setIterationMonitor(new SimpleIterationMonitor(ITERATIONS));
-			    //solver.getIterationMonitor().setIterationReporter(new OutputIterationReporter());
-			    
-			    // Start the solver
-			    long t0 = System.currentTimeMillis();
-			    solver.solve(A, rhsVector, solutionsVector);
-			    long t1 = System.currentTimeMillis();
-
-			    double itps = ITERATIONS / ((t1-t0)/1000.);
-
-			    //System.out.println("Iterations per second:\t" + itps);
-
-				// Copy the destination into the montage (the background)
-				BufferedImage finalImage = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g2d = (Graphics2D) finalImage.getGraphics();
-				g2d.drawImage(destImage, 0, 0, null);
-
-				// For each pixel in the cloned image (source image)
-				for (int x = 1; x < wSrc - 1; x++) {
-					for (int y = 1; y < hSrc - 1; y++) {
-						if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
-							// Move to the corresponding position in the
-							// destination image
-							xDest = x + xOffset;
-							yDest = y + yOffset;
-							
-							//System.out.printf("%d, %d\r\n", xDest, yDest);
-							int rgb = OPAQUE_BACKGROUND | ((int) Math.round(solutionsVector.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << 16;
-							finalImage.setRGB(xDest, yDest, rgb);
-						}
-					}
-				}
-
-				return finalImage;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return null;
-	}
-	
-	private static class MatrixCell {
-		public final int row;
-		public final int col;
-		public final int value;
-		
-		public MatrixCell(final int row, final int col, final int value) {
-			this.row = row;
-			this.col = col;
-			this.value = value;
-		}
-	}
-	
-	private static class SimpleIterationMonitor extends AbstractIterationMonitor {
-		private final int max;
-
-		public SimpleIterationMonitor(int max) {
-			this.max = max;
-		}
-
-		protected boolean convergedI(final double r, final Vector x) throws IterativeSolverNotConvergedException {
-			return convergedI(r);
-		}
-
-		protected boolean convergedI(final double r) throws IterativeSolverNotConvergedException {
-			return iter >= max;
-		}
-	}
-
 }
 	
