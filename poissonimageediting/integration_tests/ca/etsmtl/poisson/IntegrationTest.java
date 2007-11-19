@@ -71,9 +71,16 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 			BufferedImage destImage = ImageIO.read(new File(testImgPath + dstImagePath));
 
 			// Setup the Poisson solver
-			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(10, 10));
+			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(95, 95));
+			
 			// Do the heavy lifting
+			long t0 = System.nanoTime();
 			output = photomontage.createPhotomontage();
+			long t1 = System.nanoTime();
+			
+			// 4656528000 ns --> 4 s
+			System.out.printf("%d ns --> %f s\r\n", t1 - t0, (t1 - t0) / Math.pow(10, 9));
+			
 			return output;
 		} catch (Exception e) {
 			e.printStackTrace();
