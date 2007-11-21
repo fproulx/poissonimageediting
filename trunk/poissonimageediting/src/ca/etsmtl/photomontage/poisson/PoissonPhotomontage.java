@@ -21,26 +21,23 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 import no.uib.cipr.matrix.DenseVector;
 import no.uib.cipr.matrix.Matrices;
 import no.uib.cipr.matrix.Matrix;
 import no.uib.cipr.matrix.Vector;
-import no.uib.cipr.matrix.io.MatrixInfo;
-import no.uib.cipr.matrix.io.MatrixSize;
-import no.uib.cipr.matrix.io.MatrixVectorReader;
-import no.uib.cipr.matrix.io.MatrixVectorWriter;
 import no.uib.cipr.matrix.sparse.CG;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 import no.uib.cipr.matrix.sparse.IterativeSolver;
@@ -50,8 +47,6 @@ import ca.etsmtl.matrix.MatrixSolverIterationMonitor;
 import ca.etsmtl.photomontage.AbstractPhotomontage;
 import ca.etsmtl.photomontage.exceptions.ComputationException;
 import ca.etsmtl.util.ColorChannel;
-
-import com.Ostermiller.util.CircularByteBuffer;
 
 /**
  * This is an implementation of <a href="http://research.microsoft.com/vision/cambridge/papers/perez_siggraph03.pdf">the "Poisson Image Editing" algorithm</a>.
@@ -143,16 +138,18 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
 		    
 		    try {
-		    	// Prepare a parallel execution barrier (for a total of three tasks).
+		    	// Prepare a parralel task executor for the 3 solvers (red, green, blue)
+		    	Executor executor = Executors.newFixedThreadPool(3); 
+		    	// Prepare a parallel execution barrier
 		    	CountDownLatch barrier = new CountDownLatch(3);
 		    	
 		    	// Prepare and launch threads for each of the computation tasks
 		    	FutureTask<Vector> computeTaskVectorRed = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.RED, barrier);
-		    	new Thread(computeTaskVectorRed).start();
+		    	executor.execute(computeTaskVectorRed);
 		    	FutureTask<Vector> computeTaskVectorGreen = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.GREEN, barrier);
-		    	new Thread(computeTaskVectorGreen).start();
+		    	executor.execute(computeTaskVectorGreen);
 		    	FutureTask<Vector> computeTaskVectorBlue = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.BLUE, barrier);
-		    	new Thread(computeTaskVectorBlue).start();
+		    	executor.execute(computeTaskVectorBlue);
 		    	
 		    	// Wait for all the tasks to be completed.
 				barrier.await();
@@ -225,6 +222,22 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 			}
 	    }
 		return destToSolutionsMap;
+	}
+	
+	/**
+	 * Compute the divergence about a point in an image (over a given field)
+	 * 
+	 * @param img
+	 * @param channel
+	 * @param x
+	 * @param y
+	 */
+	protected int computeDivergenceAboutPoint(final BufferedImage img, final ColorChannel channel, final int x, final int y) {
+		return - ((img.getRGB(x - 1, y) & channel.mask()) >> channel.shift()) + 
+		       - ((img.getRGB(x, y - 1) & channel.mask()) >> channel.shift()) + 
+		       - ((img.getRGB(x + 1, y) & channel.mask()) >> channel.shift()) + 
+		       - ((img.getRGB(x, y + 1) & channel.mask()) >> channel.shift()) 
+		       + 4 * ((img.getRGB(x, y) & channel.mask()) >> channel.shift());
 	}
 	
 	public BufferedImage getDestinationImage() {
@@ -300,15 +313,9 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 							// Set the coefficient on the diagonal
 							matrixDataList.add(new MatrixCell(solutionRow, solutionRow, 4));
 							
-							// Compute the divergence on the fly
-							div = - ((srcImage.getRGB(x - 1, y) & channel.mask()) >> channel.shift()) + 
-							      - ((srcImage.getRGB(x, y - 1) & channel.mask()) >> channel.shift()) + 
-							      - ((srcImage.getRGB(x + 1, y) & channel.mask()) >> channel.shift()) + 
-							      - ((srcImage.getRGB(x, y + 1) & channel.mask()) >> channel.shift()) 
-							      + 4 * ((srcImage.getRGB(x, y) & channel.mask()) >> channel.shift());
+							// Compute the divergences about the current point for the source and destination
+							div = computeDivergenceAboutPoint(srcImage, channel, x, y);
 
-							//System.out.printf("%s (%d,%d) = %d --> %d\r\n", channel.name(), x+1, y+1, ((srcImage.getRGB(x, y) & channel.mask()) >> channel.shift()), div);
-							
 							// Construct the guidance field by adding the color intensity (by channel) to the right-hand side vector.
 							// Notice the the add() method uses the compound addition operator (i.e. rightHandSide[solutionRow] += value).
 							rhsVector.add(solutionRow, div);
@@ -323,59 +330,44 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 				if(solutionRow != N)
 					throw new ComputationException(String.format("The number of rows did not match the expected number. (solutionRow != N) --> (%d != %d) ", solutionRow, N));
 				
-				// Prepare three int[] arrays that will be used to load the data in the matrix.
-				int[] rowsArray = new int[matrixDataList.size()];
-				int[] colsArray = new int[matrixDataList.size()];
-				int[] valuesArray = new int[matrixDataList.size()];
-				
-				// For each non-zero cells of the sparse matrix, initialize the primitive arrays.
-				int i = 0;
-				for(MatrixCell cell: matrixDataList) {
-					rowsArray[i] = cell.row;
-					colsArray[i] = cell.col;
-					valuesArray[i] = cell.value;
-					
-					i++;
-				}
-				
-				// Prepare a circular byte buffer that will contain the data in memory.
-				CircularByteBuffer rawMatrixByteBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
-				
-				// Write the metadata and actual data for the sparse matrix.
-				MatrixVectorWriter matrixWriter = new MatrixVectorWriter(rawMatrixByteBuffer.getOutputStream());
-				matrixWriter.printMatrixInfo(new MatrixInfo(true, MatrixInfo.MatrixField.Integer, MatrixInfo.MatrixSymmetry.General));
-				matrixWriter.printMatrixSize(new MatrixSize(N, N, matrixDataList.size()));
-				matrixWriter.printCoordinate(rowsArray, colsArray, valuesArray, 1);
-				matrixWriter.close();
-				
-				// Prepare to read the raw data in the compressed format.
-				BufferedReader rawMatrixReader = new BufferedReader(new InputStreamReader(rawMatrixByteBuffer.getInputStream()));
-				
-				Vector solutionsVector = null;
-				try {
-					// Prepare a NxN sparse matrix, that will contain the system linear of equations.
-					Matrix A = new CompRowMatrix(new MatrixVectorReader(rawMatrixReader));
-					
-					// Prepare the solution vector that will contain the value of each computed pixel
-					// Shuffle some random data around to speed up the convergence of the solution.
-					solutionsVector = Matrices.random(N);
+				// Build an array containing a list of non-zero columns for the sake of feeding it to the sparse matrix
+		        List<Set<Integer>> nonZeroRows = new ArrayList<Set<Integer>>(N);
+		        for (int i = 0; i < N; ++i)
+		        	nonZeroRows.add(new HashSet<Integer>());
 
-				    // Choose a conjugate iterative solver to compute Ax = b
-				    IterativeSolver solver = new CG(solutionsVector);
-				    
-				    // Limit the solver iterations by setting up a custom monitor
-				    solver.setIterationMonitor(new MatrixSolverIterationMonitor(SOLVER_ITERATIONS));
-				    
-				    // Start the iterative solver
-				    solver.solve(A, rhsVector, solutionsVector);
-				} 
-				catch (IOException e) {
-					throw new ComputationException("Could not read the data to populate the sparse matrix.");
-				}
-				finally {
-					// Notify that the computation is completed.
-					doneSignal.countDown();
-				}
+				for(MatrixCell cell: matrixDataList)
+					nonZeroRows.get(cell.row).add(cell.col);
+
+		        int[][] nonZeroCells = new int[N][];
+		        for (int i = 0; i < N; ++i) {
+		        	nonZeroCells[i] = new int[nonZeroRows.get(i).size()];
+		            int j = 0;
+		            for (Integer colind : nonZeroRows.get(i))
+		            	nonZeroCells[i][j++] = colind;
+		        }
+				
+				// Prepare a NxN sparse matrix, that will contain the system linear of equations.
+				Matrix A = new CompRowMatrix(N, N, nonZeroCells);
+				
+				// Fill the matrix the actual values
+				for(MatrixCell cell: matrixDataList)
+					A.set(cell.row, cell.col, cell.value);
+				
+				// Prepare the solution vector that will contain the value of each computed pixel
+				// Shuffle some random data around to speed up the convergence of the solution.
+				Vector solutionsVector = Matrices.random(N);
+
+			    // Choose a Conjugate Gradient iterative solver to compute Ax = b
+			    IterativeSolver solver = new CG(solutionsVector);
+			    
+			    // Limit the solver iterations by setting up a custom monitor
+			    solver.setIterationMonitor(new MatrixSolverIterationMonitor(SOLVER_ITERATIONS));
+			    
+			    // Start the iterative solver
+			    solver.solve(A, rhsVector, solutionsVector);
+
+				// Notify that the computation is completed.
+				doneSignal.countDown();
 				
 				return solutionsVector;
 			}
