@@ -112,7 +112,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	}
 	
 	/**
-	 * Clamps the given value between 0 and 255 (to fit in an integer ARGB)
+	 * Clamps the given value between 0 and 255 (to fit in an integer ARGB pixel)
 	 * 
 	 * @return The clamped value.
 	 */
@@ -271,13 +271,6 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 			public Vector call() throws ComputationException, IterativeSolverNotConvergedException {
 				// Get the number of rows in the squared matrix. 
 				int N = destToSolutionsMap.size();
-				
-				/*
-			     * WARNING : This part of the algorithm is a bit tricky to understand.
-			     * Mostly because of the nature of sparse matrices, they cannot be created
-			     * interactively. Thus, we need to create temporary arrays to accumulate its
-			     * actual content. This is the reason why we need to use an List of cells.
-			     */
 			    
 				// This array will be used to prepare the sparse matrix (initial size N).
 				List<MatrixCell> matrixDataList = new ArrayList<MatrixCell>(N);
@@ -366,7 +359,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 			    // Start the iterative solver
 			    solver.solve(A, rhsVector, solutionsVector);
 
-				// Notify that the computation is completed.
+				// Notify the synchronization primitive that the computation is completed.
 				doneSignal.countDown();
 				
 				return solutionsVector;

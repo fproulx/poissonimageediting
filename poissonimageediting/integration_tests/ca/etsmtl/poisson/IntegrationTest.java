@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -65,17 +67,39 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 			srcImage = ImageIO.read(new File("resources/images/objects/duck.jpg"));
 			maskImage = ImageIO.read(new File("resources/images/masks/duck.png"));
 			destImage = ImageIO.read(new File("resources/images/backgrounds/green_lake_with_duck.png"));
-			 
+			*/
+			
 			srcImage = ImageIO.read(new File("resources/images/tests/validateInput/src-small.png"));
 			maskImage = ImageIO.read(new File("resources/images/tests/validateInput/mask-best.png"));
 			destImage = ImageIO.read(new File("resources/images/tests/validateInput/dst.png"));
-			*/
-			srcImage = ImageIO.read(new File("resources/images/objects/F16.png"));
-			maskImage = ImageIO.read(new File("resources/images/masks/F16mask.png"));
-			destImage = ImageIO.read(new File("resources/images/backgrounds/F16Target.jpg"));
 			
+			
+			/*srcImage = ImageIO.read(new File(chooser.getSelectedFile().getName()));
+			maskImage = ImageIO.read(new File("resources/images/masks/F16mask.png"));
+			destImage = ImageIO.read(new File("resources/images/backgrounds/F16Target.jpg"));*/
+			
+			/*
+			JFileChooser chooser = new JFileChooser();
+		    
+			chooser.setCurrentDirectory(new File("resources/images/"));
+			chooser.showOpenDialog(null);
+		    srcImage = ImageIO.read(chooser.getSelectedFile());
+		    
+		    chooser.setCurrentDirectory(new File("resources/images/"));
+		    chooser.showOpenDialog(null);
+		    maskImage = ImageIO.read(chooser.getSelectedFile());
+		    
+		    chooser.setCurrentDirectory(new File("resources/images/"));
+		    chooser.showOpenDialog(null);
+		    destImage = ImageIO.read(chooser.getSelectedFile());
+		    
+		    int x, y;
+		    x = Integer.parseInt(JOptionPane.showInputDialog("X"));
+		    y = Integer.parseInt(JOptionPane.showInputDialog("Y"));
+		    
+		    */
 			// Setup the Poisson solver
-			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(215, 150));
+			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(95, 95));
 			
 			// Do the heavy lifting
 			long t0 = System.nanoTime();
