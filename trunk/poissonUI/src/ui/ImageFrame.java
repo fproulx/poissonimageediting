@@ -9,7 +9,6 @@
 
 package ui;
 
-import java.awt.dnd.DropTarget;
 import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
@@ -21,11 +20,16 @@ import javax.swing.JPanel;
 import ui.containers.ImageFramesContainer;
 import ui.containers.ImageHolder;
 import ui.containers.PreviewContainer;
+import ui.containers.Selection;
 import ui.containers.WindowItem;
-import ui.dnd.ImageSelectionDrop;
-import ui.dnd.ImageSelectionHandler;
 import ui.events.ImageFrameEvents;
-import ui.events.ImageFrameMouseEvents;
+import ui.events.ImageFrameMouseListener;
+import ui.events.ImageFrameMouseMotionListener;
+
+import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
+import com.developpez.gfx.swing.drag.GhostDropEvent;
+import com.developpez.gfx.swing.drag.GhostDropListener;
+import com.developpez.gfx.swing.drag.GhostGlassPane;
 
 /**
  * Classe ImageFrame contient l'image de travail qui sera dans le desktop
@@ -41,14 +45,11 @@ public class ImageFrame extends JInternalFrame {
 	 * generated serial uid
 	 */
 	private static final long serialVersionUID = -2677920466179585697L;
-
 	private ImageHolder image;
-
 	private boolean modified = false;
-
 	private ImageFramesContainer container;
-
 	private WindowItem menuitem;
+	private final Selection selection = new Selection();
 
 	/**
 	 * Contructeur
@@ -60,8 +61,7 @@ public class ImageFrame extends JInternalFrame {
 	 * @param preview
 	 *            est le container du preview (pointer)
 	 */
-	public ImageFrame(ImageHolder img, ImageFramesContainer container,
-			PreviewContainer preview) {
+	public ImageFrame(ImageHolder img, ImageFramesContainer container, PreviewContainer preview) {
 
 		// passe param à la classe parent
 		super(img.getFilename(), true, true, true);
@@ -83,8 +83,7 @@ public class ImageFrame extends JInternalFrame {
 		add(panel);
 
 		// set les paramètres du imageframe
-		setSize(image.getOriginal().getWidth() + 30, image.getOriginal()
-				.getHeight() + 60);
+		setSize(image.getOriginal().getWidth() + 30, image.getOriginal().getHeight() + 60);
 		setVisible(true);
 		setAutoscrolls(true);
 		setFocusable(true);
@@ -95,14 +94,21 @@ public class ImageFrame extends JInternalFrame {
 
 		//ajouter les événements de la souris (mouseevent, dradndrop)
 		ImageFrameEvents ife = new ImageFrameEvents(this, preview);
-		ImageFrameMouseEvents ifme = new ImageFrameMouseEvents();
-		ImageSelectionDrop isd = new ImageSelectionDrop();
-
 		addInternalFrameListener(ife);
-		label.addMouseListener(ifme);
-		label.addMouseMotionListener(ifme);
-		label.setTransferHandler(new ImageSelectionHandler("icon", ifme));
-		label.setDropTarget(new DropTarget(UIView.selections, isd));
+		
+		GhostGlassPane glassPane = (GhostGlassPane) UIApp.getApplication().getMainFrame().getGlassPane();
+		
+		ImageFrameMouseListener mouseListener = new ImageFrameMouseListener(glassPane, image.getOriginal(), selection);
+		AbstractGhostDropManager dropListener = new AbstractGhostDropManager(UIView.selections) {
+			public void ghostDropped(GhostDropEvent e) {
+				System.out.println("Dropped " + e.getAction());
+			}
+		};
+		mouseListener.addGhostDropListener(dropListener);
+		label.addMouseListener(mouseListener);
+		
+		ImageFrameMouseMotionListener mouseMotionListener = new ImageFrameMouseMotionListener(glassPane, selection);
+		label.addMouseMotionListener(mouseMotionListener);
 	}
 
 	public boolean isModified() {
