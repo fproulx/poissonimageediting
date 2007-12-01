@@ -25,6 +25,8 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
+import com.developpez.gfx.swing.drag.GhostGlassPane;
+
 import ui.containers.ImageFramesContainer;
 import ui.containers.PreviewContainer;
 import ui.containers.WindowItem;
@@ -34,10 +36,13 @@ import ui.controllers.MenuController;
  * The application's main frame.
  */
 public class UIView extends FrameView implements Observer {
-
+	
 	public UIView(SingleFrameApplication app) {
 		super(app);
-
+		
+        GhostGlassPane glassPane = new GhostGlassPane();
+        getFrame().setGlassPane(glassPane);
+		
 		// initialisation de tous les components
 		initComponents();
 
