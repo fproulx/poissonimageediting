@@ -30,15 +30,19 @@ public class SelectionBrowser extends JComponent {
 
 	public static List<ImageHolder> images = new ArrayList<ImageHolder>();
 
-	public static int currentSize = 175;
+	public final static int currentSize = 180;
 
 	/** Creates a new instance of ImageBrowser */
 	public SelectionBrowser() {
 
+		initComponents();
+		//TODO: ici ajouter ghost drop lis de romain
+	}
+	
+	private void initComponents() {
 		setOpaque(true);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		
-		//TODO: ici ajouter ghost drop lis de romain
+		setPreferredSize(new Dimension(currentSize,0));
 	}
 
 	/**
