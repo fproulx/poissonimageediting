@@ -1,5 +1,5 @@
 /*
- * Seamless Image Cloning Tools
+ * SmartPhotomontage
  * Copyright (C) 2007
  * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
  * http://poissonimageediting.googlecode.com
@@ -13,28 +13,26 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
  */
 
-package ca.etsmtl.util;
+package ca.etsmtl.photomontage.matrix;
 
-/**
- * This is an enumeration of the bitmasks and bitshifts for each integer ARGB pixels.
- * @author fproulx
- *
- */
-public enum ColorChannel {
-	 RED (0x00FF0000, 16),
-	 GREEN (0x0000FF00, 8),
-	 BLUE (0x000000FF, 0),
-	 ALPHA (0xFF000000, 24);
-	 
-	 private final int mask, shift;
-	 ColorChannel(int mask, int shift) {
-		 this.mask = mask;
-		 this.shift = shift;
-	 }
-	 
-	 public int mask() { return mask; }
-	 public int shift() { return shift; }
+import no.uib.cipr.matrix.Vector;
+import no.uib.cipr.matrix.sparse.AbstractIterationMonitor;
+import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
+
+public class MatrixSolverIterationMonitor extends AbstractIterationMonitor {
+	private final int max;
+
+	public MatrixSolverIterationMonitor(int max) {
+		this.max = max;
+	}
+
+	protected boolean convergedI(final double r) throws IterativeSolverNotConvergedException {
+		return iter >= max;
+	}
+
+	protected boolean convergedI(final double r, final Vector x) throws IterativeSolverNotConvergedException {
+		return convergedI(r);
+	}
 }

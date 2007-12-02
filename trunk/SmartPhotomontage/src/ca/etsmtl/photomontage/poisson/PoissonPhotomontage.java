@@ -1,5 +1,5 @@
 /*
- * Seamless Image Cloning Tools
+ * SmartPhotomontage
  * Copyright (C) 2007
  * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
  * http://poissonimageediting.googlecode.com
@@ -42,11 +42,11 @@ import no.uib.cipr.matrix.sparse.CG;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
-import ca.etsmtl.matrix.MatrixCell;
-import ca.etsmtl.matrix.MatrixSolverIterationMonitor;
 import ca.etsmtl.photomontage.AbstractPhotomontage;
 import ca.etsmtl.photomontage.exceptions.ComputationException;
-import ca.etsmtl.util.ColorChannel;
+import ca.etsmtl.photomontage.matrix.MatrixCell;
+import ca.etsmtl.photomontage.matrix.MatrixSolverIterationMonitor;
+import ca.etsmtl.photomontage.util.ColorChannel;
 
 /**
  * This is an implementation of <a href="http://research.microsoft.com/vision/cambridge/papers/perez_siggraph03.pdf">the "Poisson Image Editing" algorithm</a>.

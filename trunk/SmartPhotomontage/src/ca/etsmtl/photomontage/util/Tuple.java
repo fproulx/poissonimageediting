@@ -16,16 +16,13 @@
  *
  */
 
-package ca.etsmtl.photomontage.exceptions;
+package ca.etsmtl.photomontage.util;
 
-public class ComputationException extends Exception {
-	private static final long serialVersionUID = -1982069004778632902L;
+public class Tuple {
+	public final int u, v;
 	
-	/**
-	 * Constructor
-	 * @param msg
-	 */
-	public ComputationException(String msg) {
-		super("The computation could not complete successfully because of: \r\n" + msg);
+	public Tuple(int u, int v) {
+		this.u = u;
+		this.v = v;
 	}
 }

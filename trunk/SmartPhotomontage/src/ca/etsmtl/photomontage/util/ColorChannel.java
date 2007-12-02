@@ -1,5 +1,5 @@
 /*
- * Seamless Image Cloning Tools
+ * SmartPhotomontage
  * Copyright (C) 2007
  * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
  * http://poissonimageediting.googlecode.com
@@ -13,18 +13,28 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
+ *
  */
 
-package ca.etsmtl.matrix;
+package ca.etsmtl.photomontage.util;
 
-public class MatrixCell {
-	public final int row;
-	public final int col;
-	public final int value;
-	
-	public MatrixCell(final int row, final int col, final int value) {
-		this.row = row;
-		this.col = col;
-		this.value = value;
-	}
+/**
+ * This is an enumeration of the bitmasks and bitshifts for each integer ARGB pixels.
+ * @author fproulx
+ *
+ */
+public enum ColorChannel {
+	 RED (0x00FF0000, 16),
+	 GREEN (0x0000FF00, 8),
+	 BLUE (0x000000FF, 0),
+	 ALPHA (0xFF000000, 24);
+	 
+	 private final int mask, shift;
+	 ColorChannel(int mask, int shift) {
+		 this.mask = mask;
+		 this.shift = shift;
+	 }
+	 
+	 public int mask() { return mask; }
+	 public int shift() { return shift; }
 }
