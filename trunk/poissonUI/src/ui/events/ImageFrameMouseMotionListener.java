@@ -1,6 +1,7 @@
 package ui.events;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 import ui.containers.Selection;
@@ -37,10 +38,12 @@ public class ImageFrameMouseMotionListener extends GhostMotionAdapter {
 		if (selection.isSelectionMode() == true) {
 			if (!selection.getPoints().contains(e.getPoint())) {
 	
-				//System.out.println("mouseDragged at " + e.getPoint());
+				// Draw a line from the last point to the new one which is the cutest
+				Point last = selection.getPoints().get(selection.getPoints().size()-1);
+				
 				selection.getPoints().add(e.getPoint());
 				Graphics g = e.getComponent().getGraphics();
-				g.drawRect(e.getPoint().x, e.getPoint().y, 1, 1);
+				g.drawLine(e.getPoint().x, e.getPoint().y, last.x, last.y);
 	
 			}
 		}
