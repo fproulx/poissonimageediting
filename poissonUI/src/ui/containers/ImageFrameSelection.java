@@ -9,7 +9,7 @@ import java.util.List;
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel <lebel.kim@gmail.com>, Jean-Philippe Plante <jphilippeplante@gmail.com>, Francois Proulx <francois.proulx@gmail.com> 
  * TODO improve this class's friendliness with ImageFrameMouseListener 
  */
-public class Selection {
+public class ImageFrameSelection {
 
 	private boolean mode = true;
 	private List<Point> points = new ArrayList<Point>();

@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import ui.containers.Selection;
+import ui.containers.ImageFrameSelection;
 
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 import com.developpez.gfx.swing.drag.GhostMotionAdapter;
@@ -20,14 +20,14 @@ import com.developpez.gfx.swing.drag.GhostMotionAdapter;
 
 public class ImageFrameMouseMotionListener extends GhostMotionAdapter {
 	
-	private Selection selection;
+	private ImageFrameSelection selection;
 	
 	public ImageFrameMouseMotionListener(GhostGlassPane glassPane) {
 		super(glassPane);
 		// TODO Auto-generated constructor stub
 	}
 	
-	public ImageFrameMouseMotionListener(GhostGlassPane glassPane, Selection selection) {
+	public ImageFrameMouseMotionListener(GhostGlassPane glassPane, ImageFrameSelection selection) {
 		super(glassPane);
 		// TODO Auto-generated constructor stub
 		

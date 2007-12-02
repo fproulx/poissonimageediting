@@ -9,21 +9,19 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
-import ui.containers.Selection;
+import ui.containers.ImageFrameSelection;
 
 import com.developpez.gfx.swing.drag.GhostDropAdapter;
 import com.developpez.gfx.swing.drag.GhostDropEvent;
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 
+//TODO: Fix bug disappearing lines ?!
 /**
- * 
+ *
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  * <lebel.kim@gmail.com>, Jean-Philippe Plante
  * <jphilippeplante@gmail.com>, Francois Proulx
@@ -32,7 +30,7 @@ import com.developpez.gfx.swing.drag.GhostGlassPane;
  */
 
 public class ImageFrameMouseListener extends GhostDropAdapter {
-	private Selection selection;
+	private ImageFrameSelection selection;
 	
 	// Image that represents the selected part of the image
 	private BufferedImage srcImage;
@@ -42,15 +40,10 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	
 	// Original image
 	private BufferedImage origImage;
-	
-	// TODO Original image with the selection line drawn on it
-	private BufferedImage origPlusSelectionImage;
 
-	//TODO: remove image --> change vers mask
-	public ImageFrameMouseListener(GhostGlassPane glassPane, BufferedImage img, Selection selection) {
+	public ImageFrameMouseListener(GhostGlassPane glassPane, BufferedImage img, ImageFrameSelection selection) {
 		super(glassPane, null);
-		// TODO Auto-generated constructor stub
-		
+
 		this.selection = selection;
 		this.origImage = img;
 	}
@@ -143,26 +136,15 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 			graphSrc.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
 			graphSrc.drawImage(origImage,0,0,srcImage.getWidth(),srcImage.getHeight(),topleft.x,topleft.y,srcImage.getWidth()+topleft.x,srcImage.getHeight()+topleft.y,null);
 			
-			
-			try {
-				//TODO get rid of this
-				ImageIO.write(srcImage, "PNG", new File("C://mask1.png"));
-	
-			} catch (IOException e1) {
-	
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} finally {
-				selection.setMode(false);
-				System.out.println("selectionMode setted to false");
-			}
+			selection.setMode(false);
+
 		} else {
 			Component c = e.getComponent();
 			if (!(e.getPoint().x < 0 || e.getPoint().y < 0  || e.getPoint().x > c.getWidth() || e.getPoint().y > c.getHeight())) {
 				// if selection mode == false and the mouse was released in the image, clear selection
 				points.clear();
 				
-				//TODO Frank thinks this is code smell, find a better way to do it
+				// Force a repaint of the attached ImageFrame to clear the current selection
 				c.repaint();
 				
 				// let's go again in selectionMode 
@@ -180,7 +162,7 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	        glassPane.setVisible(false);
 	        glassPane.setImage(null);
 
-	        fireGhostDropEvent(new GhostDropEvent(action, eventPoint));
+	        fireGhostDropEvent(new SelectionGhostDropEvent(srcImage, maskImage, eventPoint));
 		}
 	}
 }
