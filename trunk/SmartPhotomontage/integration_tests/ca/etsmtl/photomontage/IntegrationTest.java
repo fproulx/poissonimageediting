@@ -38,21 +38,36 @@ import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
  *
  */
 interface DataComputer<T> {
+	/**
+	 * 
+	 * @return
+	 */
 	public T computeData();
 	public void addComputationListener(ComputationListener<T> cl);
 	public void notifyComputationListeners(T s, T m, T o);
 }
 
+/**
+ * IntegrationTest for integration testing with a UI
+ *
+ */
 public class IntegrationTest implements DataComputer<BufferedImage> {
 	BufferedImage srcImage, maskImage, destImage;
 	BufferedImage output;
 	List<ComputationListener<BufferedImage>> computationListeners = new ArrayList<ComputationListener<BufferedImage>>();
 	
+	/**
+	 * Main
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		IntegrationTest test = new IntegrationTest();
 		test.computeData();
 	}
 	
+	/**
+	 * Constructor for integration testing
+	 */
 	public IntegrationTest() {
 		final DataComputer<BufferedImage> self = this;
 		SwingUtilities.invokeLater(new Runnable() {
@@ -151,11 +166,19 @@ class ComputationResultsDisplay extends JFrame implements ComputationListener<Bu
 		initComponents();
 	}
 	
+	/**
+	 * Initialize components
+	 */
 	public void initComponents() {
 		setSize(1024, 768);
 		setLocationRelativeTo(null);
 		
 		displayPanel = new JPanel() {
+			/**
+			 * generated UID
+			 */
+			private static final long serialVersionUID = 7178866588266350768L;
+
 			public void paint(Graphics g) {
 				if(computedImage != null) {
 					synchronized(computedImage) {

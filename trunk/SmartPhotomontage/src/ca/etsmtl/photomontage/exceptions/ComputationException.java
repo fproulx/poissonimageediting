@@ -18,6 +18,10 @@
 
 package ca.etsmtl.photomontage.exceptions;
 
+/**
+ * ComputationException, exception for computation error
+ *
+ */
 public class ComputationException extends Exception {
 	private static final long serialVersionUID = -1982069004778632902L;
 	

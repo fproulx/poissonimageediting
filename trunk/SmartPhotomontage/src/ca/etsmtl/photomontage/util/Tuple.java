@@ -18,9 +18,26 @@
 
 package ca.etsmtl.photomontage.util;
 
+/**
+ * Tuple is representing the gradiant variation
+ *
+ */
 public class Tuple {
-	public final int u, v;
+	/**
+	 * variation of the gradiant in x 
+	 */
+	public final int u;
 	
+	/**
+	 * variation of the gradiant in y
+	 */
+	public final int v;
+	
+	/**
+	 * Constructor
+	 * @param u variation in x
+	 * @param v variation in y
+	 */
 	public Tuple(int u, int v) {
 		this.u = u;
 		this.v = v;

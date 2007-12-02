@@ -17,11 +17,30 @@
 
 package ca.etsmtl.photomontage.matrix;
 
+/**
+ * MatrixCell is representing a cell in a matrix
+ *
+ */
 public class MatrixCell {
+	/**
+	 * row number
+	 */
 	public final int row;
+	/**
+	 * col number
+	 */
 	public final int col;
+	/**
+	 * rgba value
+	 */
 	public final int value;
 	
+	/**
+	 * Constructor
+	 * @param row number
+	 * @param col number
+	 * @param value for rgba
+	 */
 	public MatrixCell(final int row, final int col, final int value) {
 		this.row = row;
 		this.col = col;

@@ -22,6 +22,10 @@ import java.awt.image.BufferedImage;
 import static org.junit.Assert.fail;
 import static ca.etsmtl.photomontage.util.ColorChannel.*;
 
+/**
+ * Custom Assert for the unit tests
+ *
+ */
 public class CustomAssert {
 
 	/**
