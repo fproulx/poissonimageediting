@@ -5,7 +5,6 @@
 package ui;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.Observer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.Timer;
@@ -472,5 +470,9 @@ public class UIView extends FrameView implements Observer {
 			// clean mdi frames
 			mdiframes = null;
 		}
+	}
+
+	public SelectionBrowser getSelectionBrowser() {
+		return selectionBrowser;
 	}
 }
