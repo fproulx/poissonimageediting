@@ -30,7 +30,18 @@ import com.developpez.gfx.swing.drag.GhostGlassPane;
 
 public class ImageFrameMouseListener extends GhostDropAdapter {
 	private Selection selection;
-	private BufferedImage image;
+	
+	// Image that represents the selected part of the image (used for drag and drop effect)
+	private BufferedImage ghostImage;
+	
+	// Image that represents the actual mask (only composed of black and white)
+	private BufferedImage maskImage;
+	
+	// Original image
+	private BufferedImage origImage;
+	
+	// TODO Original image with the selection line drawn on it
+	private BufferedImage origPlusSelectionImage;
 
 	//TODO: remove image --> change vers mask
 	public ImageFrameMouseListener(GhostGlassPane glassPane, BufferedImage img, Selection selection) {
@@ -38,7 +49,7 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 		// TODO Auto-generated constructor stub
 		
 		this.selection = selection;
-		this.image = img;
+		this.origImage = img;
 	}
 	
 	public void mousePressed(MouseEvent e) {
@@ -53,9 +64,6 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 			System.out.println("Mouse pressed; # of clicks: " + e.getClickCount());
 			points.add(e.getPoint());
 			Graphics g = e.getComponent().getGraphics();
-			g.drawRect(e.getPoint().x, e.getPoint().y, 1, 1);
-			
-			System.out.println("Pressed" + e.getPoint());
 		}
 		else {
 			Component c = e.getComponent();
@@ -67,7 +75,7 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	        SwingUtilities.convertPointFromScreen(p, glassPane);
 
 	        glassPane.setPoint(p);
-	        glassPane.setImage(image);
+	        glassPane.setImage(origImage);
 	        glassPane.repaint();
 		}
 	}
