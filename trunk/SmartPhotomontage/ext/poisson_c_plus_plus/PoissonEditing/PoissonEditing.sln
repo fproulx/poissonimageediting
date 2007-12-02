@@ -1,0 +1,39 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PoissonEditing", "PoissonEditing.vcproj", "{CAF24540-BF3A-41C9-82A5-99F23487CAA4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94BF2831-2A24-46BA-B5AC-9456E3A2A32C} = {94BF2831-2A24-46BA-B5AC-9456E3A2A32C}
+		{E27ABD4E-2093-4194-985E-E9EE5BF040D8} = {E27ABD4E-2093-4194-985E-E9EE5BF040D8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imagelib", "..\imagelib\imagelib.vcproj", "{94BF2831-2A24-46BA-B5AC-9456E3A2A32C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "taucs", "..\taucs\taucs.vcproj", "{E27ABD4E-2093-4194-985E-E9EE5BF040D8}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{CAF24540-BF3A-41C9-82A5-99F23487CAA4}.Debug.ActiveCfg = Debug|Win32
+		{CAF24540-BF3A-41C9-82A5-99F23487CAA4}.Debug.Build.0 = Debug|Win32
+		{CAF24540-BF3A-41C9-82A5-99F23487CAA4}.Release.ActiveCfg = Release|Win32
+		{CAF24540-BF3A-41C9-82A5-99F23487CAA4}.Release.Build.0 = Release|Win32
+		{94BF2831-2A24-46BA-B5AC-9456E3A2A32C}.Debug.ActiveCfg = Debug|Win32
+		{94BF2831-2A24-46BA-B5AC-9456E3A2A32C}.Debug.Build.0 = Debug|Win32
+		{94BF2831-2A24-46BA-B5AC-9456E3A2A32C}.Release.ActiveCfg = Release|Win32
+		{94BF2831-2A24-46BA-B5AC-9456E3A2A32C}.Release.Build.0 = Release|Win32
+		{E27ABD4E-2093-4194-985E-E9EE5BF040D8}.Debug.ActiveCfg = Debug|Win32
+		{E27ABD4E-2093-4194-985E-E9EE5BF040D8}.Debug.Build.0 = Debug|Win32
+		{E27ABD4E-2093-4194-985E-E9EE5BF040D8}.Release.ActiveCfg = Release|Win32
+		{E27ABD4E-2093-4194-985E-E9EE5BF040D8}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
