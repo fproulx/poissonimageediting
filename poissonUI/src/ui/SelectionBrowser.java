@@ -9,11 +9,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
-import com.developpez.gfx.swing.drag.GhostDropEvent;
-
 import ui.containers.ImageHolder;
 import ui.containers.SelectionHolder;
+import ui.events.ImageFrameMouseListener;
+import ui.events.ImageFrameMouseMotionListener;
+import ui.events.SelectionBrowserMouseListener;
+
+import com.developpez.gfx.swing.drag.GhostGlassPane;
+import com.developpez.gfx.swing.drag.GhostMotionAdapter;
 
 
 /**
@@ -57,10 +60,14 @@ public class SelectionBrowser extends JComponent {
 		JLabel label = new JLabel();
 		label.setIcon(new ImageIcon(selHold.getScaledSourceImage()));
 
-		// add listener for select image
-		//TODO: romain guy rules !
-		//label.addMouseListener(new ImageBrowserMouseListener(holder, container, preview));
-
+		GhostGlassPane glassPane = (GhostGlassPane) UIApp.getApplication().getMainFrame().getGlassPane();
+		
+		SelectionBrowserMouseListener mouseListener = new SelectionBrowserMouseListener(glassPane, selHold.getSourceImage());
+		label.addMouseListener(mouseListener);
+		
+		GhostMotionAdapter mouseMotionListener = new GhostMotionAdapter(glassPane);
+		label.addMouseMotionListener(mouseMotionListener);
+		
 		add(label);
 		revalidate();
 	}
