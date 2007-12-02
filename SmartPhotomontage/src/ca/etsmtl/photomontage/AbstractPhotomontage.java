@@ -1,5 +1,5 @@
 /*
- * Seamless Image Cloning Tools
+ * SmartPhotomontage
  * Copyright (C) 2007
  * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
  * http://poissonimageediting.googlecode.com
