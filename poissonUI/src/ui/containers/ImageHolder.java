@@ -62,11 +62,9 @@ public class ImageHolder {
 		float scaleFactor = (float) width / original.getWidth();
 		int scaledH = (int) (original.getHeight() * scaleFactor);
 
-		BufferedImage img = new BufferedImage(width, scaledH, original
-				.getType());
+		BufferedImage img = new BufferedImage(width, scaledH, original.getType());
 		Graphics2D g2d = img.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-				RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g2d.drawImage(original, 0, 0, width, scaledH, null);
 		g2d.dispose();
 

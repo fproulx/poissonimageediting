@@ -64,7 +64,7 @@ public class ImageFramesContainer extends Observable {
 	public boolean contains(ImageFrame frame) {
 		// check if its in the imageframe list
 		for (ImageFrame myframe : imageFrames) {
-			if (frame.getImage().hashCode() == myframe.getImage().hashCode()) {
+			if (frame.getImageHolder().hashCode() == myframe.getImageHolder().hashCode()) {
 				return true;
 			}
 		}
