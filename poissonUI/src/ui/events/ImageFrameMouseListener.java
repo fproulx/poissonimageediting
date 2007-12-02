@@ -1,8 +1,12 @@
 package ui.events;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -10,7 +14,6 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import ui.containers.Selection;
@@ -31,8 +34,8 @@ import com.developpez.gfx.swing.drag.GhostGlassPane;
 public class ImageFrameMouseListener extends GhostDropAdapter {
 	private Selection selection;
 	
-	// Image that represents the selected part of the image (used for drag and drop effect)
-	private BufferedImage ghostImage;
+	// Image that represents the selected part of the image
+	private BufferedImage srcImage;
 	
 	// Image that represents the actual mask (only composed of black and white)
 	private BufferedImage maskImage;
@@ -75,7 +78,7 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	        SwingUtilities.convertPointFromScreen(p, glassPane);
 
 	        glassPane.setPoint(p);
-	        glassPane.setImage(origImage);
+	        glassPane.setImage(srcImage);
 	        glassPane.repaint();
 		}
 	}
@@ -87,131 +90,63 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 		List<Point> points = selection.getPoints();
 		
 		if (selection.isSelectionMode() == true) {	
-			// Trouver le premier point cliqué et le dernier
-			int indexDernierPoint = points.size() - 1;
-			Point premierPoint = points.get(0);
-			Point dernierPoint = points.get(indexDernierPoint);
+			// Finish the selection by drawing a line between the first point and the point where the mouse was released
 			Graphics g = e.getComponent().getGraphics();
-	
-			// ajouter les points de la ligne entre le premier point et le dernier
-			if (premierPoint.x > dernierPoint.x) {
-				premierPoint = dernierPoint;
-				dernierPoint = points.get(0);
-			}
-	
-			int x0 = premierPoint.x;
-			int y0 = premierPoint.y;
-			int x1 = dernierPoint.x - 1;
-			int y1 = dernierPoint.y - 1;
-			int dx = x1 - x0;
-			int dy = y1 - y0;
-			int x = x0;
-			int y = y0;
-			int d = -dx + 2 * dy;
-			int dE = 2 * dy;
-			int dNE = 2 * dy - 2 * dx;
-	
-			while (x <= x1) {
-				if (d <= 0) {
-					d += dE;
-				} else {
-					d += dNE;
-					++y;
+			Point first = points.get(0);
+			points.add(e.getPoint());
+			points.add(first);
+			g.drawLine(e.getPoint().x, e.getPoint().y, first.x, first.y);
+
+			// Find the upperleft pixel of the selection
+			Point topleft = (Point) first.clone();
+			for(Point p:points) {
+				if (p.x < topleft.x) {
+					topleft.x = p.x;
 				}
-	
-				++x;
-	
-				Point pointLigne = new Point(x, y);
-	
-				if (points.contains(pointLigne))
-					break;
-				else
-					points.add(pointLigne);
-	
-				System.out.println(pointLigne);
-				g.drawLine(x0, y0, x1, y1);
-			}
-	
-			int maxX = 0;
-			int minX = points.get(0).x;
-			int maxY = 0;
-			int minY = points.get(0).y;
-	
-			// Trouver le min en x
-			for (int i = 0; i < points.size(); i++) {
-				if (points.get(i).x > maxX) {
-					maxX = points.get(i).x;
-				}
-	
-				if (points.get(i).x < minX) {
-					minX = points.get(i).x;
-				}
-	
-				if (points.get(i).y > maxY) {
-					maxY = points.get(i).y;
-				}
-	
-				if (points.get(i).y < minY) {
-					minY = points.get(i).y;
+				if (p.y < topleft.y) {
+					topleft.y = p.y;
 				}
 			}
-	
-			BufferedImage mask = new BufferedImage(maxX - minX, maxY - minY,
-					BufferedImage.TYPE_INT_RGB);
-	
-			// int[][] mask = new int[maxX-minX][maxY-minY];
-			for (int i = minX; i < maxX; i++) {
-				boolean flip = false;
-	
-				for (int j = minY; j < maxY; j++) {
-	
-					if (points.contains(new Point(i, j))
-						&& !points.contains(new Point(i, j - 1))
-						&& !points.contains(new Point(i, j + 1))) {
-							flip = true;
-					}
-	
-					if (points.contains(new Point(i, j))
-						&& !points.contains(new Point(i, j - 1))
-						&& points.contains(new Point(i, j + 1))) {
-							flip = true;
-					}
-	
-					if (points.contains(new Point(i, j))
-						&& points.contains(new Point(i, j - 1))
-						&& !points.contains(new Point(i, j + 1))) {
-							flip = true;
-					}
-	
-					if (points.contains(new Point(i, j))
-						&& points.contains(new Point(i, j - 1))
-						&& points.contains(new Point(i, j + 1))) {
-							flip = false;
-					}
-	
-					if (flip) {
-						// mask[i - minX][j - minY] = 1;
-						mask.setRGB(i - minX, j - minY, 0xFFFFFFFF);
-	
-					} else {
-	
-						// mask[i - minX][j - minY] = 0;
-						mask.setRGB(i - minX, j - minY, 0);
-					}
-				}
+			
+			// Construct a polygon from the series of points and fill it
+			// Note: this polygon's coordinates are related to the original image
+			Polygon poly = new Polygon();
+			for(Point p: points) {
+				poly.addPoint(p.x - topleft.x, p.y - topleft.y);
 			}
-	
-			/*
-			 * for(int i = 0; i < mask.length;i++) {
-			 * 		for(int j = 0; j < mask[i].length;j++) {
-			 * 			System.out.print(mask[i][j]);
-			 *  	}
-			 * 		System.out.println();
-			 * }
-			 */
-	
+
+			
+			// Alter the polygon's points to be related to the extracted image with the mask
+			// FIXME if there is only a click and release, there is no points this sucks throw Exception 
+			maskImage = new BufferedImage(poly.getBounds().width, poly.getBounds().height,
+			BufferedImage.TYPE_INT_ARGB);
+			
+			srcImage = new BufferedImage(poly.getBounds().width, poly.getBounds().height,
+					BufferedImage.TYPE_INT_ARGB);
+
+			
+			// MASK: Fill bgcolor with translucent/black then fill polygon in opaque/white
+			Graphics2D graphMask = (Graphics2D) maskImage.getGraphics();
+			graphMask.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f));
+			// TODO use Color constants after merging with the Poisson part
+			graphMask.setColor(new Color(0x00000000));
+			graphMask.fillRect(0, 0, maskImage.getWidth(), maskImage.getHeight());
+			graphMask.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+			graphMask.setColor(Color.white);
+			graphMask.fillPolygon(poly);
+			
+			// SOURCE IMAGE
+			Graphics2D graphSrc = (Graphics2D) srcImage.getGraphics();
+			// Copy mask as the background for srcImage
+			graphSrc.drawImage(maskImage, 0,0, null);
+			// Paste over original image using the correct AlphaComposite
+			graphSrc.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
+			graphSrc.drawImage(origImage,0,0,srcImage.getWidth(),srcImage.getHeight(),topleft.x,topleft.y,srcImage.getWidth()+topleft.x,srcImage.getHeight()+topleft.y,null);
+			
+			
 			try {
-				ImageIO.write(mask, "PNG", new File("C://mask1.png"));
+				//TODO get rid of this
+				ImageIO.write(srcImage, "PNG", new File("C://mask1.png"));
 	
 			} catch (IOException e1) {
 	
