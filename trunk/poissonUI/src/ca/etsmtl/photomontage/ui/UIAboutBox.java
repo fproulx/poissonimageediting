@@ -2,7 +2,7 @@
  * UIAboutBox.java
  */
 
-package ui;
+package ca.etsmtl.photomontage.ui;
 
 import org.jdesktop.application.Action;
 
@@ -46,14 +46,14 @@ public class UIAboutBox extends javax.swing.JDialog {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
-				.getInstance(ui.UIApp.class).getContext().getResourceMap(
+				.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getResourceMap(
 						UIAboutBox.class);
 		setTitle(resourceMap.getString("title")); // NOI18N
 		setName("aboutBox"); // NOI18N
 		setResizable(false);
 
 		javax.swing.ActionMap actionMap = org.jdesktop.application.Application
-				.getInstance(ui.UIApp.class).getContext().getActionMap(
+				.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getActionMap(
 						UIAboutBox.class, this);
 		closeButton.setAction(actionMap.get("closeAboutBox")); // NOI18N
 

@@ -1,4 +1,4 @@
-package ui.events;
+package ca.etsmtl.photomontage.ui.events;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -13,7 +13,8 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import ui.containers.ImageFrameSelection;
+
+import ca.etsmtl.photomontage.ui.containers.ImageFrameSelection;
 
 import com.developpez.gfx.swing.drag.GhostDropAdapter;
 import com.developpez.gfx.swing.drag.GhostDropEvent;

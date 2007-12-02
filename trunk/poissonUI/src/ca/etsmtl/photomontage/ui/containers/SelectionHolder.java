@@ -7,13 +7,14 @@
  * and open the template in the editor.
  */
 
-package ui.containers;
+package ca.etsmtl.photomontage.ui.containers;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import ui.SelectionBrowser;
+import ca.etsmtl.photomontage.ui.SelectionBrowser;
+
 
 /**
  * SelectionHolder contains the mask, scaled version 

@@ -1,10 +1,11 @@
-package ui.events;
+package ca.etsmtl.photomontage.ui.events;
 
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import ui.containers.ImageFrameSelection;
+
+import ca.etsmtl.photomontage.ui.containers.ImageFrameSelection;
 
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 import com.developpez.gfx.swing.drag.GhostMotionAdapter;

@@ -1,4 +1,4 @@
-package ui.events;
+package ca.etsmtl.photomontage.ui.events;
 
 import java.awt.Component;
 import java.awt.Point;
@@ -9,10 +9,11 @@ import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import ui.ImageFrame;
-import ui.SelectionBrowser;
-import ui.UIApp;
-import ui.UIView;
+
+import ca.etsmtl.photomontage.ui.ImageFrame;
+import ca.etsmtl.photomontage.ui.SelectionBrowser;
+import ca.etsmtl.photomontage.ui.UIApp;
+import ca.etsmtl.photomontage.ui.UIView;
 
 import com.developpez.gfx.swing.drag.GhostDropAdapter;
 import com.developpez.gfx.swing.drag.GhostGlassPane;

@@ -1,4 +1,4 @@
-package ui;
+package ca.etsmtl.photomontage.ui;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -16,10 +16,11 @@ import org.jdesktop.tools.io.FileTreeWalk;
 import org.jdesktop.tools.io.FileTreeWalker;
 import org.jdesktop.tools.io.UnixGlobFileFilter;
 
-import ui.containers.ImageFramesContainer;
-import ui.containers.ImageHolder;
-import ui.containers.PreviewContainer;
-import ui.events.ImageBrowserMouseListener;
+import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
+import ca.etsmtl.photomontage.ui.containers.ImageHolder;
+import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
+import ca.etsmtl.photomontage.ui.events.ImageBrowserMouseListener;
+
 
 /**
  * Image Browser based on a demo of the AnimatedTransitions library uses a layout manager to

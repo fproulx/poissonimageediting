@@ -7,15 +7,16 @@
  * and open the template in the editor.
  */
 
-package ui.events;
+package ca.etsmtl.photomontage.ui.events;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import ui.ImageFrame;
-import ui.containers.ImageFramesContainer;
-import ui.containers.ImageHolder;
-import ui.containers.PreviewContainer;
+import ca.etsmtl.photomontage.ui.ImageFrame;
+import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
+import ca.etsmtl.photomontage.ui.containers.ImageHolder;
+import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
+
 
 /**
  * Classe ImageBrowserMouseListener est l'implémentation les événements de la

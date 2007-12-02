@@ -7,13 +7,14 @@
  * and open the template in the editor.
  */
 
-package ui.containers;
+package ca.etsmtl.photomontage.ui.containers;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
-import ui.ImageBrowser;
+import ca.etsmtl.photomontage.ui.ImageBrowser;
+
 
 /**
  * Classe ImageHolder contient l'image original ainsi que le preview

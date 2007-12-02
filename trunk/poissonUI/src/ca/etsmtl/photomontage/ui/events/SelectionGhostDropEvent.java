@@ -1,4 +1,4 @@
-package ui.events;
+package ca.etsmtl.photomontage.ui.events;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;

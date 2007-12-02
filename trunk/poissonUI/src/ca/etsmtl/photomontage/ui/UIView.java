@@ -2,7 +2,7 @@
  * UIView.java
  */
 
-package ui;
+package ca.etsmtl.photomontage.ui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -24,10 +24,11 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
-import ui.containers.ImageFramesContainer;
-import ui.containers.PreviewContainer;
-import ui.containers.WindowItem;
-import ui.controllers.MenuController;
+
+import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
+import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
+import ca.etsmtl.photomontage.ui.containers.WindowItem;
+import ca.etsmtl.photomontage.ui.controllers.MenuController;
 
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 
@@ -178,7 +179,7 @@ public class UIView extends FrameView implements Observer {
 		rightpanel.setName("rightpanel"); // NOI18N
 
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
-				.getInstance(ui.UIApp.class).getContext().getResourceMap(
+				.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getResourceMap(
 						UIView.class);
 
 		org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(rightpanel);
@@ -270,7 +271,7 @@ public class UIView extends FrameView implements Observer {
 		fileMenu.add(saveMenuItem);
 
 		javax.swing.ActionMap actionMap = org.jdesktop.application.Application
-				.getInstance(ui.UIApp.class).getContext().getActionMap(
+				.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getActionMap(
 						UIView.class, this);
 		exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
 		exitMenuItem.setName("exitMenuItem"); // NOI18N
@@ -424,7 +425,7 @@ public class UIView extends FrameView implements Observer {
 	// preview container
 	private PreviewContainer previewcontainer = new PreviewContainer();
 
-	// ui menu controller
+	// ca.etsmtl.photomontage.ui menu controller
 	private MenuController menuCtrl = new MenuController();
 
 	// image browser

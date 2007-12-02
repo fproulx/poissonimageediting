@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package ui.controllers;
+package ca.etsmtl.photomontage.ui.controllers;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,7 +17,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import ui.ImageBrowser;
+import ca.etsmtl.photomontage.ui.ImageBrowser;
+
 
 /**
  * Classe MenuController s'occupe des actions des menus
