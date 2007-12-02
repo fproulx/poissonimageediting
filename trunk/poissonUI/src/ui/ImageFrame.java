@@ -21,10 +21,12 @@ import ui.containers.ImageFrameSelection;
 import ui.containers.ImageFramesContainer;
 import ui.containers.ImageHolder;
 import ui.containers.PreviewContainer;
+import ui.containers.SelectionHolder;
 import ui.containers.WindowItem;
 import ui.events.ImageFrameEvents;
 import ui.events.ImageFrameMouseListener;
 import ui.events.ImageFrameMouseMotionListener;
+import ui.events.SelectionGhostDropEvent;
 
 import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
 import com.developpez.gfx.swing.drag.GhostDropEvent;
@@ -84,6 +86,7 @@ public class ImageFrame extends JInternalFrame {
 		// set les paramètres du imageframe
 		setSize(image.getOriginal().getWidth() + 30, image.getOriginal().getHeight() + 60);
 		setVisible(true);
+		setMaximizable(false);
 		setAutoscrolls(true);
 		setFocusable(true);
 
@@ -92,6 +95,7 @@ public class ImageFrame extends JInternalFrame {
 		requestFocus();
 
 		//ajouter les événements de la souris (mouseevent, dradndrop)
+		//TODO get rid of preview
 		ImageFrameEvents ife = new ImageFrameEvents(this, preview);
 		addInternalFrameListener(ife);
 		
@@ -102,6 +106,24 @@ public class ImageFrame extends JInternalFrame {
 		
 		ImageFrameMouseMotionListener mouseMotionListener = new ImageFrameMouseMotionListener(glassPane, selection);
 		label.addMouseMotionListener(mouseMotionListener);
+		
+		UIView appView = (UIView) UIApp.getApplication().getMainView();
+		AbstractGhostDropManager dropListener = new AbstractGhostDropManager(appView.getSelectionBrowser()) {
+			public void ghostDropped(GhostDropEvent e) {
+				if(isInTarget(getTranslatedPoint(e.getDropLocation()))) {
+					if(e instanceof SelectionGhostDropEvent) {
+						SelectionGhostDropEvent selectionEvent = (SelectionGhostDropEvent) e;
+						System.out.println("Dropped " + selectionEvent.getMaskImage());
+						
+						SelectionBrowser selBrowser = (SelectionBrowser) component;
+						SelectionHolder holder = new SelectionHolder(selectionEvent.getSourceImage(), selectionEvent.getMaskImage());
+						selBrowser.addImage(holder);
+					}
+				}
+			}
+		};
+		mouseListener.addGhostDropListener(dropListener);
+
 	}
 
 	public boolean isModified() {

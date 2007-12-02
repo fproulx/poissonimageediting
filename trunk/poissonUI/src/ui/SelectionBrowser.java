@@ -1,8 +1,6 @@
 package ui;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +9,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
+import com.developpez.gfx.swing.drag.GhostDropEvent;
+
 import ui.containers.ImageHolder;
+import ui.containers.SelectionHolder;
 
 
 /**
@@ -31,18 +33,17 @@ public class SelectionBrowser extends JComponent {
 	public static List<ImageHolder> images = new ArrayList<ImageHolder>();
 
 	public final static int currentSize = 180;
-
+	
 	/** Creates a new instance of ImageBrowser */
 	public SelectionBrowser() {
 
 		initComponents();
-		//TODO: ici ajouter ghost drop lis de romain
 	}
 	
 	private void initComponents() {
 		setOpaque(true);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		setPreferredSize(new Dimension(currentSize,0));
+		setPreferredSize(new Dimension(currentSize, 0));
 	}
 
 	/**
@@ -51,18 +52,16 @@ public class SelectionBrowser extends JComponent {
 	 * @param image est l'image en bufferedimage à ajouter
 	 * @param filename est le path de l'image
 	 */
-	public void addImage(BufferedImage image, String filename) {
-		ImageHolder holder = new ImageHolder(image, filename);
+	public void addImage(SelectionHolder selHold) {
 
 		JLabel label = new JLabel();
-		label.setIcon(new ImageIcon(holder.getScaledImage()));
+		label.setIcon(new ImageIcon(selHold.getScaledSourceImage()));
 
 		// add listener for select image
 		//TODO: romain guy rules !
 		//label.addMouseListener(new ImageBrowserMouseListener(holder, container, preview));
 
 		add(label);
-
 		revalidate();
 	}
 }

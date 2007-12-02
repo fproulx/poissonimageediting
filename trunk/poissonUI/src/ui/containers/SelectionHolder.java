@@ -31,6 +31,7 @@ public class SelectionHolder {
 	public SelectionHolder(BufferedImage srcImage, BufferedImage maskImage) {
 		this.srcImage = srcImage;
 		this.maskImage = maskImage;
+		//TODO: tight coupling is satan's brother -----> no currentSize icite
 		this.scaledSrcImage = createScaledImage(SelectionBrowser.currentSize);
 	}
 
@@ -40,18 +41,21 @@ public class SelectionHolder {
 	 * provide a fast and high-quality scaled version at the requested size.
 	 */
 	private BufferedImage createScaledImage(int width) {
-		float scaleFactor = (float) width / srcImage.getWidth();
-		int scaledH = (int) (srcImage.getHeight() * scaleFactor);
+		if(srcImage.getWidth() > width) {
+			float scaleFactor = (float) width / srcImage.getWidth();
+			int scaledH = (int) (srcImage.getHeight() * scaleFactor);
 
-		BufferedImage img = new BufferedImage(width, scaledH, srcImage
-				.getType());
-		Graphics2D g2d = img.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-				RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2d.drawImage(srcImage, 0, 0, width, scaledH, null);
-		g2d.dispose();
+			BufferedImage img = new BufferedImage(width, scaledH, srcImage
+					.getType());
+			Graphics2D g2d = img.createGraphics();
+			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+					RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g2d.drawImage(srcImage, 0, 0, width, scaledH, null);
+			g2d.dispose();
 
-		return img;
+			return img;
+		}
+		return srcImage;
 	}
 
 	public BufferedImage getMaskImage() {
