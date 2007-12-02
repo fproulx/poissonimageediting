@@ -475,4 +475,8 @@ public class UIView extends FrameView implements Observer {
 	public SelectionBrowser getSelectionBrowser() {
 		return selectionBrowser;
 	}
+
+	public javax.swing.JDesktopPane getImageFramesDesktop() {
+		return mdi;
+	}
 }

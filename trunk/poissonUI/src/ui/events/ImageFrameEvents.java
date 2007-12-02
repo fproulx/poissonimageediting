@@ -12,8 +12,15 @@ package ui.events;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
+import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
+import com.developpez.gfx.swing.drag.GhostDropEvent;
+
 import ui.ImageFrame;
+import ui.SelectionBrowser;
+import ui.UIApp;
+import ui.UIView;
 import ui.containers.PreviewContainer;
+import ui.containers.SelectionHolder;
 
 /**
  * Classe ImageFrameEvents implements ImageFrame events
@@ -24,41 +31,24 @@ import ui.containers.PreviewContainer;
  *         <francois.proulx@gmail.com>
  */
 public class ImageFrameEvents implements InternalFrameListener {
-
 	private ImageFrame frame;
 
-	private PreviewContainer preview;
-
-	public ImageFrameEvents(ImageFrame frame, PreviewContainer preview) {
+	public ImageFrameEvents(ImageFrame frame) {
 		this.frame = frame;
-		this.preview = preview;
 	}
-
-	public void internalFrameOpened(InternalFrameEvent arg0) {
-		// nothing...
-	}
-
+	
 	public void internalFrameClosing(InternalFrameEvent arg0) {
 		// TODO ask save
 	}
 
-	public void internalFrameClosed(InternalFrameEvent arg0) {
+	public void internalFrameClosed(InternalFrameEvent ife) {
 		frame.close();
 	}
+	
+	public void internalFrameActivated(InternalFrameEvent arg0) {}
+	public void internalFrameDeactivated(InternalFrameEvent arg0) {}
+	public void internalFrameOpened(InternalFrameEvent ife) {}
+	public void internalFrameIconified(InternalFrameEvent arg0) {}
+	public void internalFrameDeiconified(InternalFrameEvent arg0) {}
 
-	public void internalFrameIconified(InternalFrameEvent arg0) {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	public void internalFrameDeiconified(InternalFrameEvent arg0) {
-		throw new UnsupportedOperationException("Not supported.");
-	}
-
-	public void internalFrameActivated(InternalFrameEvent arg0) {
-		preview.update(frame.getImage().getScaledImage());
-	}
-
-	public void internalFrameDeactivated(InternalFrameEvent arg0) {
-		preview.update(null);
-	}
 }

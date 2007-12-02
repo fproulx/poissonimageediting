@@ -9,6 +9,8 @@
 
 package ui;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
@@ -96,7 +98,7 @@ public class ImageFrame extends JInternalFrame {
 
 		//ajouter les événements de la souris (mouseevent, dradndrop)
 		//TODO get rid of preview
-		ImageFrameEvents ife = new ImageFrameEvents(this, preview);
+		ImageFrameEvents ife = new ImageFrameEvents(this);
 		addInternalFrameListener(ife);
 		
 		GhostGlassPane glassPane = (GhostGlassPane) UIApp.getApplication().getMainFrame().getGlassPane();
@@ -123,18 +125,13 @@ public class ImageFrame extends JInternalFrame {
 			}
 		};
 		mouseListener.addGhostDropListener(dropListener);
-
 	}
 
 	public boolean isModified() {
 		return modified;
 	}
-
-	public BufferedImage getBufferedImage() {
-		return image.getOriginal();
-	}
-
-	public ImageHolder getImage() {
+	
+	public ImageHolder getImageHolder() {
 		return image;
 	}
 
@@ -152,5 +149,11 @@ public class ImageFrame extends JInternalFrame {
 
 	public void setMenuItem(WindowItem item) {
 		menuitem = item;
+	}
+
+	public void windowStateChanged(WindowEvent we) {
+		if(we.getNewState() == WindowEvent.WINDOW_ACTIVATED) {
+			System.out.println("Bingo !!!");
+		}
 	}
 }
