@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package ui.containers;
+package ca.etsmtl.photomontage.ui.containers;
 
 import java.awt.image.BufferedImage;
 import java.util.Observable;

@@ -2,7 +2,7 @@
  * UIApp.java
  */
 
-package ui;
+package ca.etsmtl.photomontage.ui;
 
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;

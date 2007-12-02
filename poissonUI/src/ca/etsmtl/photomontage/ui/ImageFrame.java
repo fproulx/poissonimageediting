@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package ui;
+package ca.etsmtl.photomontage.ui;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
@@ -19,16 +19,17 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import ui.containers.ImageFrameSelection;
-import ui.containers.ImageFramesContainer;
-import ui.containers.ImageHolder;
-import ui.containers.PreviewContainer;
-import ui.containers.SelectionHolder;
-import ui.containers.WindowItem;
-import ui.events.ImageFrameEvents;
-import ui.events.ImageFrameMouseListener;
-import ui.events.ImageFrameMouseMotionListener;
-import ui.events.SelectionGhostDropEvent;
+
+import ca.etsmtl.photomontage.ui.containers.ImageFrameSelection;
+import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
+import ca.etsmtl.photomontage.ui.containers.ImageHolder;
+import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
+import ca.etsmtl.photomontage.ui.containers.SelectionHolder;
+import ca.etsmtl.photomontage.ui.containers.WindowItem;
+import ca.etsmtl.photomontage.ui.events.ImageFrameEvents;
+import ca.etsmtl.photomontage.ui.events.ImageFrameMouseListener;
+import ca.etsmtl.photomontage.ui.events.ImageFrameMouseMotionListener;
+import ca.etsmtl.photomontage.ui.events.SelectionGhostDropEvent;
 
 import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
 import com.developpez.gfx.swing.drag.GhostDropEvent;

@@ -1,4 +1,4 @@
-package ui.containers;
+package ca.etsmtl.photomontage.ui.containers;
 
 import java.awt.Point;
 import java.util.ArrayList;

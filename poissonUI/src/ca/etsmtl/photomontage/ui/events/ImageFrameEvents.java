@@ -7,20 +7,21 @@
  * and open the template in the editor.
  */
 
-package ui.events;
+package ca.etsmtl.photomontage.ui.events;
 
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
+import ca.etsmtl.photomontage.ui.ImageFrame;
+import ca.etsmtl.photomontage.ui.SelectionBrowser;
+import ca.etsmtl.photomontage.ui.UIApp;
+import ca.etsmtl.photomontage.ui.UIView;
+import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
+import ca.etsmtl.photomontage.ui.containers.SelectionHolder;
+
 import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
 import com.developpez.gfx.swing.drag.GhostDropEvent;
 
-import ui.ImageFrame;
-import ui.SelectionBrowser;
-import ui.UIApp;
-import ui.UIView;
-import ui.containers.PreviewContainer;
-import ui.containers.SelectionHolder;
 
 /**
  * Classe ImageFrameEvents implements ImageFrame events

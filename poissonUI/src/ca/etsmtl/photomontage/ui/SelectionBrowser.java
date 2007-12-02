@@ -1,4 +1,4 @@
-package ui;
+package ca.etsmtl.photomontage.ui;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -9,11 +9,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import ui.containers.ImageHolder;
-import ui.containers.SelectionHolder;
-import ui.events.ImageFrameMouseListener;
-import ui.events.ImageFrameMouseMotionListener;
-import ui.events.SelectionBrowserMouseListener;
+
+import ca.etsmtl.photomontage.ui.containers.ImageHolder;
+import ca.etsmtl.photomontage.ui.containers.SelectionHolder;
+import ca.etsmtl.photomontage.ui.events.ImageFrameMouseListener;
+import ca.etsmtl.photomontage.ui.events.ImageFrameMouseMotionListener;
+import ca.etsmtl.photomontage.ui.events.SelectionBrowserMouseListener;
 
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 import com.developpez.gfx.swing.drag.GhostMotionAdapter;

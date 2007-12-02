@@ -7,13 +7,14 @@
  * and open the template in the editor.
  */
 
-package ui.containers;
+package ca.etsmtl.photomontage.ui.containers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import ui.ImageFrame;
+import ca.etsmtl.photomontage.ui.ImageFrame;
+
 
 /**
  * Classe ImageFramesContainer contient la liste des imageframes

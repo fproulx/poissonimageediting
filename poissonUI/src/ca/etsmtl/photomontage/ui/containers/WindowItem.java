@@ -1,9 +1,10 @@
-package ui.containers;
+package ca.etsmtl.photomontage.ui.containers;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JMenuItem;
 
-import ui.ImageFrame;
+import ca.etsmtl.photomontage.ui.ImageFrame;
+
 
 /**
  * Classe WindowItem est utilisé pour le lien avec le JMenuItem du menu Window
