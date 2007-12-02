@@ -37,6 +37,10 @@ import org.junit.Test;
 import ca.etsmtl.photomontage.exceptions.ComputationException;
 import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 
+/**
+ * PoissonPhotomontageTest for testing the poisson algo
+ *
+ */
 public class PoissonPhotomontageTest {
 	
 	// top-level path
@@ -54,15 +58,26 @@ public class PoissonPhotomontageTest {
 	// the class being tested
 	private PoissonPhotomontage poissonPhotomontage;
 
+	/**
+	 * @throws Exception if an error occurs
+	 */
 	@Before
 	public void setUp() throws Exception {
 		
 	}
 
+	/**
+	 * @throws Exception if an error occurs
+	 */
 	@After
 	public void tearDown() throws Exception {
 	}
 	
+	/**
+	 * Validate the source image size
+	 * 
+	 * @throws IOException if an error occurs
+	 */
 	@Test public void validateSourceImageSize() throws IOException {
 		
 		Point dstPt = new Point(15,21); // arbitrary valid values
@@ -76,6 +91,11 @@ public class PoissonPhotomontageTest {
 		assertFalse(poissonPhotomontage.validateSourceImageSize());
 	}
 	
+	/**
+	 * Validate the destination position in the destination image
+	 * 
+	 * @throws IOException if an error occurs
+	 */
 	@Test public void validateDestinationPosition() throws IOException {
 		
 		// Destination Point outside of dstImage : expect False
@@ -100,6 +120,11 @@ public class PoissonPhotomontageTest {
 		assertFalse(poissonPhotomontage.validateDestinationPosition());
 	}
 	
+	/**
+	 * Validate the mask
+	 * 
+	 * @throws IOException if an error occurs
+	 */
 	@Test public void validateMask() throws IOException {
 		
 		// Input a source image and a mask of different size : expect False
@@ -125,6 +150,11 @@ public class PoissonPhotomontageTest {
 
 	}
 	
+	/**
+	 * Validate the input images
+	 * 
+	 * @throws IOException if an error occurs
+	 */
 	@Test public void validateInputImages() throws IOException {
 		
 		// Input valid data and expect correct result
@@ -146,9 +176,9 @@ public class PoissonPhotomontageTest {
 	 * mainchevre. Then we compare each pixel of createPhotomontage's resulting 
 	 * image and the matlab program's with a certain tolerance level.  
 	 * 
-	 * @throws IOException
-	 * @throws ComputationException
-	 * @throws IterativeSolverNotConvergedException
+	 * @throws IOException if an in/output error occurs
+	 * @throws ComputationException if an computation error occurs
+	 * @throws IterativeSolverNotConvergedException if the algo dont converged
 	 */
 	@Test public void createPhotoMontage() throws IOException, ComputationException, IterativeSolverNotConvergedException {
 		

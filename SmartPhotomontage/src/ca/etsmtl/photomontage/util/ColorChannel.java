@@ -24,9 +24,21 @@ package ca.etsmtl.photomontage.util;
  *
  */
 public enum ColorChannel {
+	/**
+	 * RED mask and shift
+	 */
 	 RED (0x00FF0000, 16),
+	 /**
+	  * GREEN  mask and shift
+	  */
 	 GREEN (0x0000FF00, 8),
+	 /**
+	  * BLUE  mask and shift
+	  */
 	 BLUE (0x000000FF, 0),
+	 /**
+	  * ALPHA mask and shift
+	  */
 	 ALPHA (0xFF000000, 24);
 	 
 	 private final int mask, shift;
@@ -35,6 +47,15 @@ public enum ColorChannel {
 		 this.shift = shift;
 	 }
 	 
+	 /**
+	  * 
+	  * @return mask
+	  */
 	 public int mask() { return mask; }
+	 
+	 /**
+	  * 
+	  * @return shift
+	  */
 	 public int shift() { return shift; }
 }

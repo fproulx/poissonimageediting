@@ -21,9 +21,17 @@ import no.uib.cipr.matrix.Vector;
 import no.uib.cipr.matrix.sparse.AbstractIterationMonitor;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 
+/**
+ * MatrixSolverIterationMonitor check if the algo converge
+ *
+ */
 public class MatrixSolverIterationMonitor extends AbstractIterationMonitor {
 	private final int max;
 
+	/**
+	 * Constructor
+	 * @param max
+	 */
 	public MatrixSolverIterationMonitor(int max) {
 		this.max = max;
 	}

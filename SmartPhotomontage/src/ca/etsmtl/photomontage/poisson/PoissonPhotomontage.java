@@ -240,18 +240,34 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		       + 4 * ((img.getRGB(x, y) & channel.mask()) >> channel.shift());
 	}
 	
+	/**
+	 * 
+	 * @return destination image
+	 */
 	public BufferedImage getDestinationImage() {
 		return destImage;
 	}
 	
+	/**
+	 * 
+	 * @return destination position
+	 */
 	public Point2D getDestinationPosition() {
 		return destPosition;
 	}
 	
+	/**
+	 * 
+	 * @return mask image
+	 */
 	public BufferedImage getMaskImage() {
 		return maskImage;
 	}
 	
+	/**
+	 * 
+	 * @return source image
+	 */
 	public BufferedImage getSourceImage() {
 		return srcImage;
 	}

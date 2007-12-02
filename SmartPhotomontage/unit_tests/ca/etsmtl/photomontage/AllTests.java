@@ -22,10 +22,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+/**
+ *  All Tests for SmartPhotomontage
+ *
+ */
 @RunWith(Suite.class)
 @SuiteClasses(value={
 	PoissonPhotomontageTest.class
 })
+
 public class AllTests {
 	
 }
