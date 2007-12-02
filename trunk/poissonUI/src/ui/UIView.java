@@ -5,9 +5,9 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -15,6 +15,7 @@ import java.util.Observer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.Timer;
@@ -25,12 +26,12 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
-import com.developpez.gfx.swing.drag.GhostGlassPane;
-
 import ui.containers.ImageFramesContainer;
 import ui.containers.PreviewContainer;
 import ui.containers.WindowItem;
 import ui.controllers.MenuController;
+
+import com.developpez.gfx.swing.drag.GhostGlassPane;
 
 /**
  * The application's main frame.
@@ -131,9 +132,6 @@ public class UIView extends FrameView implements Observer {
 		// Our code 
 		//TODO: REfactor me please !
 		
-		// paramétriser le imageframe et ajouter à l'interface
-		selectionBrowser = new SelectionBrowser();
-		
 		// création du image browser
 		ImageBrowser.currentSize = 180;
 
@@ -147,8 +145,6 @@ public class UIView extends FrameView implements Observer {
 		mdi = new javax.swing.JDesktopPane();
 		browser = new javax.swing.JPanel();
 		rightpanel = new javax.swing.JPanel();
-		selections = new javax.swing.JScrollPane();
-		preview = new javax.swing.JPanel();
 		menuBar = new javax.swing.JMenuBar();
 		javax.swing.JMenu fileMenu = new javax.swing.JMenu();
 		openFileMenuItem = new javax.swing.JMenuItem();
@@ -183,49 +179,34 @@ public class UIView extends FrameView implements Observer {
 
 		rightpanel.setName("rightpanel"); // NOI18N
 
-		selections.setFocusable(false);
-		selections.setName("selections"); // NOI18N
-
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(ui.UIApp.class).getContext().getResourceMap(
 						UIView.class);
-		preview.setName("preview"); // NOI18N
 
-		org.jdesktop.layout.GroupLayout previewLayout = new org.jdesktop.layout.GroupLayout(
-				preview);
-		preview.setLayout(previewLayout);
-		previewLayout.setHorizontalGroup(previewLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 180,
-				Short.MAX_VALUE));
-		previewLayout.setVerticalGroup(previewLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 160,
-				Short.MAX_VALUE));
-
-		org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(
-				rightpanel);
-		rightpanel.setLayout(rightpanelLayout);
-		rightpanelLayout.setHorizontalGroup(rightpanelLayout
-				.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-				.add(selections,
-						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 196,
-						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-				.add(preview,
-						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE));
-		rightpanelLayout.setVerticalGroup(rightpanelLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(
-				org.jdesktop.layout.GroupLayout.TRAILING,
-				rightpanelLayout.createSequentialGroup()
-				.add(preview,
-						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-				.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-				
-				.add(selections,
-								org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-								237, Short.MAX_VALUE)));
+		org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(rightpanel);
+		//rightpanel.setLayout(rightpanelLayout);
+//		rightpanelLayout.setHorizontalGroup(rightpanelLayout
+//				.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+//				.add(selections,
+//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 196,
+//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+//				.add(preview,
+//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+//						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE));
+//		rightpanelLayout.setVerticalGroup(rightpanelLayout.createParallelGroup(
+//				org.jdesktop.layout.GroupLayout.LEADING).add(
+//				org.jdesktop.layout.GroupLayout.TRAILING,
+//				rightpanelLayout.createSequentialGroup()
+//				.add(preview,
+//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+//						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+//				.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+//				
+//				.add(selections,
+//								org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+//								237, Short.MAX_VALUE)));
 
 		org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(
 				mainPanel);
@@ -394,6 +375,17 @@ public class UIView extends FrameView implements Observer {
 		browser.setLayout(new BorderLayout());
 		browser.add(imageBrowserScrollpane);
 		
+		// paramétriser le imageframe et ajouter à l'interface
+		selectionBrowser = new SelectionBrowser();
+		JScrollPane selectionBrowserScrollpane = new JScrollPane(selectionBrowser );
+		selectionBrowserScrollpane.setLayout(new ScrollPaneLayout());
+		selectionBrowserScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		selectionBrowserScrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		selectionBrowserScrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
+		rightpanel.setLayout(new BorderLayout());
+		rightpanel.add(selectionBrowserScrollpane);
+
+		
 	}// </editor-fold>//GEN-END:initComponents
 
 	private void openFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_openFileMenuItemActionPerformed
@@ -414,11 +406,9 @@ public class UIView extends FrameView implements Observer {
 	private javax.swing.JDesktopPane mdi;
 	private javax.swing.JMenuBar menuBar;
 	private javax.swing.JMenuItem openFileMenuItem;
-	private javax.swing.JPanel preview;
 	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JPanel rightpanel;
 	private javax.swing.JMenuItem saveMenuItem;
-	public static javax.swing.JScrollPane selections;
 	private javax.swing.JLabel statusAnimationLabel;
 	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;
@@ -448,20 +438,6 @@ public class UIView extends FrameView implements Observer {
 	 * Update des observers
 	 */
 	public void update(Observable arg0, Object arg1) {
-		// pour le preview
-		if (arg0 instanceof PreviewContainer) {
-			BufferedImage img = previewcontainer.getScaledImage();
-
-			// clean vieux preview
-			preview.getGraphics().clearRect(0, 0, preview.getWidth(),
-					preview.getHeight());
-
-			// remplacer le preview
-			if (img != null) {
-				System.out.println("UIView.update replace preview");
-				preview.getGraphics().drawImage(img, 0, 0, null);
-			}
-		}
 
 		// update pour le container de imageframe
 		if (arg0 instanceof ImageFramesContainer) {
