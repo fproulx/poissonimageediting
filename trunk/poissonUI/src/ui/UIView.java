@@ -46,27 +46,6 @@ public class UIView extends FrameView implements Observer {
 		// initialisation de tous les components
 		initComponents();
 
-		// création du image browser
-		ImageBrowser.currentSize = 180;
-
-		// ajouter UIView en temps que observer pour les containers de image
-		// frame et du preview
-		container.addObserver(this);
-		previewcontainer.addObserver(this);
-
-		// paramétriser le imageframe et ajouter à l'interface
-		imagebrowser = new ImageBrowser(container, previewcontainer);
-		JScrollPane scrollpane = new JScrollPane(imagebrowser);
-		scrollpane.setLayout(new ScrollPaneLayout());
-		scrollpane
-				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollpane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
-
-		browser.setLayout(new BorderLayout());
-		browser.add(scrollpane);
-
 		// status bar initialization - message timeout, idle icon and busy
 		// animation, etc
 		ResourceMap resourceMap = getResourceMap();
@@ -149,10 +128,24 @@ public class UIView extends FrameView implements Observer {
 	// <editor-fold defaultstate="collapsed" desc="Generated
 	// Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
+		// Our code 
+		//TODO: REfactor me please !
+		
+		// paramétriser le imageframe et ajouter à l'interface
+		selectionBrowser = new SelectionBrowser();
+		
+		// création du image browser
+		ImageBrowser.currentSize = 180;
 
+		// ajouter UIView en temps que observer pour les containers de image
+		// frame et du preview
+		container.addObserver(this);
+		previewcontainer.addObserver(this);
+		
 		mainPanel = new javax.swing.JPanel();
-		browser = new javax.swing.JPanel();
+	
 		mdi = new javax.swing.JDesktopPane();
+		browser = new javax.swing.JPanel();
 		rightpanel = new javax.swing.JPanel();
 		selections = new javax.swing.JScrollPane();
 		preview = new javax.swing.JPanel();
@@ -215,21 +208,22 @@ public class UIView extends FrameView implements Observer {
 				.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
 				.add(selections,
 						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 196,
-						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(
-						preview,
+						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+				.add(preview,
 						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
 						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE));
 		rightpanelLayout.setVerticalGroup(rightpanelLayout.createParallelGroup(
 				org.jdesktop.layout.GroupLayout.LEADING).add(
 				org.jdesktop.layout.GroupLayout.TRAILING,
-				rightpanelLayout.createSequentialGroup().add(preview,
+				rightpanelLayout.createSequentialGroup()
+				.add(preview,
 						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
 						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(
-								org.jdesktop.layout.LayoutStyle.RELATED).add(
-								selections,
+				.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+				
+				.add(selections,
 								org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 								237, Short.MAX_VALUE)));
 
@@ -388,6 +382,18 @@ public class UIView extends FrameView implements Observer {
 		setComponent(mainPanel);
 		setMenuBar(menuBar);
 		setStatusBar(statusPanel);
+
+		// paramétriser le imageframe et ajouter à l'interface
+		imagebrowser = new ImageBrowser(container, previewcontainer);
+		JScrollPane imageBrowserScrollpane = new JScrollPane(imagebrowser);
+		imageBrowserScrollpane.setLayout(new ScrollPaneLayout());
+		imageBrowserScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		imageBrowserScrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		imageBrowserScrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
+
+		browser.setLayout(new BorderLayout());
+		browser.add(imageBrowserScrollpane);
+		
 	}// </editor-fold>//GEN-END:initComponents
 
 	private void openFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_openFileMenuItemActionPerformed
@@ -435,6 +441,8 @@ public class UIView extends FrameView implements Observer {
 
 	// image browser
 	private ImageBrowser imagebrowser;
+	
+	private SelectionBrowser selectionBrowser;
 
 	/**
 	 * Update des observers

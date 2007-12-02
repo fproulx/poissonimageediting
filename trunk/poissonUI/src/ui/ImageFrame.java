@@ -17,10 +17,10 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import ui.containers.ImageFrameSelection;
 import ui.containers.ImageFramesContainer;
 import ui.containers.ImageHolder;
 import ui.containers.PreviewContainer;
-import ui.containers.Selection;
 import ui.containers.WindowItem;
 import ui.events.ImageFrameEvents;
 import ui.events.ImageFrameMouseListener;
@@ -28,7 +28,6 @@ import ui.events.ImageFrameMouseMotionListener;
 
 import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
 import com.developpez.gfx.swing.drag.GhostDropEvent;
-import com.developpez.gfx.swing.drag.GhostDropListener;
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 
 /**
@@ -49,7 +48,7 @@ public class ImageFrame extends JInternalFrame {
 	private boolean modified = false;
 	private ImageFramesContainer container;
 	private WindowItem menuitem;
-	private final Selection selection = new Selection();
+	private final ImageFrameSelection selection = new ImageFrameSelection();
 
 	/**
 	 * Contructeur
@@ -99,12 +98,6 @@ public class ImageFrame extends JInternalFrame {
 		GhostGlassPane glassPane = (GhostGlassPane) UIApp.getApplication().getMainFrame().getGlassPane();
 		
 		ImageFrameMouseListener mouseListener = new ImageFrameMouseListener(glassPane, image.getOriginal(), selection);
-		AbstractGhostDropManager dropListener = new AbstractGhostDropManager(UIView.selections) {
-			public void ghostDropped(GhostDropEvent e) {
-				System.out.println("Dropped " + e.getAction());
-			}
-		};
-		mouseListener.addGhostDropListener(dropListener);
 		label.addMouseListener(mouseListener);
 		
 		ImageFrameMouseMotionListener mouseMotionListener = new ImageFrameMouseMotionListener(glassPane, selection);
