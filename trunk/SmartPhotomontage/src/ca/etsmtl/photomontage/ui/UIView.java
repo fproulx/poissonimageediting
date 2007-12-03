@@ -445,11 +445,13 @@ public class UIView extends FrameView implements Observer {
 			// remove old frames
 			if (mdi.getComponents().length > 0) {
 				for (int i = 0; i < mdi.getComponents().length; i++) {
-					ImageFrame frame = (ImageFrame) mdi.getComponent(i);
-					if (!container.contains(frame)) {
-						mdi.remove(frame);
-					} else {
-						mdiframes.add(frame);
+					if (mdi.getComponent(i) instanceof ImageFrame) {
+						ImageFrame frame = (ImageFrame) mdi.getComponent(i);	
+						if (!container.contains(frame)) {
+							mdi.remove(frame);
+						} else {
+							mdiframes.add(frame);
+						}
 					}
 				}
 			}
