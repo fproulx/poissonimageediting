@@ -7,17 +7,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
-
 
 import ca.etsmtl.photomontage.ui.containers.ImageFrameSelection;
 
 import com.developpez.gfx.swing.drag.GhostDropAdapter;
-import com.developpez.gfx.swing.drag.GhostDropEvent;
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 
 //TODO: Fix bug disappearing lines ?!
@@ -40,25 +42,27 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	private BufferedImage maskImage;
 	
 	// Original image
-	private BufferedImage origImage;
+	private BufferedImage dstImage;
+	
+	private BufferedImage maskedSrcImage;
 
-	public ImageFrameMouseListener(GhostGlassPane glassPane, BufferedImage img, ImageFrameSelection selection) {
+	public ImageFrameMouseListener(GhostGlassPane glassPane, BufferedImage dstImage, ImageFrameSelection selection) {
 		super(glassPane, null);
 
 		this.selection = selection;
-		this.origImage = img;
+		this.dstImage = dstImage;
 	}
 	
 	public void mousePressed(MouseEvent e) {
 
-		System.out.println("Selection Mode is: "+selection.isSelectionMode());
+		//System.out.println("Selection Mode is: "+selection.isSelectionMode());
 		
 		// We are in selection mode
 		if (selection.isSelectionMode() == true) {
 			List<Point> points = selection.getPoints();
 			
 			points.clear();
-			System.out.println("Mouse pressed; # of clicks: " + e.getClickCount());
+			//System.out.println("Mouse pressed; # of clicks: " + e.getClickCount());
 			points.add(e.getPoint());
 			Graphics g = e.getComponent().getGraphics();
 		}
@@ -72,15 +76,14 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	        SwingUtilities.convertPointFromScreen(p, glassPane);
 
 	        glassPane.setPoint(p);
-	        glassPane.setImage(srcImage);
+	        glassPane.setImage(maskedSrcImage);
 	        glassPane.repaint();
 		}
 	}
 
 	public void mouseReleased(MouseEvent e) {
-
-		System.out.println("Mouse released; # of clicks: " + e.getClickCount());
-		System.out.println("State selection mode: "+selection.isSelectionMode());
+		//System.out.println("Mouse released; # of clicks: " + e.getClickCount());
+		//System.out.println("State selection mode: "+selection.isSelectionMode());
 		List<Point> points = selection.getPoints();
 		
 		if (selection.isSelectionMode() == true) {	
@@ -102,43 +105,54 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 				}
 			}
 			
+			final int PADDING = 10;
+			final int OFFSET = PADDING / 2;
+			
 			// Construct a polygon from the series of points and fill it
 			// Note: this polygon's coordinates are related to the original image
 			Polygon poly = new Polygon();
 			for(Point p: points) {
-				poly.addPoint(p.x - topleft.x, p.y - topleft.y);
+				// Translate each point by (+1,+1) so that the polygon won't touch the edges
+				poly.addPoint(p.x - topleft.x + OFFSET, p.y - topleft.y + OFFSET);
 			}
 
-			
-			// Alter the polygon's points to be related to the extracted image with the mask
-			// FIXME if there is only a click and release, there is no points this sucks throw Exception 
-			maskImage = new BufferedImage(poly.getBounds().width, poly.getBounds().height,
-			BufferedImage.TYPE_INT_ARGB);
-			
-			srcImage = new BufferedImage(poly.getBounds().width, poly.getBounds().height,
-					BufferedImage.TYPE_INT_ARGB);
-
-			
-			// MASK: Fill bgcolor with translucent/black then fill polygon in opaque/white
-			Graphics2D graphMask = (Graphics2D) maskImage.getGraphics();
-			graphMask.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f));
-			// TODO use Color constants after merging with the Poisson part
-			graphMask.setColor(new Color(0x00000000));
-			graphMask.fillRect(0, 0, maskImage.getWidth(), maskImage.getHeight());
-			graphMask.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-			graphMask.setColor(Color.white);
-			graphMask.fillPolygon(poly);
-			
-			// SOURCE IMAGE
-			Graphics2D graphSrc = (Graphics2D) srcImage.getGraphics();
-			// Copy mask as the background for srcImage
-			graphSrc.drawImage(maskImage, 0,0, null);
-			// Paste over original image using the correct AlphaComposite
-			graphSrc.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
-			graphSrc.drawImage(origImage,0,0,srcImage.getWidth(),srcImage.getHeight(),topleft.x,topleft.y,srcImage.getWidth()+topleft.x,srcImage.getHeight()+topleft.y,null);
-			
-			selection.setMode(false);
-
+			Rectangle bounds = poly.getBounds();
+			if(points.size() >= 1 && bounds.width >= 3 && bounds.height >= 3) {
+				// Alter the polygon's points to be related to the extracted image with the mask
+				// FIXME if there is only a click and release, there is no points this sucks throw Exception 
+				
+				// MASK: Fill bgcolor with translucent/black then fill polygon in opaque/white
+				// Make sure to add the manditory padding (1 pixel) around the image
+				maskImage = new BufferedImage(bounds.width + PADDING, bounds.height + PADDING, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D graphMask = (Graphics2D) maskImage.getGraphics();
+				graphMask.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f));
+				// TODO use Color constants after merging with the Poisson part
+				graphMask.setColor(new Color(0x00000000));
+				graphMask.fillRect(0, 0, maskImage.getWidth(), maskImage.getHeight());
+				graphMask.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+				graphMask.setColor(Color.WHITE);
+				graphMask.fillPolygon(poly);
+				graphMask.dispose();
+				
+				// MASKED SOURCE IMAGE
+				// Make sure to add the manditory padding (1 pixel) around the image
+				maskedSrcImage = new BufferedImage(bounds.width + PADDING, bounds.height + PADDING, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D graphMaskedSrc = (Graphics2D) maskedSrcImage.getGraphics();
+				// Copy mask as the background for srcImage
+				graphMaskedSrc.drawImage(maskImage, 0, 0, null);
+				// Paste over original image using the correct AlphaComposite
+				graphMaskedSrc.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP));
+				graphMaskedSrc.drawImage(dstImage, OFFSET, OFFSET, bounds.width + OFFSET, bounds.height + OFFSET, topleft.x, topleft.y, bounds.width + topleft.x, bounds.height + topleft.y, null);
+				graphMaskedSrc.dispose();
+				
+				// SOURCE IMAGE
+				srcImage = new BufferedImage(bounds.width + PADDING, bounds.height + PADDING, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D graphSrc = (Graphics2D) srcImage.getGraphics();
+				graphSrc.drawImage(dstImage, OFFSET, OFFSET, bounds.width + OFFSET, bounds.height + OFFSET, topleft.x, topleft.y, bounds.width + topleft.x, bounds.height + topleft.y, null);
+				graphSrc.dispose();
+				
+				selection.setMode(false);
+			}	
 		} else {
 			Component c = e.getComponent();
 			if (!(e.getPoint().x < 0 || e.getPoint().y < 0  || e.getPoint().x > c.getWidth() || e.getPoint().y > c.getHeight())) {
@@ -163,7 +177,7 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	        glassPane.setVisible(false);
 	        glassPane.setImage(null);
 
-	        fireGhostDropEvent(new SelectionGhostDropEvent(srcImage, maskImage, eventPoint));
+	        fireGhostDropEvent(new SelectionGhostDropEvent(srcImage, maskImage, maskedSrcImage, eventPoint));
 		}
 	}
 }

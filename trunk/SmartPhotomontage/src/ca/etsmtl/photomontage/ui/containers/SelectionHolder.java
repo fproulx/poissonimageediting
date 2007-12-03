@@ -27,15 +27,16 @@ import ca.etsmtl.photomontage.ui.SelectionBrowser;
 //TODO: Consider refactoring with ImageHolder
 public class SelectionHolder {
 
-	private BufferedImage srcImage, scaledSrcImage, maskImage;
+	private BufferedImage srcImage, scaledSrcImage, maskImage, maskedSrcImage;
 
 	/**
 	 * @param srcImage
 	 * @param maskImage
 	 */
-	public SelectionHolder(BufferedImage srcImage, BufferedImage maskImage) {
+	public SelectionHolder(BufferedImage srcImage, BufferedImage maskImage, BufferedImage maskedSrcImage) {
 		this.srcImage = srcImage;
 		this.maskImage = maskImage;
+		this.maskedSrcImage = maskedSrcImage;
 		//TODO: tight coupling is satan's brother -----> no currentSize icite
 		this.scaledSrcImage = createScaledImage(SelectionBrowser.currentSize);
 	}
@@ -46,25 +47,28 @@ public class SelectionHolder {
 	 * provide a fast and high-quality scaled version at the requested size.
 	 */
 	private BufferedImage createScaledImage(int width) {
-		if(srcImage.getWidth() > width) {
-			float scaleFactor = (float) width / srcImage.getWidth();
-			int scaledH = (int) (srcImage.getHeight() * scaleFactor);
+		if(maskedSrcImage.getWidth() > width) {
+			float scaleFactor = (float) width / maskedSrcImage.getWidth();
+			int scaledH = (int) (maskedSrcImage.getHeight() * scaleFactor);
 
-			BufferedImage img = new BufferedImage(width, scaledH, srcImage
-					.getType());
+			BufferedImage img = new BufferedImage(width, scaledH, maskedSrcImage.getType());
 			Graphics2D g2d = img.createGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 					RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g2d.drawImage(srcImage, 0, 0, width, scaledH, null);
+			g2d.drawImage(maskedSrcImage, 0, 0, width, scaledH, null);
 			g2d.dispose();
 
 			return img;
 		}
-		return srcImage;
+		return maskedSrcImage;
 	}
 
 	public BufferedImage getMaskImage() {
 		return maskImage;
+	}
+	
+	public BufferedImage getMaskedSourceImage() {
+		return maskedSrcImage;
 	}
 
 	/**

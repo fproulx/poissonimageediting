@@ -104,7 +104,6 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 			maskImage = ImageIO.read(new File("resources/images/tests/validateInput/mask-best2.png"));
 			destImage = ImageIO.read(new File("resources/images/tests/validateInput/dst.png"));
 			
-			
 			/*srcImage = ImageIO.read(new File(chooser.getSelectedFile().getName()));
 			maskImage = ImageIO.read(new File("resources/images/masks/F16mask.png"));
 			destImage = ImageIO.read(new File("resources/images/backgrounds/F16Target.jpg"));*/
