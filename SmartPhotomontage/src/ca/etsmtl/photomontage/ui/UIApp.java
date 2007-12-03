@@ -4,6 +4,8 @@
 
 package ca.etsmtl.photomontage.ui;
 
+import javax.swing.JOptionPane;
+
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
 
@@ -36,6 +38,13 @@ public class UIApp extends SingleFrameApplication {
 	 */
 	public static UIApp getApplication() {
 		return Application.getInstance(UIApp.class);
+	}
+	
+	/**
+	 * @param t
+	 */
+	public static void showException(final Throwable t) {
+		JOptionPane.showMessageDialog(null, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**

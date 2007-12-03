@@ -9,11 +9,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-
 import ca.etsmtl.photomontage.ui.containers.ImageHolder;
 import ca.etsmtl.photomontage.ui.containers.SelectionHolder;
-import ca.etsmtl.photomontage.ui.events.ImageFrameMouseListener;
-import ca.etsmtl.photomontage.ui.events.ImageFrameMouseMotionListener;
 import ca.etsmtl.photomontage.ui.events.SelectionBrowserMouseListener;
 
 import com.developpez.gfx.swing.drag.GhostGlassPane;

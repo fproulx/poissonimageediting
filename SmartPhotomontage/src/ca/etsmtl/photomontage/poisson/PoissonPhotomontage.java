@@ -143,11 +143,11 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		validateInputImages();
 		
 	    // Build a mapping between points in the destination image and the computed solutions.
-	    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
+	    Map<Integer, Integer> destToSolutionsMap = createSolutionsMap();
 	    
 	    try {
 	    	// Prepare a parralel task executor for the 3 solvers (red, green, blue)
-	    	Executor executor = Executors.newFixedThreadPool(3); 
+	    	Executor executor = Executors.newFixedThreadPool(3);
 	    	// Prepare a parallel execution barrier
 	    	CountDownLatch barrier = new CountDownLatch(3);
 	    	
@@ -166,7 +166,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 			Vector solutionsVectorRed = computeTaskVectorRed.get();
 			Vector solutionsVectorGreen = computeTaskVectorGreen.get();
 			Vector solutionsVectorBlue = computeTaskVectorBlue.get();
-			
+	 
 			// Create a perfect copy of the destination that will be used as a canvas for the final composition.
 			BufferedImage finalImage = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2d = (Graphics2D) finalImage.getGraphics();
@@ -200,9 +200,11 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	    }
 	    catch(IterativeSolverNotConvergedException e) {
 	    	throw new ComputationException("The iterative matrix solver could not converge to the solution.");
-	    } catch (InterruptedException e) {
+	    }
+	    catch (InterruptedException e) {
 	    	throw new ComputationException("The parralel computation tasks got abrutly interrupted.");
-		} catch (ExecutionException e) {
+		} 
+	    catch (ExecutionException e) {
 			e.printStackTrace();
 			throw new ComputationException("The parralel execution of a task got abrutly interrupted.");
 		}
@@ -215,7 +217,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	 */
 	protected Map<Integer, Integer> createSolutionsMap() {
 		int N = 0;
-		ConcurrentHashMap<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
+		Map<Integer, Integer> destToSolutionsMap = new ConcurrentHashMap<Integer, Integer>();
 		for (int x = 1; x < srcImage.getWidth() - 1; x++) {
 			for (int y = 1; y < srcImage.getHeight() - 1; y++) {
 				if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
@@ -289,7 +291,6 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	protected FutureTask<Vector> solvePoissonEquationsForChannel(final Map<Integer, Integer> destToSolutionsMap, final ColorChannel channel, final CountDownLatch doneSignal) throws ComputationException, IterativeSolverNotConvergedException {
 		return new FutureTask<Vector>(new Callable<Vector>() {
 			public Vector call() throws ComputationException, IterativeSolverNotConvergedException {
-				System.out.println("Called " + channel);
 				// Get the number of rows in the squared matrix. 
 				int N = destToSolutionsMap.size();
 			    
@@ -329,7 +330,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 							
 							// Compute the divergences about the current point for the source and destination
 							div = computeDivergenceAboutPoint(srcImage, channel, x, y);
-
+							
 							// Construct the guidance field by adding the color intensity (by channel) to the right-hand side vector.
 							// Notice the the add() method uses the compound addition operator (i.e. rightHandSide[solutionRow] += value).
 							rhsVector.add(solutionRow, div);
@@ -339,8 +340,6 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 						}
 					}
 				}
-				
-				System.out.println("Done " + channel);
 				
 				// Make sure that all the expected rows were dealt with.
 				if(solutionRow != N)
@@ -362,7 +361,6 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		            	nonZeroCells[i][j++] = colind;
 		        }
 				
-		        System.out.println("Filling " + channel);
 				// Prepare a NxN sparse matrix, that will contain the system linear of equations.
 				Matrix A = new CompRowMatrix(N, N, nonZeroCells);
 				
@@ -374,7 +372,6 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 				// Shuffle some random data around to speed up the convergence of the solution.
 				Vector solutionsVector = Matrices.random(N);
 
-				System.out.println("Solving " + channel);
 			    // Choose a Conjugate Gradient iterative solver to compute Ax = b
 			    IterativeSolver solver = new CG(solutionsVector);
 			    
@@ -383,10 +380,10 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 			    
 			    // Start the iterative solver
 			    solver.solve(A, rhsVector, solutionsVector);
-			    System.out.println("Done " + channel);
+			    
 				// Notify the synchronization primitive that the computation is completed.
 				doneSignal.countDown();
-				System.out.println("Counted down " + channel);
+				
 				return solutionsVector;
 			}
 			
@@ -395,8 +392,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	
 	/**
 	 * Validate the destination position.
-	 * 
-	 * @return true: valid / false: invalid
+	 * @throws InvalidDestinationPositionException 
 	 */
 	public void validateDestinationPosition() throws InvalidDestinationPositionException {
 		// Make sure that the specified destination offset fits
@@ -417,7 +413,6 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	/**
 	 * Validate the input images against all the requirements.
 	 * 
-	 * @return true: valid / false: invalid
 	 * @throws InvalidMaskException 
 	 * @throws InvalidDestinationPositionException 
 	 * @throws InvalidSourceImageSizeException 
@@ -431,7 +426,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	/**
 	 * Validate the mask image.
 	 * 
-	 * @return true: valid / false: invalid
+	 * @throws InvalidMaskException 
 	 */
 	public void validateMask() throws InvalidMaskException {
 		if (maskImage == null || destImage == null)
@@ -447,14 +442,13 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	       srcImage.getHeight() != maskImage.getHeight())
 	    	throw new InvalidMaskException("The mask MUST have the same size as the source image.");
 	    
-	    /*
 		// Destination image must not have the mask pasted so that a mask value of 0 touches the destination image edges
 	    // verify for non-zeros values on top and bottom edges 
 	    for(int x=0; x<maskImage.getWidth()-1; x++) {
 	    	// Alpha 255 Red 0 Green 0 Blue 0 => MASK_BACKGROUND
 	    	if (maskImage.getRGB(x, 0) != MASK_BACKGROUND ||
 	    		maskImage.getRGB(x, maskImage.getHeight()-1) != MASK_BACKGROUND)
-	    		return false;
+	    		throw new InvalidMaskException("The mask MUST have some padding around the object.");
 	    }
 	    	
 	    // verify for non-zeros values on left and right edges 
@@ -462,15 +456,14 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	    	// Alpha 255 Red 0 Green 0 Blue 0 => MASK_BACKGROUND
     		if (maskImage.getRGB(0, y) != MASK_BACKGROUND ||
 		    	maskImage.getRGB(maskImage.getWidth()-1, y) != MASK_BACKGROUND)
-		    		return false;
+    			throw new InvalidMaskException("The mask MUST have some padding around the object.");
     	}
-	    */
 	}
 	
 	/**
 	 * Validate Source Image correctness.
 	 * 
-	 * @return true: valid false: invalid
+	 * @throws InvalidSourceImageSizeException 
 	 */
 	public void validateSourceImageSize() throws InvalidSourceImageSizeException {
 		if (srcImage == null)
@@ -483,4 +476,3 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		}
 	}
 }
-	

@@ -84,8 +84,7 @@ public class ImageBrowser extends JComponent {
 	private void loadImages() {
 		try {
 			File imagesDir = new File("images");
-			FileTreeWalker walker = new FileTreeWalker(imagesDir,
-					new UnixGlobFileFilter("*.jpg"));
+			FileTreeWalker walker = new FileTreeWalker(imagesDir, new UnixGlobFileFilter("*.jpg"));
 			walker.walk(new FileTreeWalk() {
 
 				public void walk(File path) {

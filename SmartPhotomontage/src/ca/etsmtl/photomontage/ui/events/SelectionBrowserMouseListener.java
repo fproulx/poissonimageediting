@@ -5,19 +5,16 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import ca.etsmtl.photomontage.exceptions.ComputationException;
-import ca.etsmtl.photomontage.exceptions.InvalidDestinationPositionException;
-import ca.etsmtl.photomontage.exceptions.InvalidMaskException;
-import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
 import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 import ca.etsmtl.photomontage.ui.ImageFrame;
+import ca.etsmtl.photomontage.ui.ImagePanel;
 import ca.etsmtl.photomontage.ui.SelectionBrowser;
 import ca.etsmtl.photomontage.ui.UIApp;
 import ca.etsmtl.photomontage.ui.UIView;
@@ -63,12 +60,11 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
         SwingUtilities.convertPointFromScreen(p, glassPane);
 
         glassPane.setPoint(p);
-        glassPane.setImage(selectionHolder.getImage());
+        glassPane.setImage(selectionHolder.getMaskedSourceImage());
         glassPane.repaint();
 	}
 
 	public void mouseReleased(MouseEvent e) {
-
 		Component c = e.getComponent();
 
 		// Ghostly drag and drop
@@ -90,29 +86,47 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
         SelectionBrowser selectionBrowser = appView.getSelectionBrowser();
         
         // Convert the point relative to the Desktop area
-        Point desktopConvertedPoint = SwingUtilities.convertPoint(selectionBrowser, e.getPoint(), desktop);
+        //Point desktopConvertedPoint = SwingUtilities.convertPoint(selectionBrowser, eventPoint, desktop);
         // find the component that under this point
-        Component component = SwingUtilities.getDeepestComponentAt(desktop, desktopConvertedPoint.x, desktopConvertedPoint.y);
-        //TODO: this should check if it is actually the right JLabel (inside an ImageFrame)
-        if(component instanceof JLabel) {
-        	JLabel dstComponent = (JLabel) component;
-        	
-        	// convert point relative to the target component
-        	final Point dstPoint = SwingUtilities.convertPoint(selectionBrowser, e.getPoint(), dstComponent);
-        	final ImageFrame frame = (ImageFrame) dstComponent.getParent().getParent().getParent().getParent().getParent();
+        //Component component = SwingUtilities.getDeepestComponentAt(desktop, desktopConvertedPoint.x, desktopConvertedPoint.y);
+        /*
+        SwingUtilities.convertPoint(c, e.getPoint(), destination)
+        Point z = (Point) e.getPoint().clone();
+        SwingUtilities.convertPointToScreen(z, c);
+        */
+        
+        
+        Point screenPoint = (Point) e.getPoint().clone();
+        SwingUtilities.convertPointToScreen(screenPoint, c);
+        
+        Point desktopPoint = (Point) screenPoint.clone();
+        SwingUtilities.convertPointFromScreen(desktopPoint, desktop);
+        
+        Component component = desktop.findComponentAt(desktopPoint);
+        
+        //TODO: Fix this ugly ugly ugly hack
+        //TODO: this should check if it is actually the right ImagePanel (inside an ImageFrame)
+        if(component instanceof ImagePanel) {
+        	final ImageFrame frame = (ImageFrame) component.getParent().getParent().getParent().getParent();
 
-        	new Thread() {
+        	// convert point relative to the target component
+        	final Point dstPoint = (Point) screenPoint.clone();
+            SwingUtilities.convertPointFromScreen(dstPoint, component);
+            dstPoint.translate(- (selectionHolder.getImage().getWidth() / 2), - (selectionHolder.getImage().getHeight() / 2));
+            
+        	Executor executor = Executors.newSingleThreadExecutor();
+        	executor.execute(new Runnable() {
         		public void run() {
         			// Setup the Poisson solver
         			PoissonPhotomontage photomontage = new PoissonPhotomontage(selectionHolder.getImage(), selectionHolder.getMaskImage(), frame.getImageHolder().getImage(), dstPoint);
         			
         			BufferedImage output = null;
         			try {
+        				System.out.println("Starting computation...");
 	        			// Do the heavy lifting
 	        			long t0 = System.nanoTime();
 	        			output = photomontage.createPhotomontage();
 	        			long t1 = System.nanoTime();
-	        			
 	        			// 2573864000 ns --> 2.573864 s
 	        			System.out.printf("%d ns --> %f s\r\n", t1 - t0, (t1 - t0) / Math.pow(10, 9));
 	        			
@@ -120,20 +134,15 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
 	        			ImageHolder newImageHolder = new ImageHolder(output, frame.getImageHolder().getFilename());
 	        			frame.setImageHolder(newImageHolder);
 	        			
-        			} catch (ComputationException e) {
-						e.printStackTrace();
-					} catch (InvalidSourceImageSizeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InvalidDestinationPositionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InvalidMaskException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+        			} catch (final Exception e) {
+        				SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								UIApp.showException(e);
+							}
+        				});
+					} 
         		}
-        	}.start();
+        	});
         }
    
         //TODO fix this!

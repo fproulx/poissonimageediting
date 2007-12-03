@@ -50,7 +50,7 @@ public class ImageFrame extends JInternalFrame {
 	private WindowItem menuitem;
 	private final ImageFrameSelection selection = new ImageFrameSelection();
 	private boolean modificationStatus;
-	private JLabel label;
+	private ImagePanel imagePanel;
 
 	/**
 	 * Contructeur
@@ -70,25 +70,18 @@ public class ImageFrame extends JInternalFrame {
 		this.imageHolder = holder;
 		this.container = container;
 
-		// creer un panel pour contenir l'image
-		JPanel panel = new JPanel();
-		label = new JLabel();
-
-		// etre sur qu'il y a aucune bordure
-		panel.setBorder(BorderFactory.createEmptyBorder());
-		label.setBorder(BorderFactory.createEmptyBorder());
-		label.setIcon(new ImageIcon(imageHolder.getImage()));
-
-		// ajoute le panel � l'imageframe
-		panel.add(label);
-		add(panel);
+		// Create and add the panel that will contain the image
+		imagePanel = new ImagePanel(imageHolder.getImage()); 
+		add(imagePanel);
 
 		// set les param�tres du imageframe
-		setSize(imageHolder.getImage().getWidth() + 30, imageHolder.getImage().getHeight() + 60);
+		//setSize(imageHolder.getImage().getWidth(), imageHolder.getImage().getHeight());
 		setVisible(true);
 		setMaximizable(false);
-		setAutoscrolls(true);
+		setResizable(false);
 		setFocusable(true);
+		
+		pack();
 
 		// demande le focus au desktop pour afficher le nouveau imageframe �
 		// l'avant de tout les autres
@@ -102,10 +95,10 @@ public class ImageFrame extends JInternalFrame {
 		GhostGlassPane glassPane = (GhostGlassPane) UIApp.getApplication().getMainFrame().getGlassPane();
 		
 		ImageFrameMouseListener mouseListener = new ImageFrameMouseListener(glassPane, imageHolder.getImage(), selection);
-		label.addMouseListener(mouseListener);
+		imagePanel.addMouseListener(mouseListener);
 		
 		ImageFrameMouseMotionListener mouseMotionListener = new ImageFrameMouseMotionListener(glassPane, selection);
-		label.addMouseMotionListener(mouseMotionListener);
+		imagePanel.addMouseMotionListener(mouseMotionListener);
 		
 		UIView appView = (UIView) UIApp.getApplication().getMainView();
 		AbstractGhostDropManager dropListener = new AbstractGhostDropManager(appView.getSelectionBrowser()) {
@@ -113,10 +106,8 @@ public class ImageFrame extends JInternalFrame {
 				if(isInTarget(getTranslatedPoint(e.getDropLocation()))) {
 					if(e instanceof SelectionGhostDropEvent) {
 						SelectionGhostDropEvent selectionEvent = (SelectionGhostDropEvent) e;
-						System.out.println("Dropped " + selectionEvent.getMaskImage());
-						
 						SelectionBrowser selBrowser = (SelectionBrowser) component;
-						SelectionHolder holder = new SelectionHolder(selectionEvent.getSourceImage(), selectionEvent.getMaskImage());
+						SelectionHolder holder = new SelectionHolder(selectionEvent.getSourceImage(), selectionEvent.getMaskImage(), selectionEvent.getMaskedSourceImage());
 						selBrowser.addImage(holder);
 					}
 				}
@@ -188,7 +179,7 @@ public class ImageFrame extends JInternalFrame {
 		// Ask Swing to redraw the component that contains the image later
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				label.setIcon(new ImageIcon(imageHolder.getImage()));
+				imagePanel.setImage(imageHolder.getImage());
 			}	
 		});
 	}
