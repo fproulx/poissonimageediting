@@ -25,33 +25,18 @@ import ca.etsmtl.photomontage.ui.ImageBrowser;
  *         <francois.proulx@gmail.com>
  */
 public class ImageHolder {
+	private final BufferedImage scaledImage;
+	private final BufferedImage original;
+	private final String filename;
 
-	private BufferedImage scaledImage;
-
-	private BufferedImage original;
-	
-	private String filename = "Untitled";
-
-	public ImageHolder(BufferedImage originalImage, String filename) {
+	/**
+	 * @param originalImage
+	 * @param filename
+	 */
+	public ImageHolder(final BufferedImage originalImage, final String filename) {
 		this.original = originalImage;
 		this.filename = filename;
-		this.scaledImage = getImage(ImageBrowser.currentSize);
-	}
-
-	/**
-	 * 
-	 * @return l'image redimensionné
-	 */
-	public BufferedImage getScaledImage() {
-		return scaledImage;
-	}
-
-	/**
-	 * 
-	 * @return l'image original
-	 */
-	public BufferedImage getOriginal() {
-		return original;
+		this.scaledImage = createScaledImage(ImageBrowser.currentSize);
 	}
 
 	/**
@@ -59,7 +44,7 @@ public class ImageHolder {
 	 * pre-scaled size with the closest/larger width and scales down from it, to
 	 * provide a fast and high-quality scaled version at the requested size.
 	 */
-	public BufferedImage getImage(int width) {
+	public BufferedImage createScaledImage(int width) {
 		float scaleFactor = (float) width / original.getWidth();
 		int scaledH = (int) (original.getHeight() * scaleFactor);
 
@@ -80,9 +65,18 @@ public class ImageHolder {
 	}
 
 	/**
-	 * @param filename the filename to set
+	 * 
+	 * @return l'image original
 	 */
-	public void setFilename(String filename) {
-		this.filename = filename;
+	public BufferedImage getImage() {
+		return original;
+	}
+
+	/**
+	 * 
+	 * @return l'image redimensionnï¿½
+	 */
+	public BufferedImage getScaledImage() {
+		return scaledImage;
 	}
 }

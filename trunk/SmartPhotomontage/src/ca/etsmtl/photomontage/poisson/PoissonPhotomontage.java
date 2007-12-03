@@ -44,6 +44,9 @@ import no.uib.cipr.matrix.sparse.IterativeSolver;
 import no.uib.cipr.matrix.sparse.IterativeSolverNotConvergedException;
 import ca.etsmtl.photomontage.AbstractPhotomontage;
 import ca.etsmtl.photomontage.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.InvalidDestinationPositionException;
+import ca.etsmtl.photomontage.exceptions.InvalidMaskException;
+import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
 import ca.etsmtl.photomontage.matrix.MatrixCell;
 import ca.etsmtl.photomontage.matrix.MatrixSolverIterationMonitor;
 import ca.etsmtl.photomontage.util.ColorChannel;
@@ -61,8 +64,9 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	private static final int SOLVER_ITERATIONS = 300;
 	/**
 	 * The bitmask representing the non-selected parts of the mask as a set of ARGB integer pixels.
+	 * The pixels MUST be set to pure black RGB (0,0,0) with a 0.0f alpha channel (fully transparent)
 	 */
-	private static final int MASK_BACKGROUND = 0xFF000000;
+	private static final int MASK_BACKGROUND = 0x00000000;
 	/**
 	 * The bitmask for opaque pixels (the value for the alpha channel is 0xFF).
 	 */
@@ -130,77 +134,77 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	 * 
 	 * @return The resulting image in the form of a BufferedImage instance.
 	 * @throws ComputationException
+	 * @throws InvalidMaskException 
+	 * @throws InvalidDestinationPositionException 
+	 * @throws InvalidSourceImageSizeException 
 	 */
-	public BufferedImage createPhotomontage() throws ComputationException {
+	public BufferedImage createPhotomontage() throws ComputationException, InvalidSourceImageSizeException, InvalidDestinationPositionException, InvalidMaskException {
 		// Make sure the input images fit the requirements set by the algorithm.
-		if(validateInputImages()) {
-		    // Build a mapping between points in the destination image and the computed solutions.
-		    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
-		    
-		    try {
-		    	// Prepare a parralel task executor for the 3 solvers (red, green, blue)
-		    	Executor executor = Executors.newFixedThreadPool(3); 
-		    	// Prepare a parallel execution barrier
-		    	CountDownLatch barrier = new CountDownLatch(3);
-		    	
-		    	// Prepare and launch threads for each of the computation tasks
-		    	FutureTask<Vector> computeTaskVectorRed = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.RED, barrier);
-		    	executor.execute(computeTaskVectorRed);
-		    	FutureTask<Vector> computeTaskVectorGreen = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.GREEN, barrier);
-		    	executor.execute(computeTaskVectorGreen);
-		    	FutureTask<Vector> computeTaskVectorBlue = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.BLUE, barrier);
-		    	executor.execute(computeTaskVectorBlue);
-		    	
-		    	// Wait for all the tasks to be completed.
-				barrier.await();
-		    	
-				// Retrieve the computed values
-				Vector solutionsVectorRed = computeTaskVectorRed.get();
-				Vector solutionsVectorGreen = computeTaskVectorGreen.get();
-				Vector solutionsVectorBlue = computeTaskVectorBlue.get();
-				
-				// Create a perfect copy of the destination that will be used as a canvas for the final composition.
-				BufferedImage finalImage = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g2d = (Graphics2D) finalImage.getGraphics();
-				g2d.drawImage(destImage, 0, 0, null);
+		validateInputImages();
+		
+	    // Build a mapping between points in the destination image and the computed solutions.
+	    ConcurrentHashMap<Integer, Integer> destToSolutionsMap = (ConcurrentHashMap<Integer, Integer>) createSolutionsMap();
+	    
+	    try {
+	    	// Prepare a parralel task executor for the 3 solvers (red, green, blue)
+	    	Executor executor = Executors.newFixedThreadPool(3); 
+	    	// Prepare a parallel execution barrier
+	    	CountDownLatch barrier = new CountDownLatch(3);
+	    	
+	    	// Prepare and launch threads for each of the computation tasks
+	    	FutureTask<Vector> computeTaskVectorRed = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.RED, barrier);
+	    	executor.execute(computeTaskVectorRed);
+	    	FutureTask<Vector> computeTaskVectorGreen = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.GREEN, barrier);
+	    	executor.execute(computeTaskVectorGreen);
+	    	FutureTask<Vector> computeTaskVectorBlue = solvePoissonEquationsForChannel(destToSolutionsMap, ColorChannel.BLUE, barrier);
+	    	executor.execute(computeTaskVectorBlue);
+	    	
+	    	// Wait for all the tasks to be completed.
+			barrier.await();
+	    	
+			// Retrieve the computed values
+			Vector solutionsVectorRed = computeTaskVectorRed.get();
+			Vector solutionsVectorGreen = computeTaskVectorGreen.get();
+			Vector solutionsVectorBlue = computeTaskVectorBlue.get();
+			
+			// Create a perfect copy of the destination that will be used as a canvas for the final composition.
+			BufferedImage finalImage = new BufferedImage(destImage.getWidth(), destImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g2d = (Graphics2D) finalImage.getGraphics();
+			g2d.drawImage(destImage, 0, 0, null);
 
-				// For each pixel in the cloned image (source image).
-				int xDest, yDest;
-				int rgb;
-				int wDest = destImage.getWidth();
-				for (int x = 1; x < srcImage.getWidth() - 1; x++) {
-					for (int y = 1; y < srcImage.getHeight() - 1; y++) {
-						if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
-							// Move to the corresponding position in the destination image.
-							xDest = x + destPosition.x;
-							yDest = y + destPosition.y;
-							
-							// Add up all the channels to compute the value of the pixel (while making sure the values fit in a byte so that they don't collide when shifted).
-							rgb = clampValue((int) Math.round(solutionsVectorRed.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.RED.shift() |
-							      clampValue((int) Math.round(solutionsVectorGreen.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.GREEN.shift() |
-							      clampValue((int) Math.round(solutionsVectorBlue.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.BLUE.shift() |
-							      OPAQUE_BACKGROUND;
-							
-							// Replace the original pixel with the computed one.
-							finalImage.setRGB(xDest, yDest, rgb);
-						}
+			// For each pixel in the cloned image (source image).
+			int xDest, yDest;
+			int rgb;
+			int wDest = destImage.getWidth();
+			for (int x = 1; x < srcImage.getWidth() - 1; x++) {
+				for (int y = 1; y < srcImage.getHeight() - 1; y++) {
+					if (maskImage.getRGB(x, y) != MASK_BACKGROUND) {
+						// Move to the corresponding position in the destination image.
+						xDest = x + destPosition.x;
+						yDest = y + destPosition.y;
+						
+						// Add up all the channels to compute the value of the pixel (while making sure the values fit in a byte so that they don't collide when shifted).
+						rgb = clampValue((int) Math.round(solutionsVectorRed.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.RED.shift() |
+						      clampValue((int) Math.round(solutionsVectorGreen.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.GREEN.shift() |
+						      clampValue((int) Math.round(solutionsVectorBlue.get(destToSolutionsMap.get(wDest * yDest + xDest)))) << ColorChannel.BLUE.shift() |
+						      OPAQUE_BACKGROUND;
+						
+						// Replace the original pixel with the computed one.
+						finalImage.setRGB(xDest, yDest, rgb);
 					}
 				}
-				
-				// If everything went as expected, return the computed image.
-				return finalImage;
-		    }
-		    catch(IterativeSolverNotConvergedException e) {
-		    	throw new ComputationException("The iterative matrix solver could not converge to the solution.");
-		    } catch (InterruptedException e) {
-		    	throw new ComputationException("The parralel computation tasks got abrutly interrupted.");
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-				throw new ComputationException("The parralel execution of a task got abrutly interrupted.");
 			}
-		}
-		else {
-			throw new ComputationException("One or more of the input images (either source, mask or destination) do not meet the requirements.");
+			
+			// If everything went as expected, return the computed image.
+			return finalImage;
+	    }
+	    catch(IterativeSolverNotConvergedException e) {
+	    	throw new ComputationException("The iterative matrix solver could not converge to the solution.");
+	    } catch (InterruptedException e) {
+	    	throw new ComputationException("The parralel computation tasks got abrutly interrupted.");
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			throw new ComputationException("The parralel execution of a task got abrutly interrupted.");
 		}
 	}
 	
@@ -285,6 +289,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	protected FutureTask<Vector> solvePoissonEquationsForChannel(final Map<Integer, Integer> destToSolutionsMap, final ColorChannel channel, final CountDownLatch doneSignal) throws ComputationException, IterativeSolverNotConvergedException {
 		return new FutureTask<Vector>(new Callable<Vector>() {
 			public Vector call() throws ComputationException, IterativeSolverNotConvergedException {
+				System.out.println("Called " + channel);
 				// Get the number of rows in the squared matrix. 
 				int N = destToSolutionsMap.size();
 			    
@@ -335,6 +340,8 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 					}
 				}
 				
+				System.out.println("Done " + channel);
+				
 				// Make sure that all the expected rows were dealt with.
 				if(solutionRow != N)
 					throw new ComputationException(String.format("The number of rows did not match the expected number. (solutionRow != N) --> (%d != %d) ", solutionRow, N));
@@ -355,6 +362,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		            	nonZeroCells[i][j++] = colind;
 		        }
 				
+		        System.out.println("Filling " + channel);
 				// Prepare a NxN sparse matrix, that will contain the system linear of equations.
 				Matrix A = new CompRowMatrix(N, N, nonZeroCells);
 				
@@ -366,6 +374,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 				// Shuffle some random data around to speed up the convergence of the solution.
 				Vector solutionsVector = Matrices.random(N);
 
+				System.out.println("Solving " + channel);
 			    // Choose a Conjugate Gradient iterative solver to compute Ax = b
 			    IterativeSolver solver = new CG(solutionsVector);
 			    
@@ -374,10 +383,10 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 			    
 			    // Start the iterative solver
 			    solver.solve(A, rhsVector, solutionsVector);
-
+			    System.out.println("Done " + channel);
 				// Notify the synchronization primitive that the computation is completed.
 				doneSignal.countDown();
-				
+				System.out.println("Counted down " + channel);
 				return solutionsVector;
 			}
 			
@@ -389,7 +398,7 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	 * 
 	 * @return true: valid / false: invalid
 	 */
-	public boolean validateDestinationPosition() {
+	public void validateDestinationPosition() throws InvalidDestinationPositionException {
 		// Make sure that the specified destination offset fits
 		// the solver requirements and is inside the destination image.
 		if(destPosition == null || 
@@ -397,23 +406,26 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 		   destPosition.y <= 0 ||
 		   destPosition.x >= destImage.getWidth() -1 ||
 		   destPosition.y >= destImage.getHeight() -1)
-			return false;
+			throw new InvalidDestinationPositionException("The destination position MUST within the boundaries of the destination image.");
 		
 		// Destination Point + Source image must not be taller than Destination Image
 		if ((destPosition.x + srcImage.getWidth())  > destImage.getWidth() ||
 			(destPosition.y + srcImage.getHeight()) > destImage.getHeight())
-			return false;
-		
-		return true;
+			throw new InvalidDestinationPositionException("The entire source image MUST be constrained inside the destination image.");
 	}
 
 	/**
 	 * Validate the input images against all the requirements.
 	 * 
 	 * @return true: valid / false: invalid
+	 * @throws InvalidMaskException 
+	 * @throws InvalidDestinationPositionException 
+	 * @throws InvalidSourceImageSizeException 
 	 */
-	public boolean validateInputImages() {
-		return validateSourceImageSize() && validateDestinationPosition() && validateMask();
+	public void validateInputImages() throws InvalidSourceImageSizeException, InvalidDestinationPositionException, InvalidMaskException {
+		validateSourceImageSize();
+		validateDestinationPosition();
+		validateMask();
 	}
 	
 	/**
@@ -421,24 +433,25 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	 * 
 	 * @return true: valid / false: invalid
 	 */
-	public boolean validateMask() {
+	public void validateMask() throws InvalidMaskException {
 		if (maskImage == null || destImage == null)
-			return false;
+			throw new InvalidMaskException("The mask or the destination image was null.");
 		
 		// Make sure that the mask fits in the destination area
 	    if(destImage.getWidth() < maskImage.getWidth() || 
 	 	   destImage.getHeight() < maskImage.getHeight())
-	    	return false;
+	    	throw new InvalidMaskException("The mask MUST be smaller than the destination image.");
 	    
 		// Input a source image and a mask of different size
 	    if(srcImage.getWidth() != maskImage.getWidth() ||
 	       srcImage.getHeight() != maskImage.getHeight())
-	    	return false;
+	    	throw new InvalidMaskException("The mask MUST have the same size as the source image.");
 	    
+	    /*
 		// Destination image must not have the mask pasted so that a mask value of 0 touches the destination image edges
 	    // verify for non-zeros values on top and bottom edges 
 	    for(int x=0; x<maskImage.getWidth()-1; x++) {
-	    	// Alpha 255 Red 0 Green 0 Blue 0 => 0xFF000000
+	    	// Alpha 255 Red 0 Green 0 Blue 0 => MASK_BACKGROUND
 	    	if (maskImage.getRGB(x, 0) != MASK_BACKGROUND ||
 	    		maskImage.getRGB(x, maskImage.getHeight()-1) != MASK_BACKGROUND)
 	    		return false;
@@ -446,13 +459,12 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	    	
 	    // verify for non-zeros values on left and right edges 
     	for(int y=0; y<maskImage.getHeight()-1; y++) {
-	    	// Alpha 255 Red 0 Green 0 Blue 0 => 0xFF000000
-    		if (maskImage.getRGB(0, y) != 0xFF000000 ||
+	    	// Alpha 255 Red 0 Green 0 Blue 0 => MASK_BACKGROUND
+    		if (maskImage.getRGB(0, y) != MASK_BACKGROUND ||
 		    	maskImage.getRGB(maskImage.getWidth()-1, y) != MASK_BACKGROUND)
 		    		return false;
     	}
-	    
-	    return true;
+	    */
 	}
 	
 	/**
@@ -460,17 +472,15 @@ public class PoissonPhotomontage extends AbstractPhotomontage {
 	 * 
 	 * @return true: valid false: invalid
 	 */
-	public boolean validateSourceImageSize() {
+	public void validateSourceImageSize() throws InvalidSourceImageSizeException {
 		if (srcImage == null)
-			return false;
+			throw new InvalidSourceImageSizeException("The source image was null.");
 
 		// Source must be smaller or equal than the destination image
 		if (srcImage.getWidth() > destImage.getWidth() ||
 			srcImage.getHeight() > destImage.getHeight()) {
-			return false;
+			throw new InvalidSourceImageSizeException("The source image MUST be smaller than the destination image.");
 		}
-		
-		return true;
 	}
 }
 	

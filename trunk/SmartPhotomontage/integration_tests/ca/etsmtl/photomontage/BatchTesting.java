@@ -26,6 +26,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import ca.etsmtl.photomontage.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.InvalidDestinationPositionException;
+import ca.etsmtl.photomontage.exceptions.InvalidMaskException;
+import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
 import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 
 /**
@@ -39,8 +42,11 @@ public class BatchTesting {
 	 * @param args
 	 * @throws IOException
 	 * @throws ComputationException
+	 * @throws InvalidMaskException 
+	 * @throws InvalidDestinationPositionException 
+	 * @throws InvalidSourceImageSizeException 
 	 */
-	public static void main(String args[]) throws IOException, ComputationException {
+	public static void main(String args[]) throws IOException, ComputationException, InvalidSourceImageSizeException, InvalidDestinationPositionException, InvalidMaskException {
 		// top-level path
 		String testImgPath = "resources/images/tests/";
 
