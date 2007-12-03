@@ -53,17 +53,17 @@ public class SelectionBrowser extends JComponent {
 	/**
 	 * Ajoute une image dans le image browser
 	 * 
-	 * @param image est l'image en bufferedimage à ajouter
+	 * @param image est l'image en bufferedimage ï¿½ ajouter
 	 * @param filename est le path de l'image
 	 */
 	public void addImage(SelectionHolder selHold) {
 
 		JLabel label = new JLabel();
-		label.setIcon(new ImageIcon(selHold.getScaledSourceImage()));
+		label.setIcon(new ImageIcon(selHold.getScaledImage()));
 
 		GhostGlassPane glassPane = (GhostGlassPane) UIApp.getApplication().getMainFrame().getGlassPane();
 		
-		SelectionBrowserMouseListener mouseListener = new SelectionBrowserMouseListener(glassPane, selHold.getSourceImage());
+		SelectionBrowserMouseListener mouseListener = new SelectionBrowserMouseListener(glassPane, selHold);
 		label.addMouseListener(mouseListener);
 		
 		GhostMotionAdapter mouseMotionListener = new GhostMotionAdapter(glassPane);

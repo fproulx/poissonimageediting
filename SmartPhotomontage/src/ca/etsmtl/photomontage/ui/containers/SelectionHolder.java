@@ -29,6 +29,10 @@ public class SelectionHolder {
 
 	private BufferedImage srcImage, scaledSrcImage, maskImage;
 
+	/**
+	 * @param srcImage
+	 * @param maskImage
+	 */
 	public SelectionHolder(BufferedImage srcImage, BufferedImage maskImage) {
 		this.srcImage = srcImage;
 		this.maskImage = maskImage;
@@ -65,9 +69,9 @@ public class SelectionHolder {
 
 	/**
 	 * 
-	 * @return l'image redimensionné
+	 * @return l'image redimensionnï¿½
 	 */
-	public BufferedImage getScaledSourceImage() {
+	public BufferedImage getScaledImage() {
 		return scaledSrcImage;
 	}
 
@@ -75,7 +79,7 @@ public class SelectionHolder {
 	 * 
 	 * @return l'image original
 	 */
-	public BufferedImage getSourceImage() {
+	public BufferedImage getImage() {
 		return srcImage;
 	}
 }

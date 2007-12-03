@@ -35,6 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ca.etsmtl.photomontage.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.InvalidDestinationPositionException;
+import ca.etsmtl.photomontage.exceptions.InvalidMaskException;
+import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
 import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 
 /**
@@ -77,8 +80,9 @@ public class PoissonPhotomontageTest {
 	 * Validate the source image size
 	 * 
 	 * @throws IOException if an error occurs
+	 * @throws InvalidSourceImageSizeException 
 	 */
-	@Test public void validateSourceImageSize() throws IOException {
+	@Test public void validateSourceImageSize() throws IOException, InvalidSourceImageSizeException {
 		
 		Point dstPt = new Point(15,21); // arbitrary valid values
 		
@@ -88,15 +92,16 @@ public class PoissonPhotomontageTest {
 		BufferedImage srcTooBigImage = ImageIO.read(new File(testImgPath+srcBigImagePath));
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcTooBigImage,maskImage,dstImage,dstPt);
-		assertFalse(poissonPhotomontage.validateSourceImageSize());
+		poissonPhotomontage.validateSourceImageSize();
 	}
 	
 	/**
 	 * Validate the destination position in the destination image
 	 * 
 	 * @throws IOException if an error occurs
+	 * @throws InvalidDestinationPositionException 
 	 */
-	@Test public void validateDestinationPosition() throws IOException {
+	@Test public void validateDestinationPosition() throws IOException, InvalidDestinationPositionException {
 		
 		// Destination Point outside of dstImage : expect False
 		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
@@ -105,7 +110,7 @@ public class PoissonPhotomontageTest {
 		Point dstPt = new Point(300,150);
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
-		assertFalse(poissonPhotomontage.validateDestinationPosition());
+		poissonPhotomontage.validateDestinationPosition();
 		
 		// Input the source image at a destination point that will have the source image go outside destination image : expect false
 		// FIXME we will have to test this, maybe the poisson editing accept that kind of stuff (will have to be reflected in the algorithm's implementation)
@@ -117,15 +122,16 @@ public class PoissonPhotomontageTest {
 		dstPt = new Point(120,150);
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
-		assertFalse(poissonPhotomontage.validateDestinationPosition());
+		poissonPhotomontage.validateDestinationPosition();
 	}
 	
 	/**
 	 * Validate the mask
 	 * 
 	 * @throws IOException if an error occurs
+	 * @throws InvalidMaskException 
 	 */
-	@Test public void validateMask() throws IOException {
+	@Test public void validateMask() throws IOException, InvalidMaskException {
 		
 		// Input a source image and a mask of different size : expect False
 		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
@@ -134,19 +140,19 @@ public class PoissonPhotomontageTest {
 		Point dstPt = new Point(15,21); // arbitrary valid values
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,invalidMaskImage,dstImage,dstPt);
-		assertFalse(poissonPhotomontage.validateMask());
+		poissonPhotomontage.validateMask();
 		
 		// Destination image must not have the mask pasted so that a mask value of 1 touches the destination image edges
 		BufferedImage fullMaskImage = ImageIO.read(new File(testImgPath+maskFullImagePath));
 		dstPt = new Point(0,0); // paste full mask on 0,0
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,fullMaskImage,dstImage,dstPt);
-		assertFalse(poissonPhotomontage.validateMask());
+		poissonPhotomontage.validateMask();
 		
 		// Send in a valid mask : expect True
 		BufferedImage maskImage = ImageIO.read(new File(testImgPath+maskValidImagePath));
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
-		assertTrue(poissonPhotomontage.validateMask());
+		poissonPhotomontage.validateMask();
 
 	}
 	
@@ -154,8 +160,11 @@ public class PoissonPhotomontageTest {
 	 * Validate the input images
 	 * 
 	 * @throws IOException if an error occurs
+	 * @throws InvalidMaskException 
+	 * @throws InvalidDestinationPositionException 
+	 * @throws InvalidSourceImageSizeException 
 	 */
-	@Test public void validateInputImages() throws IOException {
+	@Test public void validateInputImages() throws IOException, InvalidSourceImageSizeException, InvalidDestinationPositionException, InvalidMaskException {
 		
 		// Input valid data and expect correct result
 		// imgSrc < imgDst
@@ -167,7 +176,7 @@ public class PoissonPhotomontageTest {
 		Point dstPt = new Point(15,21); // arbitrary valid values
 		
 		poissonPhotomontage = new PoissonPhotomontage(srcSmallImage,maskImage,dstImage,dstPt);
-		assertTrue(poissonPhotomontage.validateInputImages()); 
+		poissonPhotomontage.validateInputImages(); 
 	}
 	
 	/**
@@ -179,8 +188,11 @@ public class PoissonPhotomontageTest {
 	 * @throws IOException if an in/output error occurs
 	 * @throws ComputationException if an computation error occurs
 	 * @throws IterativeSolverNotConvergedException if the algo dont converged
+	 * @throws InvalidMaskException 
+	 * @throws InvalidDestinationPositionException 
+	 * @throws InvalidSourceImageSizeException 
 	 */
-	@Test public void createPhotoMontage() throws IOException, ComputationException, IterativeSolverNotConvergedException {
+	@Test public void createPhotoMontage() throws IOException, ComputationException, IterativeSolverNotConvergedException, InvalidSourceImageSizeException, InvalidDestinationPositionException, InvalidMaskException {
 		
 		BufferedImage srcSmallImage = ImageIO.read(new File(testImgPath+srcSmallImagePath));
 		BufferedImage dstImage = ImageIO.read(new File(testImgPath+dstImagePath));

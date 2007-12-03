@@ -67,7 +67,7 @@ public class ImageBrowser extends JComponent {
 		// just fine. So the custom effect is purely an optimization here.
 		for (int i = 0; i < images.size(); ++i) {
 			JLabel label = new JLabel();
-			label.setIcon(new ImageIcon(images.get(i).getImage(currentSize)));
+			label.setIcon(new ImageIcon(images.get(i).createScaledImage(currentSize)));
 
 			// add listener for select image
 			label.addMouseListener(new ImageBrowserMouseListener(images.get(i),
@@ -105,7 +105,7 @@ public class ImageBrowser extends JComponent {
 	/**
 	 * Ajoute une image dans le image browser
 	 * 
-	 * @param image est l'image en bufferedimage à ajouter
+	 * @param image est l'image en bufferedimage ï¿½ ajouter
 	 * @param filename est le path de l'image
 	 */
 	public void addImage(BufferedImage image, String filename) {

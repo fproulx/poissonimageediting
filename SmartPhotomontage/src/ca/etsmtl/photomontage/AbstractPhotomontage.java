@@ -21,6 +21,9 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 import ca.etsmtl.photomontage.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.InvalidDestinationPositionException;
+import ca.etsmtl.photomontage.exceptions.InvalidMaskException;
+import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
 
 /**
  * This is a generalized abstract class to every Photomontage implementation
@@ -56,6 +59,9 @@ public abstract class AbstractPhotomontage {
 	 * Creates a photomontage
 	 * @return The computed seamlessly cloned image.
 	 * @throws ComputationException
+	 * @throws InvalidMaskException 
+	 * @throws InvalidDestinationPositionException 
+	 * @throws InvalidSourceImageSizeException 
 	 */
-	public abstract BufferedImage createPhotomontage() throws ComputationException;
+	public abstract BufferedImage createPhotomontage() throws ComputationException, InvalidSourceImageSizeException, InvalidDestinationPositionException, InvalidMaskException;
 }

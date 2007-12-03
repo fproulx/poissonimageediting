@@ -4,16 +4,25 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-
+import ca.etsmtl.photomontage.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.InvalidDestinationPositionException;
+import ca.etsmtl.photomontage.exceptions.InvalidMaskException;
+import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
+import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 import ca.etsmtl.photomontage.ui.ImageFrame;
 import ca.etsmtl.photomontage.ui.SelectionBrowser;
 import ca.etsmtl.photomontage.ui.UIApp;
 import ca.etsmtl.photomontage.ui.UIView;
+import ca.etsmtl.photomontage.ui.containers.ImageHolder;
+import ca.etsmtl.photomontage.ui.containers.SelectionHolder;
 
 import com.developpez.gfx.swing.drag.GhostDropAdapter;
 import com.developpez.gfx.swing.drag.GhostGlassPane;
@@ -31,14 +40,18 @@ import com.developpez.gfx.swing.drag.GhostGlassPane;
 public class SelectionBrowserMouseListener extends GhostDropAdapter {
 	
 	// Image that represents the selected part of the image
-	private BufferedImage srcImage;
-	
-	public SelectionBrowserMouseListener(GhostGlassPane glassPane, BufferedImage img) {
-		super(glassPane, null);
+	private final SelectionHolder selectionHolder;
 
-		this.srcImage = img;
+	/**
+	 * @param glassPane
+	 * @param holder
+	 */
+	public SelectionBrowserMouseListener(final GhostGlassPane glassPane, final SelectionHolder holder) {
+		super(glassPane, null);
+		
+		this.selectionHolder = holder;
 	}
-	
+
 	public void mousePressed(MouseEvent e) {
 
 		Component c = e.getComponent();
@@ -50,7 +63,7 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
         SwingUtilities.convertPointFromScreen(p, glassPane);
 
         glassPane.setPoint(p);
-        glassPane.setImage(srcImage);
+        glassPane.setImage(selectionHolder.getImage());
         glassPane.repaint();
 	}
 
@@ -83,9 +96,44 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
         //TODO: this should check if it is actually the right JLabel (inside an ImageFrame)
         if(component instanceof JLabel) {
         	JLabel dstComponent = (JLabel) component;
-        	ImageFrame frame = (ImageFrame) dstComponent.getParent().getParent().getParent().getParent().getParent();
-        	frame.getImageHolder();
-        	//TODO: Francois continue ici
+        	
+        	// convert point relative to the target component
+        	final Point dstPoint = SwingUtilities.convertPoint(selectionBrowser, e.getPoint(), dstComponent);
+        	final ImageFrame frame = (ImageFrame) dstComponent.getParent().getParent().getParent().getParent().getParent();
+
+        	new Thread() {
+        		public void run() {
+        			// Setup the Poisson solver
+        			PoissonPhotomontage photomontage = new PoissonPhotomontage(selectionHolder.getImage(), selectionHolder.getMaskImage(), frame.getImageHolder().getImage(), dstPoint);
+        			
+        			BufferedImage output = null;
+        			try {
+	        			// Do the heavy lifting
+	        			long t0 = System.nanoTime();
+	        			output = photomontage.createPhotomontage();
+	        			long t1 = System.nanoTime();
+	        			
+	        			// 2573864000 ns --> 2.573864 s
+	        			System.out.printf("%d ns --> %f s\r\n", t1 - t0, (t1 - t0) / Math.pow(10, 9));
+	        			
+	        			// Replace the image with the photomontage
+	        			ImageHolder newImageHolder = new ImageHolder(output, frame.getImageHolder().getFilename());
+	        			frame.setImageHolder(newImageHolder);
+	        			
+        			} catch (ComputationException e) {
+						e.printStackTrace();
+					} catch (InvalidSourceImageSizeException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvalidDestinationPositionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvalidMaskException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+        		}
+        	}.start();
         }
    
         //TODO fix this!

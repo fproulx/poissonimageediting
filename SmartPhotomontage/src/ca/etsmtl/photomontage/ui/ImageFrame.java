@@ -9,16 +9,12 @@
 
 package ca.etsmtl.photomontage.ui;
 
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
-import java.awt.image.BufferedImage;
-
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
+import javax.swing.SwingUtilities;
 
 import ca.etsmtl.photomontage.ui.containers.ImageFrameSelection;
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
@@ -49,11 +45,12 @@ public class ImageFrame extends JInternalFrame {
 	 * generated serial uid
 	 */
 	private static final long serialVersionUID = -2677920466179585697L;
-	private ImageHolder image;
-	private boolean modified = false;
+	private ImageHolder imageHolder;
 	private ImageFramesContainer container;
 	private WindowItem menuitem;
 	private final ImageFrameSelection selection = new ImageFrameSelection();
+	private boolean modificationStatus;
+	private JLabel label;
 
 	/**
 	 * Contructeur
@@ -65,46 +62,46 @@ public class ImageFrame extends JInternalFrame {
 	 * @param preview
 	 *            est le container du preview (pointer)
 	 */
-	public ImageFrame(ImageHolder img, ImageFramesContainer container, PreviewContainer preview) {
+	public ImageFrame(ImageHolder holder, ImageFramesContainer container, PreviewContainer preview) {
 
-		// passe param à la classe parent
-		super(img.getFilename(), true, true, true);
+		// passe param ï¿½ la classe parent
+		super(holder.getFilename(), true, true, true);
 
-		this.image = img;
+		this.imageHolder = holder;
 		this.container = container;
 
 		// creer un panel pour contenir l'image
 		JPanel panel = new JPanel();
-		JLabel label = new JLabel();
+		label = new JLabel();
 
 		// etre sur qu'il y a aucune bordure
 		panel.setBorder(BorderFactory.createEmptyBorder());
 		label.setBorder(BorderFactory.createEmptyBorder());
-		label.setIcon(new ImageIcon(image.getOriginal()));
+		label.setIcon(new ImageIcon(imageHolder.getImage()));
 
-		// ajoute le panel à l'imageframe
+		// ajoute le panel ï¿½ l'imageframe
 		panel.add(label);
 		add(panel);
 
-		// set les paramètres du imageframe
-		setSize(image.getOriginal().getWidth() + 30, image.getOriginal().getHeight() + 60);
+		// set les paramï¿½tres du imageframe
+		setSize(imageHolder.getImage().getWidth() + 30, imageHolder.getImage().getHeight() + 60);
 		setVisible(true);
 		setMaximizable(false);
 		setAutoscrolls(true);
 		setFocusable(true);
 
-		// demande le focus au desktop pour afficher le nouveau imageframe à
+		// demande le focus au desktop pour afficher le nouveau imageframe ï¿½
 		// l'avant de tout les autres
 		requestFocus();
 
-		//ajouter les événements de la souris (mouseevent, dradndrop)
+		//ajouter les ï¿½vï¿½nements de la souris (mouseevent, dradndrop)
 		//TODO get rid of preview
 		ImageFrameEvents ife = new ImageFrameEvents(this);
 		addInternalFrameListener(ife);
 		
 		GhostGlassPane glassPane = (GhostGlassPane) UIApp.getApplication().getMainFrame().getGlassPane();
 		
-		ImageFrameMouseListener mouseListener = new ImageFrameMouseListener(glassPane, image.getOriginal(), selection);
+		ImageFrameMouseListener mouseListener = new ImageFrameMouseListener(glassPane, imageHolder.getImage(), selection);
 		label.addMouseListener(mouseListener);
 		
 		ImageFrameMouseMotionListener mouseMotionListener = new ImageFrameMouseMotionListener(glassPane, selection);
@@ -128,16 +125,20 @@ public class ImageFrame extends JInternalFrame {
 		mouseListener.addGhostDropListener(dropListener);
 	}
 
+	public void setModified(boolean status) {
+		this.modificationStatus = status;
+	}
+	
 	public boolean isModified() {
-		return modified;
+		return modificationStatus;
 	}
 	
 	public ImageHolder getImageHolder() {
-		return image;
+		return imageHolder;
 	}
 
 	/**
-	 * Événement lors de la fermeture du image frame
+	 * ï¿½vï¿½nement lors de la fermeture du image frame
 	 */
 	public void close() {
 		UIView.WindowsMenu.remove(menuitem);
@@ -152,9 +153,19 @@ public class ImageFrame extends JInternalFrame {
 		menuitem = item;
 	}
 
-	public void windowStateChanged(WindowEvent we) {
-		if(we.getNewState() == WindowEvent.WINDOW_ACTIVATED) {
-			System.out.println("Bingo !!!");
+	public void setImageHolder(ImageHolder newImageHolder) {
+		// Change the image in a thread-safe manner.
+		if(imageHolder != null) {
+			synchronized(imageHolder) {
+				imageHolder = newImageHolder;
+			}
 		}
+		
+		// Ask Swing to redraw the component that contains the image later
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				label.setIcon(new ImageIcon(imageHolder.getImage()));
+			}	
+		});
 	}
 }
