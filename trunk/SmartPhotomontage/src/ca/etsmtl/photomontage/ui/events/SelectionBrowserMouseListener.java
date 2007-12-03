@@ -1,14 +1,29 @@
+/*
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 package ca.etsmtl.photomontage.ui.events;
 
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import javax.imageio.ImageIO;
 import javax.swing.JDesktopPane;
 import javax.swing.SwingUtilities;
 
@@ -71,7 +86,6 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
         Point p = (Point) e.getPoint().clone();
         SwingUtilities.convertPointToScreen(p, c);
 
-        Point eventPoint = (Point) p.clone();
         SwingUtilities.convertPointFromScreen(p, glassPane);
 
         glassPane.setPoint(p);

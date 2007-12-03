@@ -1,10 +1,18 @@
 /*
- * ImageFrameEvent.java
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
  *
- * Created on Oct 28, 2007, 12:59:46 AM
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 package ca.etsmtl.photomontage.ui.events;
@@ -13,14 +21,6 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import ca.etsmtl.photomontage.ui.ImageFrame;
-import ca.etsmtl.photomontage.ui.SelectionBrowser;
-import ca.etsmtl.photomontage.ui.UIApp;
-import ca.etsmtl.photomontage.ui.UIView;
-import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
-import ca.etsmtl.photomontage.ui.containers.SelectionHolder;
-
-import com.developpez.gfx.swing.drag.AbstractGhostDropManager;
-import com.developpez.gfx.swing.drag.GhostDropEvent;
 
 
 /**
@@ -34,6 +34,10 @@ import com.developpez.gfx.swing.drag.GhostDropEvent;
 public class ImageFrameEvents implements InternalFrameListener {
 	private ImageFrame frame;
 
+	/**
+	 * Constructor
+	 * @param frame
+	 */
 	public ImageFrameEvents(ImageFrame frame) {
 		this.frame = frame;
 	}
