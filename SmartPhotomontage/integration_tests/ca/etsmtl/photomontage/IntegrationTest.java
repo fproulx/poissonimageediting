@@ -93,16 +93,36 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 	
 	public BufferedImage computeData() {
 		try {
-			/*
 			// Load all the images
-			srcImage = ImageIO.read(new File("resources/images/objects/duck.jpg"));
-			maskImage = ImageIO.read(new File("resources/images/masks/duck.png"));
-			destImage = ImageIO.read(new File("resources/images/backgrounds/green_lake_with_duck.png"));
-			*/
+//			srcImage = ImageIO.read(new File("resources/images/objects/duck.jpg"));
+//			maskImage = ImageIO.read(new File("resources/images/masks/duck.png"));
+//			destImage = ImageIO.read(new File("resources/images/backgrounds/green_lake_with_duck.png"));
+//			Point dstPoint = new Point(95, 95);
 			
+			// Goat
 			srcImage = ImageIO.read(new File("resources/images/tests/validateInput/src-small.png"));
 			maskImage = ImageIO.read(new File("resources/images/tests/validateInput/mask-best2.png"));
 			destImage = ImageIO.read(new File("resources/images/tests/validateInput/dst.png"));
+			Point dstPoint = new Point(95, 95);
+			
+			// Diver
+//			srcImage = ImageIO.read(new File("resources/images/presentation/diver-fg.jpg"));
+//			maskImage = ImageIO.read(new File("resources/images/presentation/diver-mask.png"));
+//			destImage = ImageIO.read(new File("resources/images/presentation/diver-bg.jpg"));
+//			Point dstPoint = new Point(220, 5);
+			
+			// Ovni
+//			srcImage = ImageIO.read(new File("resources/images/presentation/ovni-fg.jpg"));
+//			maskImage = ImageIO.read(new File("resources/images/presentation/ovni-mask.png"));
+//			destImage = ImageIO.read(new File("resources/images/presentation/ovni-bg.jpg"));
+//			Point dstPoint = new Point(120, 2);
+			
+			// Parachute
+//			srcImage = ImageIO.read(new File("resources/images/presentation/parachute-fg.jpg"));
+//			maskImage = ImageIO.read(new File("resources/images/presentation/parachute-mask.png"));
+//			destImage = ImageIO.read(new File("resources/images/presentation/parachute-bg.jpg"));
+//			Point dstPoint = new Point(50, 45);
+
 			
 			/*srcImage = ImageIO.read(new File(chooser.getSelectedFile().getName()));
 			maskImage = ImageIO.read(new File("resources/images/masks/F16mask.png"));
@@ -129,7 +149,7 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 		    
 		    */
 			// Setup the Poisson solver
-			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, new Point(95, 95));
+			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, dstPoint);
 			
 			// Do the heavy lifting
 			long t0 = System.nanoTime();
