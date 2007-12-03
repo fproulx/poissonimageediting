@@ -87,7 +87,7 @@ public class MenuController {
 			//si ok sauvegarder l'image avec le nom
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File myfile = fc.getSelectedFile();
-				ImageIO.write(image, "jpg", myfile);
+				ImageIO.write(image, "PNG", myfile);
 				return myfile.getAbsolutePath();
 			}
 		} catch (IOException e) {
