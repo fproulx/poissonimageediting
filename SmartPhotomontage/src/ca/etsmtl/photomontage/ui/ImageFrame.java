@@ -55,7 +55,7 @@ public class ImageFrame extends JInternalFrame {
 	/**
 	 * Contructeur
 	 * 
-	 * @param img
+	 * @param holder
 	 *            est l'image holder (original+preview)
 	 * @param container
 	 *            est le container pour les images frames (pointer)
@@ -125,34 +125,58 @@ public class ImageFrame extends JInternalFrame {
 		mouseListener.addGhostDropListener(dropListener);
 	}
 
+	/**
+	 * 
+	 * @param status of the image
+	 */
 	public void setModified(boolean status) {
 		this.modificationStatus = status;
 	}
 	
+	/**
+	 * 
+	 * @return if the image is modified
+	 */
 	public boolean isModified() {
 		return modificationStatus;
 	}
 	
+	/**
+	 * 
+	 * @return the image holder
+	 */
 	public ImageHolder getImageHolder() {
 		return imageHolder;
 	}
 
 	/**
-	 * �v�nement lors de la fermeture du image frame
+	 * Evenement lors de la fermeture du image frame
 	 */
 	public void close() {
 		UIView.WindowsMenu.remove(menuitem);
 		container.remove(this);
 	}
 
+	/**
+	 * 
+	 * @return the menu item in window menu
+	 */
 	public WindowItem getMenuItem() {
 		return menuitem;
 	}
 
+	/**
+	 * Set menu item
+	 * @param item is the new window item
+	 */
 	public void setMenuItem(WindowItem item) {
 		menuitem = item;
 	}
 
+	/**
+	 * Set the new image holder and update image in swing
+	 * @param newImageHolder
+	 */
 	public void setImageHolder(ImageHolder newImageHolder) {
 		// Change the image in a thread-safe manner.
 		if(imageHolder != null) {
