@@ -47,6 +47,8 @@ public class ImageBrowser extends JComponent {
 	private ImageFramesContainer container;
 
 	private PreviewContainer preview;
+	
+	private static String DEFAULT_PATH = "images/";
 
 	/** Creates a new instance of ImageBrowser */
 	public ImageBrowser(ImageFramesContainer container, PreviewContainer preview) {
@@ -83,8 +85,8 @@ public class ImageBrowser extends JComponent {
 	 */
 	private void loadImages() {
 		try {
-			File imagesDir = new File("images");
-			FileTreeWalker walker = new FileTreeWalker(imagesDir, new UnixGlobFileFilter("*.jpg"));
+			File imagesDir = new File(DEFAULT_PATH);
+			FileTreeWalker walker = new FileTreeWalker(imagesDir, new UnixGlobFileFilter("{*.png,*.jpg,*.gif}"));
 			walker.walk(new FileTreeWalk() {
 
 				public void walk(File path) {
