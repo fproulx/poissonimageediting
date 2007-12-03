@@ -1,10 +1,18 @@
 /*
- * ImageBrowserMouseListener.java
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * FranÃ§ois Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
  *
- * Created on Oct 15, 2007, 9:21:34 AM
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 package ca.etsmtl.photomontage.ui.events;
@@ -15,11 +23,10 @@ import java.awt.event.MouseListener;
 import ca.etsmtl.photomontage.ui.ImageFrame;
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
 import ca.etsmtl.photomontage.ui.containers.ImageHolder;
-import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
 
 
 /**
- * Classe ImageBrowserMouseListener est l'implémentation les événements de la
+ * Classe ImageBrowserMouseListener est l'implï¿½mentation les ï¿½vï¿½nements de la
  * souris sur le paneau de l'image browser
  * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
@@ -33,23 +40,19 @@ public class ImageBrowserMouseListener implements MouseListener {
 
 	private ImageFramesContainer container;
 
-	private PreviewContainer preview;
-
 	/**
 	 * 
 	 * @param image est le container
 	 * @param container
-	 * @param preview
 	 */
 	public ImageBrowserMouseListener(ImageHolder image,
-			ImageFramesContainer container, PreviewContainer preview) {
+			ImageFramesContainer container) {
 		this.image = image;
 		this.container = container;
-		this.preview = preview;
 	}
 
 	public void mouseClicked(MouseEvent arg0) {
-		ImageFrame img = new ImageFrame(image, container, preview);
+		ImageFrame img = new ImageFrame(image, container);
 		container.add(img);
 	}
 

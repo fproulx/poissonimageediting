@@ -1,3 +1,20 @@
+/*
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 package ca.etsmtl.photomontage.ui.events;
 
 import java.awt.AlphaComposite;
@@ -10,11 +27,8 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
 import ca.etsmtl.photomontage.ui.containers.ImageFrameSelection;
@@ -46,6 +60,12 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	
 	private BufferedImage maskedSrcImage;
 
+	/**
+	 * Constructor
+	 * @param glassPane
+	 * @param dstImage
+	 * @param selection
+	 */
 	public ImageFrameMouseListener(GhostGlassPane glassPane, BufferedImage dstImage, ImageFrameSelection selection) {
 		super(glassPane, null);
 
@@ -54,17 +74,11 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	}
 	
 	public void mousePressed(MouseEvent e) {
-
-		//System.out.println("Selection Mode is: "+selection.isSelectionMode());
-		
 		// We are in selection mode
 		if (selection.isSelectionMode() == true) {
 			List<Point> points = selection.getPoints();
-			
 			points.clear();
-			//System.out.println("Mouse pressed; # of clicks: " + e.getClickCount());
 			points.add(e.getPoint());
-			Graphics g = e.getComponent().getGraphics();
 		}
 		else {
 			Component c = e.getComponent();
@@ -82,8 +96,6 @@ public class ImageFrameMouseListener extends GhostDropAdapter {
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		//System.out.println("Mouse released; # of clicks: " + e.getClickCount());
-		//System.out.println("State selection mode: "+selection.isSelectionMode());
 		List<Point> points = selection.getPoints();
 		
 		if (selection.isSelectionMode() == true) {	

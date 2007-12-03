@@ -1,10 +1,18 @@
 /*
- * ImageHolder.java
- * 
- * Created on Oct 28, 2007, 11:57:46 AM
- * 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 package ca.etsmtl.photomontage.ui.containers;
@@ -32,6 +40,7 @@ public class SelectionHolder {
 	/**
 	 * @param srcImage
 	 * @param maskImage
+	 * @param maskedSrcImage 
 	 */
 	public SelectionHolder(BufferedImage srcImage, BufferedImage maskImage, BufferedImage maskedSrcImage) {
 		this.srcImage = srcImage;
@@ -63,10 +72,18 @@ public class SelectionHolder {
 		return maskedSrcImage;
 	}
 
+	/**
+	 * 
+	 * @return mask
+	 */
 	public BufferedImage getMaskImage() {
 		return maskImage;
 	}
 	
+	/**
+	 * 
+	 * @return masked source
+	 */
 	public BufferedImage getMaskedSourceImage() {
 		return maskedSrcImage;
 	}
