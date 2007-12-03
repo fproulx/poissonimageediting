@@ -27,7 +27,7 @@ import ca.etsmtl.photomontage.ui.ImageBrowser;
 public class ImageHolder {
 	private final BufferedImage scaledImage;
 	private final BufferedImage original;
-	private final String filename;
+	private String filename;
 
 	/**
 	 * @param originalImage
@@ -43,6 +43,9 @@ public class ImageHolder {
 	 * This method returns an image with the specified width. It finds the
 	 * pre-scaled size with the closest/larger width and scales down from it, to
 	 * provide a fast and high-quality scaled version at the requested size.
+	 * 
+	 * @param width of the image you want
+	 * @return scaled image
 	 */
 	public BufferedImage createScaledImage(int width) {
 		float scaleFactor = (float) width / original.getWidth();
@@ -62,6 +65,14 @@ public class ImageHolder {
 	 */
 	public String getFilename() {
 		return filename;
+	}
+	
+	/**
+	 * set filename
+	 * @param filename
+	 */
+	public void setFilename(String filename) {
+		this.filename = filename;
 	}
 
 	/**

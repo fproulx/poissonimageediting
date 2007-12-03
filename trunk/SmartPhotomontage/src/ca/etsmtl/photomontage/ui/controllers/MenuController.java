@@ -67,9 +67,10 @@ public class MenuController {
 	/**
 	 * Sauvegarde de l'image sur le disque
 	 * 
-	 * @param image a sauvegardé sur le disque
+	 * @param image a sauvegarder sur le disque
+	 * @return path ou l'image a ete sauvegarder
 	 */
-	public void saveFile(BufferedImage image) {
+	public String saveFile(BufferedImage image) {
 		//creation du filechooser pour sauvegarder une image
 		String filename = File.separator + "Users";
 		JFileChooser fc = new JFileChooser(filename);
@@ -87,6 +88,7 @@ public class MenuController {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File myfile = fc.getSelectedFile();
 				ImageIO.write(image, "jpg", myfile);
+				return myfile.getAbsolutePath();
 			}
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null,
@@ -94,7 +96,8 @@ public class MenuController {
 				    "Error while saving",
 				    JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-		}
-
+		} 
+		
+		return "";
 	}
 }
