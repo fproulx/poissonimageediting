@@ -1,3 +1,20 @@
+/*
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 package ca.etsmtl.photomontage.ui;
 
 import java.awt.Dimension;
@@ -18,7 +35,6 @@ import org.jdesktop.tools.io.UnixGlobFileFilter;
 
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
 import ca.etsmtl.photomontage.ui.containers.ImageHolder;
-import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
 import ca.etsmtl.photomontage.ui.events.ImageBrowserMouseListener;
 
 
@@ -40,20 +56,26 @@ public class ImageBrowser extends JComponent {
 
 	Dimension newSize = new Dimension();
 
+	/**
+	 * Images list
+	 */
 	public static List<ImageHolder> images = new ArrayList<ImageHolder>();
 
+	/**
+	 * Current size of each image in the image browser
+	 */
 	public static int currentSize = 175;
 
 	private ImageFramesContainer container;
-
-	private PreviewContainer preview;
 	
 	private static String DEFAULT_PATH = "images/";
 
-	/** Creates a new instance of ImageBrowser */
-	public ImageBrowser(ImageFramesContainer container, PreviewContainer preview) {
+	/** 
+	 * Creates a new instance of ImageBrowser 
+	 * @param container 
+	 */
+	public ImageBrowser(ImageFramesContainer container) {
 		this.container = container;
-		this.preview = preview;
 
 		setOpaque(true);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -73,7 +95,7 @@ public class ImageBrowser extends JComponent {
 
 			// add listener for select image
 			label.addMouseListener(new ImageBrowserMouseListener(images.get(i),
-					container, preview));
+					container));
 
 			add(label);
 		}
@@ -116,8 +138,7 @@ public class ImageBrowser extends JComponent {
 		label.setIcon(new ImageIcon(holder.getScaledImage()));
 
 		// add listener for select image
-		label.addMouseListener(new ImageBrowserMouseListener(holder, container,
-				preview));
+		label.addMouseListener(new ImageBrowserMouseListener(holder, container));
 
 		add(label);
 

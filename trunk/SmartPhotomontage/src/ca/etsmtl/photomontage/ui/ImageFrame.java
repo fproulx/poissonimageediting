@@ -1,25 +1,28 @@
 /*
- * ImageFrame.java
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
  *
- * Created on 2007-10-21, 15:29:35
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 package ca.etsmtl.photomontage.ui;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import ca.etsmtl.photomontage.ui.containers.ImageFrameSelection;
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
 import ca.etsmtl.photomontage.ui.containers.ImageHolder;
-import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
 import ca.etsmtl.photomontage.ui.containers.SelectionHolder;
 import ca.etsmtl.photomontage.ui.containers.WindowItem;
 import ca.etsmtl.photomontage.ui.events.ImageFrameEvents;
@@ -56,15 +59,13 @@ public class ImageFrame extends JInternalFrame {
 	 * Contructeur
 	 * 
 	 * @param holder
-	 *            est l'image holder (original+preview)
+	 *            est l'image holder (original)
 	 * @param container
 	 *            est le container pour les images frames (pointer)
-	 * @param preview
-	 *            est le container du preview (pointer)
 	 */
-	public ImageFrame(ImageHolder holder, ImageFramesContainer container, PreviewContainer preview) {
+	public ImageFrame(ImageHolder holder, ImageFramesContainer container) {
 
-		// passe param � la classe parent
+		// passe param a la classe parent
 		super(holder.getFilename(), true, true, true);
 
 		this.imageHolder = holder;
@@ -74,7 +75,7 @@ public class ImageFrame extends JInternalFrame {
 		imagePanel = new ImagePanel(imageHolder.getImage()); 
 		add(imagePanel);
 
-		// set les param�tres du imageframe
+		// set les parametres du imageframe
 		//setSize(imageHolder.getImage().getWidth(), imageHolder.getImage().getHeight());
 		setVisible(true);
 		setMaximizable(false);
@@ -87,8 +88,7 @@ public class ImageFrame extends JInternalFrame {
 		// l'avant de tout les autres
 		requestFocus();
 
-		//ajouter les �v�nements de la souris (mouseevent, dradndrop)
-		//TODO get rid of preview
+		//ajouter les evenements de la souris (mouseevent, dradndrop)
 		ImageFrameEvents ife = new ImageFrameEvents(this);
 		addInternalFrameListener(ife);
 		
