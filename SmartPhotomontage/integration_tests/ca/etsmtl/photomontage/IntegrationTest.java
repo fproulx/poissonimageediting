@@ -40,10 +40,24 @@ import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 interface DataComputer<T> {
 	/**
 	 * 
-	 * @return
+	 * @return T
 	 */
 	public T computeData();
+	
+	/**
+	 * Add Computation listener
+	 * 
+	 * @param cl
+	 */
 	public void addComputationListener(ComputationListener<T> cl);
+	
+	/**
+	 * Notify all listeners
+	 * 
+	 * @param s
+	 * @param m
+	 * @param o
+	 */
 	public void notifyComputationListeners(T s, T m, T o);
 }
 
@@ -172,6 +186,12 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 }
 
 interface ComputationListener<T> {
+	/**
+	 * when computation completed
+	 * @param t1
+	 * @param t2
+	 * @param t3
+	 */
 	public void onComputationCompleted(T t1, T t2, T t3);
 }
 
@@ -180,6 +200,10 @@ class ComputationResultsDisplay extends JFrame implements ComputationListener<Bu
 	private JPanel displayPanel = new JPanel();
 	private volatile BufferedImage s, m, computedImage;
 	
+	/**
+	 * Constructor
+	 * @param dc
+	 */
 	public ComputationResultsDisplay(DataComputer<BufferedImage> dc) {
 		dc.addComputationListener(this);
 		initComponents();

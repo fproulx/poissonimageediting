@@ -1,5 +1,18 @@
 /*
- * UIView.java
+ * SmartPhotomontage
+ * Copyright (C) 2007
+ * François Proulx, Olivier Bilodeau, Jean-Philippe Plante, Kim Lebel
+ * http://poissonimageediting.googlecode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 package ca.etsmtl.photomontage.ui;
@@ -24,9 +37,7 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
-
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
-import ca.etsmtl.photomontage.ui.containers.PreviewContainer;
 import ca.etsmtl.photomontage.ui.containers.WindowItem;
 import ca.etsmtl.photomontage.ui.controllers.MenuController;
 
@@ -138,13 +149,12 @@ public class UIView extends FrameView implements Observer {
 		// Our code 
 		//TODO: REfactor me please !
 		
-		// cr�ation du image browser
+		// creation du image browser
 		ImageBrowser.currentSize = 180;
 
 		// ajouter UIView en temps que observer pour les containers de image
-		// frame et du preview
+		// frame
 		container.addObserver(this);
-		previewcontainer.addObserver(this);
 		
 		mainPanel = new javax.swing.JPanel();
 	
@@ -189,27 +199,17 @@ public class UIView extends FrameView implements Observer {
 				.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getResourceMap(
 						UIView.class);
 
-		org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(rightpanel);
+		//org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(rightpanel);
 		//rightpanel.setLayout(rightpanelLayout);
 //		rightpanelLayout.setHorizontalGroup(rightpanelLayout
 //				.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
 //				.add(selections,
 //						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 196,
-//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-//				.add(preview,
-//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-//						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE));
+//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE);
 //		rightpanelLayout.setVerticalGroup(rightpanelLayout.createParallelGroup(
 //				org.jdesktop.layout.GroupLayout.LEADING).add(
 //				org.jdesktop.layout.GroupLayout.TRAILING,
 //				rightpanelLayout.createSequentialGroup()
-//				.add(preview,
-//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-//						org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-//				.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-//				
 //				.add(selections,
 //								org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 //								237, Short.MAX_VALUE)));
@@ -352,7 +352,7 @@ public class UIView extends FrameView implements Observer {
 		setStatusBar(statusPanel);
 
 		// param�triser le imageframe et ajouter � l'interface
-		imagebrowser = new ImageBrowser(container, previewcontainer);
+		imagebrowser = new ImageBrowser(container);
 		JScrollPane imageBrowserScrollpane = new JScrollPane(imagebrowser);
 		imageBrowserScrollpane.setLayout(new ScrollPaneLayout());
 		imageBrowserScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -420,9 +420,6 @@ public class UIView extends FrameView implements Observer {
 
 	// image frame container
 	private ImageFramesContainer container = new ImageFramesContainer();
-
-	// preview container
-	private PreviewContainer previewcontainer = new PreviewContainer();
 
 	// ca.etsmtl.photomontage.ui menu controller
 	private MenuController menuCtrl = new MenuController();
