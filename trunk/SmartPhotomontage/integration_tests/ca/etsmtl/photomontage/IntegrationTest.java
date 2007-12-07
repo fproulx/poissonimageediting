@@ -108,22 +108,18 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 	public BufferedImage computeData() {
 		try {
 			// Load all the images
-//			srcImage = ImageIO.read(new File("resources/images/objects/duck.jpg"));
-//			maskImage = ImageIO.read(new File("resources/images/masks/duck.png"));
-//			destImage = ImageIO.read(new File("resources/images/backgrounds/green_lake_with_duck.png"));
-//			Point dstPoint = new Point(95, 95);
 			
 			// Goat
-			srcImage = ImageIO.read(new File("resources/images/tests/validateInput/src-small.png"));
-			maskImage = ImageIO.read(new File("resources/images/tests/validateInput/mask-best2.png"));
-			destImage = ImageIO.read(new File("resources/images/tests/validateInput/dst.png"));
-			Point dstPoint = new Point(95, 95);
+//			srcImage = ImageIO.read(new File("resources/images/tests/validateInput/src-small.png"));
+//			maskImage = ImageIO.read(new File("resources/images/tests/validateInput/mask-best2.png"));
+//			destImage = ImageIO.read(new File("resources/images/tests/validateInput/dst.png"));
+//			Point dstPoint = new Point(95, 95);
 			
 			// Diver
-//			srcImage = ImageIO.read(new File("resources/images/presentation/diver-fg.jpg"));
-//			maskImage = ImageIO.read(new File("resources/images/presentation/diver-mask.png"));
-//			destImage = ImageIO.read(new File("resources/images/presentation/diver-bg.jpg"));
-//			Point dstPoint = new Point(220, 5);
+			srcImage = ImageIO.read(new File("resources/images/presentation/diver-fg.jpg"));
+			maskImage = ImageIO.read(new File("resources/images/presentation/diver-mask.png"));
+			destImage = ImageIO.read(new File("resources/images/presentation/diver-bg.jpg"));
+			Point dstPoint = new Point(220, 5);
 			
 			// Ovni
 //			srcImage = ImageIO.read(new File("resources/images/presentation/ovni-fg.jpg"));
@@ -137,31 +133,7 @@ public class IntegrationTest implements DataComputer<BufferedImage> {
 //			destImage = ImageIO.read(new File("resources/images/presentation/parachute-bg.jpg"));
 //			Point dstPoint = new Point(50, 45);
 
-			
-			/*srcImage = ImageIO.read(new File(chooser.getSelectedFile().getName()));
-			maskImage = ImageIO.read(new File("resources/images/masks/F16mask.png"));
-			destImage = ImageIO.read(new File("resources/images/backgrounds/F16Target.jpg"));*/
-			
-			/*
-			JFileChooser chooser = new JFileChooser();
-		    
-			chooser.setCurrentDirectory(new File("resources/images/"));
-			chooser.showOpenDialog(null);
-		    srcImage = ImageIO.read(chooser.getSelectedFile());
-		    
-		    chooser.setCurrentDirectory(new File("resources/images/"));
-		    chooser.showOpenDialog(null);
-		    maskImage = ImageIO.read(chooser.getSelectedFile());
-		    
-		    chooser.setCurrentDirectory(new File("resources/images/"));
-		    chooser.showOpenDialog(null);
-		    destImage = ImageIO.read(chooser.getSelectedFile());
-		    
-		    int x, y;
-		    x = Integer.parseInt(JOptionPane.showInputDialog("X"));
-		    y = Integer.parseInt(JOptionPane.showInputDialog("Y"));
-		    
-		    */
+
 			// Setup the Poisson solver
 			PoissonPhotomontage photomontage = new PoissonPhotomontage(srcImage, maskImage, destImage, dstPoint);
 			
