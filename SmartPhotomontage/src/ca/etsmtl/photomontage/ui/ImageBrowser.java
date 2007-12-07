@@ -80,6 +80,7 @@ public class ImageBrowser extends JComponent {
 		setOpaque(true);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
+		
 		loadImages();
 
 		// For each image:
