@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/mtj.jar"/>
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/swing-worker.jar"/>
+	<classpathentry kind="lib" path="lib/poissonphotomontage.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
