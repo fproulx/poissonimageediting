@@ -1,6 +1,17 @@
-Tâches
+﻿Tâches
 ======
+obligatoire
 - Toute
+- Mettre une image plus friendly dans le About Dialog
+- Poursuivre l'intégration des icônes
+- Recréer des icônes tango plus gros à partir des .SVG
+- panes de gauche.. Panel component?
+
+aaahh..
+- le zoom
+
+peut-être
+- Faire une icône style pressed
 
 Références
 ==========
@@ -9,3 +20,12 @@ http://headrush.typepad.com/creating_passionate_users/2006/12/dont_make_the_d.ht
 
 Napkin look and feel, consulté le 3 juillet 2008
 http://napkinlaf.sourceforge.net/
+
+Java Swing Components
+http://java.sun.com/docs/books/tutorial/uiswing/components/index.html
+
+Icons tango
+http://tango.freedesktop.org/Tango_Icon_Library
+
+Gnome Human Interface Guidelines (Quit vs Exit issue)
+http://library.gnome.org/devel/hig-book/stable/menus-standard.html.en#the-file-menu
