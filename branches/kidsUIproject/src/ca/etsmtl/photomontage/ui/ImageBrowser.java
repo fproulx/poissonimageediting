@@ -68,7 +68,9 @@ public class ImageBrowser extends JComponent {
 
 	private ImageFramesContainer container;
 	
-	private static String DEFAULT_PATH = "images/";
+	// FIXME I changed this so I would load the program quicker
+	//private static String DEFAULT_PATH = "images/";
+	private static String DEFAULT_PATH = "images2/";
 
 	/** 
 	 * Creates a new instance of ImageBrowser 
