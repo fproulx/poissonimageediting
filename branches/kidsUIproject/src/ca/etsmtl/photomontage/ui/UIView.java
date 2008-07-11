@@ -19,23 +19,19 @@ package ca.etsmtl.photomontage.ui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
-import javax.swing.Timer;
 
 import org.jdesktop.application.Action;
 import org.jdesktop.application.FrameView;
 import org.jdesktop.application.SingleFrameApplication;
-import org.jdesktop.application.TaskMonitor;
 
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
 import ca.etsmtl.photomontage.ui.containers.WindowItem;
@@ -82,6 +78,7 @@ public class UIView extends FrameView implements Observer {
 	 * HAHA too late!
 	 */
 	private void initComponents() {
+		
 		// Load resource file
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 		.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getResourceMap(
@@ -100,92 +97,27 @@ public class UIView extends FrameView implements Observer {
 		// frame
 		container.addObserver(this);
 		
+		// initialize major UI components
 		mainPanel = new javax.swing.JPanel();
-	
 		mdi = new javax.swing.JDesktopPane();
 		browser = new javax.swing.JPanel();
 		rightpanel = new javax.swing.JPanel();
+		
+		// Menu code
+		// ---------
+		
 		menuBar = new javax.swing.JMenuBar();
 		javax.swing.JMenu fileMenu = new javax.swing.JMenu();
 		fileMenu.setIcon(new ImageIcon(resourceMap.getString("fileMenu.icon")));
 		openFileMenuItem = new javax.swing.JMenuItem();
 		saveMenuItem = new javax.swing.JMenuItem();
-		javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
+		javax.swing.JMenuItem quitMenuItem = new javax.swing.JMenuItem();
 		WindowsMenu = new javax.swing.JMenu();
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
 		javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
 		statusPanel = new javax.swing.JPanel();
-		javax.swing.JSeparator statusPanelSeparator = new javax.swing.JSeparator();
-		statusMessageLabel = new javax.swing.JLabel();
-		statusAnimationLabel = new javax.swing.JLabel();
-		progressBar = new javax.swing.JProgressBar();
-
-		mainPanel.setName("mainPanel"); // NOI18N
-
-		browser.setAutoscrolls(true);
-		browser.setName("browser"); // NOI18N
-		browser.setPreferredSize(new java.awt.Dimension(200, 0));
-
-		org.jdesktop.layout.GroupLayout browserLayout = new org.jdesktop.layout.GroupLayout(
-				browser);
-		browser.setLayout(browserLayout);
-		browserLayout.setHorizontalGroup(browserLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 200,
-				Short.MAX_VALUE));
-		browserLayout.setVerticalGroup(browserLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 380,
-				Short.MAX_VALUE));
-
-		mdi.setName("mdi"); // NOI18N
-
-		rightpanel.setName("rightpanel"); // NOI18N
-
-		//org.jdesktop.layout.GroupLayout rightpanelLayout = new org.jdesktop.layout.GroupLayout(rightpanel);
-		//rightpanel.setLayout(rightpanelLayout);
-//		rightpanelLayout.setHorizontalGroup(rightpanelLayout
-//				.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-//				.add(selections,
-//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 196,
-//						org.jdesktop.layout.GroupLayout.PREFERRED_SIZE);
-//		rightpanelLayout.setVerticalGroup(rightpanelLayout.createParallelGroup(
-//				org.jdesktop.layout.GroupLayout.LEADING).add(
-//				org.jdesktop.layout.GroupLayout.TRAILING,
-//				rightpanelLayout.createSequentialGroup()
-//				.add(selections,
-//								org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-//								237, Short.MAX_VALUE)));
-
-		org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
-		mainPanel.setLayout(mainPanelLayout);
-		
-		mainPanelLayout.setHorizontalGroup(mainPanelLayout
-						.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-						.add(mainPanelLayout
-										.createSequentialGroup()
-										.add(browser,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(
-												org.jdesktop.layout.LayoutStyle.RELATED)
-										.add(mdi)
-										.addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-										.add(rightpanel,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)));
-		mainPanelLayout.setVerticalGroup(mainPanelLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(rightpanel,
-				org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-				org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				.add(org.jdesktop.layout.GroupLayout.TRAILING, mdi).add(
-						browser, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-						380, Short.MAX_VALUE));
 
 		menuBar.setName("menuBar"); // NOI18N
-
-		//fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
-		//fileMenu.setName("fileMenu"); // NOI18N
 
 		openFileMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
 				java.awt.event.KeyEvent.VK_O,
@@ -216,11 +148,12 @@ public class UIView extends FrameView implements Observer {
 				.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getActionMap(
 						UIView.class, this);
 
-		exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
+		quitMenuItem.setAction(actionMap.get("quit")); // NOI18N
 		//exitMenuItem.setName("exitMenuItem"); // NOI18N
 		//TODO refactor exit to quit
-		exitMenuItem.setIcon(new ImageIcon(resourceMap.getString("quitMenuItem.icon"))); // NOI18N
-		fileMenu.add(exitMenuItem);
+		quitMenuItem.setIcon(new ImageIcon(resourceMap.getString("quitMenuItem.icon"))); // NOI18N
+		
+		fileMenu.add(quitMenuItem);
 
 		menuBar.add(fileMenu);
 
@@ -236,66 +169,62 @@ public class UIView extends FrameView implements Observer {
 		helpMenu.add(aboutMenuItem);
 
 		menuBar.add(helpMenu);
+		
+		// Layout and panel setup
+		// ----------------------
+		
+		mainPanel.setName("mainPanel"); // NOI18N
 
-		statusPanel.setName("statusPanel"); // NOI18N
+		browser.setAutoscrolls(true);
+		browser.setName("browser"); // NOI18N
+		browser.setPreferredSize(new java.awt.Dimension(200, 0));
 
-		statusMessageLabel.setName("statusMessageLabel"); // NOI18N
+		org.jdesktop.layout.GroupLayout browserLayout = new org.jdesktop.layout.GroupLayout(
+				browser);
+		browser.setLayout(browserLayout);
+		browserLayout.setHorizontalGroup(browserLayout.createParallelGroup(
+				org.jdesktop.layout.GroupLayout.LEADING).add(0, 200,
+				Short.MAX_VALUE));
+		browserLayout.setVerticalGroup(browserLayout.createParallelGroup(
+				org.jdesktop.layout.GroupLayout.LEADING).add(0, 380,
+				Short.MAX_VALUE));
 
-		statusAnimationLabel
-				.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-		statusAnimationLabel.setName("statusAnimationLabel"); // NOI18N
+		mdi.setName("mdi"); // NOI18N
 
-		progressBar.setName("progressBar"); // NOI18N
+		rightpanel.setName("rightpanel"); // NOI18N
 
-		org.jdesktop.layout.GroupLayout statusPanelLayout = new org.jdesktop.layout.GroupLayout(
-				statusPanel);
-		statusPanel.setLayout(statusPanelLayout);
-		statusPanelLayout
-				.setHorizontalGroup(statusPanelLayout
-						.createParallelGroup(
-								org.jdesktop.layout.GroupLayout.LEADING)
-						.add(statusPanelSeparator,
-								org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-								828, Short.MAX_VALUE)
-						.add(
-								statusPanelLayout
+		org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
+		mainPanel.setLayout(mainPanelLayout);
+		
+		mainPanelLayout.setHorizontalGroup(mainPanelLayout
+						.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+						.add(mainPanelLayout
 										.createSequentialGroup()
-										.addContainerGap()
-										.add(statusMessageLabel)
-										.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED,632, Short.MAX_VALUE)
-										.add(progressBar,
+										.add(browser,
 												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
 												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-										.add(statusAnimationLabel)
-										.addContainerGap()));
-		statusPanelLayout
-				.setVerticalGroup(statusPanelLayout
-						.createParallelGroup(
-								org.jdesktop.layout.GroupLayout.LEADING)
-						.add(
-								statusPanelLayout
-										.createSequentialGroup()
-										.add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-												2,org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED,
-												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.add(statusPanelLayout
-														.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-														.add(statusMessageLabel)
-														.add(statusAnimationLabel)
-														.add(progressBar,
-																org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-																org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-																org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-														.add(3, 3, 3)));
+										.addPreferredGap(
+												org.jdesktop.layout.LayoutStyle.RELATED)
+										.add(mdi)
+										.addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+										.add(rightpanel,
+												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
+												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)));
+		mainPanelLayout.setVerticalGroup(mainPanelLayout.createParallelGroup(
+				org.jdesktop.layout.GroupLayout.LEADING).add(rightpanel,
+				org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+				org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.add(org.jdesktop.layout.GroupLayout.TRAILING, mdi).add(
+						browser, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
+						380, Short.MAX_VALUE));
 
 		setComponent(mainPanel);
 		setMenuBar(menuBar);
 		setStatusBar(statusPanel);
 
-		// param�triser le imageframe et ajouter � l'interface
+		// paramétriser le imageframe et ajouter à l'interface
 		imagebrowser = new ImageBrowser(container);
 		JScrollPane imageBrowserScrollpane = new JScrollPane(imagebrowser);
 		imageBrowserScrollpane.setLayout(new ScrollPaneLayout());
@@ -306,7 +235,7 @@ public class UIView extends FrameView implements Observer {
 		browser.setLayout(new BorderLayout());
 		browser.add(imageBrowserScrollpane);
 		
-		// param�triser le imageframe et ajouter � l'interface
+		// paramétriser le imageframe et ajouter à l'interface
 		selectionBrowser = new SelectionBrowser();
 		JScrollPane selectionBrowserScrollpane = new JScrollPane(selectionBrowser );
 		selectionBrowserScrollpane.setLayout(new ScrollPaneLayout());
@@ -315,68 +244,6 @@ public class UIView extends FrameView implements Observer {
 		selectionBrowserScrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
 		rightpanel.setLayout(new BorderLayout());
 		rightpanel.add(selectionBrowserScrollpane);
-
-		// status bar initialization - message timeout, idle icon and busy
-		// animation, etc
-		int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
-		messageTimer = new Timer(messageTimeout, new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				statusMessageLabel.setText("");
-			}
-		});
-		messageTimer.setRepeats(false);
-		int busyAnimationRate = resourceMap
-				.getInteger("StatusBar.busyAnimationRate");
-		for (int i = 0; i < busyIcons.length; i++) {
-			busyIcons[i] = resourceMap
-					.getIcon("StatusBar.busyIcons[" + i + "]");
-		}
-		busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
-				statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
-			}
-		});
-		idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
-		statusAnimationLabel.setIcon(idleIcon);
-		progressBar.setVisible(false);
-
-		// connecting action tasks to status bar via TaskMonitor
-		TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
-		taskMonitor
-				.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-
-					public void propertyChange(
-							java.beans.PropertyChangeEvent evt) {
-						String propertyName = evt.getPropertyName();
-						if ("started".equals(propertyName)) {
-							if (!busyIconTimer.isRunning()) {
-								statusAnimationLabel.setIcon(busyIcons[0]);
-								busyIconIndex = 0;
-								busyIconTimer.start();
-							}
-							progressBar.setVisible(true);
-							progressBar.setIndeterminate(true);
-						} else if ("done".equals(propertyName)) {
-							busyIconTimer.stop();
-							statusAnimationLabel.setIcon(idleIcon);
-							progressBar.setVisible(false);
-							progressBar.setValue(0);
-						} else if ("message".equals(propertyName)) {
-							String text = (String) (evt.getNewValue());
-							statusMessageLabel.setText((text == null) ? ""
-									: text);
-							messageTimer.restart();
-						} else if ("progress".equals(propertyName)) {
-							int value = (Integer) (evt.getNewValue());
-							progressBar.setVisible(true);
-							progressBar.setIndeterminate(false);
-							progressBar.setValue(value);
-						}
-					}
-				});
 	}
 
 	private void openFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
@@ -408,18 +275,11 @@ public class UIView extends FrameView implements Observer {
 	private javax.swing.JDesktopPane mdi;
 	private javax.swing.JMenuBar menuBar;
 	private javax.swing.JMenuItem openFileMenuItem;
-	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JPanel rightpanel;
 	private javax.swing.JMenuItem saveMenuItem;
-	private javax.swing.JLabel statusAnimationLabel;
 	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;
 
-	private Timer messageTimer;
-	private Timer busyIconTimer;
-	private Icon idleIcon;
-	private Icon[] busyIcons = new Icon[15];
-	private int busyIconIndex = 0;
 	private JDialog aboutBox;
 
 	// image frame container
