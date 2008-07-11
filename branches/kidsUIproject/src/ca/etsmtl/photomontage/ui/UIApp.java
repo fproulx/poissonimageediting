@@ -18,9 +18,13 @@
 package ca.etsmtl.photomontage.ui;
 
 import javax.swing.JOptionPane;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
+import net.sourceforge.napkinlaf.*;
 
 /**
  * The main class of the application.
@@ -32,6 +36,20 @@ public class UIApp extends SingleFrameApplication {
 	 */
 	@Override
 	protected void startup() {
+		
+		// Load napkin look and feel to enforce a prototyping feeling to our app
+		// see http://headrush.typepad.com/creating_passionate_users/2006/12/dont_make_the_d.html
+		// for the rationale behind this.
+		LookAndFeel laf; 
+		laf = new NapkinLookAndFeel(); 
+		try {
+			UIManager.setLookAndFeel(laf);
+			
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
 		show(new UIView(this));
 	}
 

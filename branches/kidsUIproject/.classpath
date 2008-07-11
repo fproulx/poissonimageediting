@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/swing-worker.jar"/>
 	<classpathentry kind="lib" path="lib/poissonphotomontage.jar"/>
+	<classpathentry kind="lib" path="lib/napkinlaf.jar"/>
+	<classpathentry kind="lib" path="lib/napkinlaf-swingset2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
