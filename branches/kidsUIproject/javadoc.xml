@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc">
+<target name="javadoc">
+<javadoc access="private" author="true" encoding="UTF-8" classpath="/Applications/eclipse/plugins/org.junit4_4.3.1/junit.jar:lib/jlapack.jar:lib/mtj.jar" destdir="docs/javadoc" doctitle="Seamless Image Cloning Tools" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="ca.etsmtl.matrix,ca.etsmtl.util,ca.etsmtl.poisson.exceptions,com.Ostermiller.util" source="1.5" sourcefiles="src/ca/etsmtl/poisson/PoissonPhotomontage.java,src/ca/etsmtl/poisson/Photomontage.java" sourcepath="deprecated_src:unit_tests:src:integration_tests" splitindex="true" use="true" version="true"/>
+</target>
+</project>
