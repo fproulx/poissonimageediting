@@ -27,6 +27,11 @@ http://java.sun.com/docs/books/tutorial/uiswing/components/index.html
 Icons tango
 http://tango.freedesktop.org/Tango_Icon_Library
 
+Icons from the GNOME project
+http://www.gnome.org
+Trouvés au /usr/share/icons ou /usr/share/pixmaps
+
+
 Gnome Human Interface Guidelines (Quit vs Exit issue)
 http://library.gnome.org/devel/hig-book/stable/menus-standard.html.en#the-file-menu
 
