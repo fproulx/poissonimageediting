@@ -15,7 +15,7 @@ peut-être
 
 Références
 ==========
-Don't make the Demo look done, consulté le 10 juillet 2008
+Don't make the Demo look done, consulté le 3 juillet 2008
 http://headrush.typepad.com/creating_passionate_users/2006/12/dont_make_the_d.html
 
 Napkin look and feel, consulté le 3 juillet 2008
@@ -29,3 +29,6 @@ http://tango.freedesktop.org/Tango_Icon_Library
 
 Gnome Human Interface Guidelines (Quit vs Exit issue)
 http://library.gnome.org/devel/hig-book/stable/menus-standard.html.en#the-file-menu
+
+Java API
+http://java.sun.com/api/
