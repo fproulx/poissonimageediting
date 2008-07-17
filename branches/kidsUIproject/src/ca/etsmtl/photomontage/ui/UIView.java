@@ -132,7 +132,7 @@ public class UIView extends FrameView implements Observer {
 		menuBar = new javax.swing.JMenuBar();
 		menuBar.setName("menuBar"); // NOI18N
 
-		// Open
+		// Open Menu
 		javax.swing.JMenuItem openFileMenuItem = new javax.swing.JMenuItem();
 		openFileMenuItem.setIcon(new ImageIcon(resourceMap.getString("fileMenu.icon")));
 		openFileMenuItem.setName("openFileMenuItem"); // NOI18N
@@ -143,11 +143,12 @@ public class UIView extends FrameView implements Observer {
 		});
 		menuBar.add(openFileMenuItem);
 
-		// Save
+		// Save Menu
 		javax.swing.JMenu saveMenu = new javax.swing.JMenu();
 		saveMenu.setIcon(new ImageIcon(resourceMap.getString("saveMenu.icon")));
 		saveMenu.setName("saveMenuItem"); // NOI18N
 		
+		// Save
 		javax.swing.JMenuItem saveMenuItem = new javax.swing.JMenuItem();
 		saveMenuItem.setIcon(new ImageIcon(resourceMap.getString("saveMenuItem.icon")));
 		saveMenuItem.setText("Enregistrer"); // TODO put in a resource file
@@ -159,6 +160,7 @@ public class UIView extends FrameView implements Observer {
 		});
 		saveMenu.add(saveMenuItem);
 		
+		// Save As
 		javax.swing.JMenuItem saveAsMenuItem = new javax.swing.JMenuItem();
 		saveAsMenuItem.setIcon(new ImageIcon(resourceMap.getString("saveAsMenuItem.icon")));
 		saveAsMenuItem.setText("Enregistrer sous"); // TODO put in a resource file
@@ -172,11 +174,12 @@ public class UIView extends FrameView implements Observer {
 		
 		menuBar.add(saveMenu);
 		
-		// Zoom
+		// Zoom menu
 		javax.swing.JMenu zoomMenu = new javax.swing.JMenu();
 		zoomMenu.setIcon(new ImageIcon(resourceMap.getString("zoomMenu.icon")));
 		zoomMenu.setName("zoomMenuItem");
 		
+		// Zoom normal
 		javax.swing.JMenuItem zoomNormalMenuItem = new javax.swing.JMenuItem();
 		zoomNormalMenuItem.setIcon(new ImageIcon(resourceMap.getString("zoomNormalMenuItem.icon")));
 		zoomNormalMenuItem.setText("Taille normale"); // TODO put in a resource file
@@ -189,6 +192,7 @@ public class UIView extends FrameView implements Observer {
 		}); */
 		zoomMenu.add(zoomNormalMenuItem);
 		
+		// Zoom In
 		javax.swing.JMenuItem zoomInMenuItem = new javax.swing.JMenuItem();
 		zoomInMenuItem.setIcon(new ImageIcon(resourceMap.getString("zoomInMenuItem.icon")));
 		zoomInMenuItem.setText("Zoom avant"); // TODO put in a resource file
@@ -201,6 +205,7 @@ public class UIView extends FrameView implements Observer {
 		}); */
 		zoomMenu.add(zoomInMenuItem);
 		
+		// Zoom Out
 		javax.swing.JMenuItem zoomOutMenuItem = new javax.swing.JMenuItem();
 		zoomOutMenuItem.setIcon(new ImageIcon(resourceMap.getString("zoomOutMenuItem.icon")));
 		zoomOutMenuItem.setText("Zoom arrière"); // TODO put in a resource file
@@ -216,6 +221,41 @@ public class UIView extends FrameView implements Observer {
 		
 		menuBar.add(zoomMenu);
 
+		// Help menu
+		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
+		helpMenu.setIcon(new ImageIcon(resourceMap.getString("helpMenu.icon"))); // NOI18N
+		helpMenu.setName("helpMenu"); // NOI18N
+
+
+		
+		// Help
+		javax.swing.JMenuItem helpMenuItem = new javax.swing.JMenuItem();
+		helpMenuItem.setIcon(new ImageIcon(resourceMap.getString("helpMenuItem.icon")));
+		helpMenuItem.setText("Aide"); // TODO put in a resource file
+		helpMenuItem.setName("helpMenuItem");
+		/*
+		helpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				// TODO insert action, for ex:
+				// saveMenuItemActionPerformed(evt);
+			}
+		});
+		*/
+		helpMenu.add(helpMenuItem);
+		
+		// About
+		javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
+		aboutMenuItem.setIcon(new ImageIcon(resourceMap.getString("aboutMenuItem.icon")));
+		aboutMenuItem.setText("À propos de..."); // TODO put in a resource file
+		aboutMenuItem.setName("aboutMenuItem"); // NOI18N
+		aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				showAboutBox(evt);
+			}
+		});
+		helpMenu.add(aboutMenuItem);
+		
+		menuBar.add(helpMenu);
 		
 		// Quit
 		javax.swing.JMenuItem quitMenuItem = new javax.swing.JMenuItem();
@@ -227,25 +267,6 @@ public class UIView extends FrameView implements Observer {
 		quitMenuItem.setIcon(new ImageIcon(resourceMap.getString("quitMenuItem.icon"))); // NOI18N
 
 		menuBar.add(quitMenuItem);
-
-		// Help menu
-		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
-		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
-		helpMenu.setName("helpMenu"); // NOI18N
-
-		// TODO we should get rid of these "NetBeans"ries UIView.form and all these helper classes that makes code unreadable
-		javax.swing.ActionMap actionMap = org.jdesktop.application.Application
-		.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getActionMap(
-				UIView.class, this);
-		
-		// About
-		javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
-		aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
-		aboutMenuItem.setName("aboutMenuItem"); // NOI18N
-		helpMenu.add(aboutMenuItem);
-		
-		menuBar.add(helpMenu);
-		
 		
 		// Layout and panel setup
 		// ----------------------
