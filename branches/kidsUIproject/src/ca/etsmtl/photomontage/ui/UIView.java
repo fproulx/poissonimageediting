@@ -45,14 +45,11 @@ import com.developpez.gfx.swing.drag.GhostGlassPane;
 public class UIView extends FrameView implements Observer {
 	
 	// Variables declaration
-	protected static javax.swing.JMenu WindowsMenu;
 	private javax.swing.JPanel browser;
 	private javax.swing.JPanel mainPanel;
 	private javax.swing.JDesktopPane mdi;
 	private javax.swing.JMenuBar menuBar;
-	private javax.swing.JMenuItem openFileMenuItem;
 	private javax.swing.JPanel rightpanel;
-	private javax.swing.JMenuItem saveMenuItem;
 
 	private JDialog aboutBox;
 
@@ -136,7 +133,7 @@ public class UIView extends FrameView implements Observer {
 		menuBar.setName("menuBar"); // NOI18N
 
 		// Open
-		openFileMenuItem = new javax.swing.JMenuItem();
+		javax.swing.JMenuItem openFileMenuItem = new javax.swing.JMenuItem();
 		openFileMenuItem.setIcon(new ImageIcon(resourceMap.getString("fileMenu.icon")));
 		openFileMenuItem.setName("openFileMenuItem"); // NOI18N
 		openFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -148,18 +145,31 @@ public class UIView extends FrameView implements Observer {
 
 		// Save
 		// TODO I'm here. Make this a toplevel menu with Icon and two sub icons
-		saveMenuItem = new javax.swing.JMenuItem();
-		saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(
-				java.awt.event.KeyEvent.VK_S,
-				java.awt.event.InputEvent.CTRL_MASK));
-		saveMenuItem.setText(resourceMap.getString("saveMenuItem.text")); // NOI18N
+		javax.swing.JMenu saveMenu = new javax.swing.JMenu();
+		saveMenu.setIcon(new ImageIcon(resourceMap.getString("saveMenu.icon")));
+		saveMenu.setName("saveMenuItem"); // NOI18N
+		
+		javax.swing.JMenuItem saveMenuItem = new javax.swing.JMenuItem();
+		saveMenuItem.setIcon(new ImageIcon(resourceMap.getString("saveMenuItem.icon")));
 		saveMenuItem.setName("saveMenuItem"); // NOI18N
 		saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				saveMenuItemActionPerformed(evt);
 			}
 		});
-		menuBar.add(saveMenuItem);
+		saveMenu.add(saveMenuItem);
+		
+		javax.swing.JMenuItem saveAsMenuItem = new javax.swing.JMenuItem();
+		saveAsMenuItem.setIcon(new ImageIcon(resourceMap.getString("saveAsMenuItem.icon")));
+		saveAsMenuItem.setName("saveMenuItem"); // NOI18N
+		saveAsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				saveMenuItemActionPerformed(evt);
+			}
+		});
+		saveMenu.add(saveAsMenuItem);
+		
+		menuBar.add(saveMenu);
 
 		// Quit
 		javax.swing.JMenuItem quitMenuItem = new javax.swing.JMenuItem();

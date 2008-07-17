@@ -144,7 +144,6 @@ public class ImageFrame extends JInternalFrame {
 	 * Evenement lors de la fermeture du image frame
 	 */
 	public void close() {
-		UIView.WindowsMenu.remove(menuitem);
 		container.remove(this);
 	}
 
