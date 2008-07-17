@@ -144,14 +144,14 @@ public class UIView extends FrameView implements Observer {
 		menuBar.add(openFileMenuItem);
 
 		// Save
-		// TODO I'm here. Make this a toplevel menu with Icon and two sub icons
 		javax.swing.JMenu saveMenu = new javax.swing.JMenu();
 		saveMenu.setIcon(new ImageIcon(resourceMap.getString("saveMenu.icon")));
 		saveMenu.setName("saveMenuItem"); // NOI18N
 		
 		javax.swing.JMenuItem saveMenuItem = new javax.swing.JMenuItem();
 		saveMenuItem.setIcon(new ImageIcon(resourceMap.getString("saveMenuItem.icon")));
-		saveMenuItem.setName("saveMenuItem"); // NOI18N
+		saveMenuItem.setText("Enregistrer"); // TODO put in a resource file
+		saveMenuItem.setName("saveMenuItem");
 		saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				saveMenuItemActionPerformed(evt);
@@ -161,7 +161,8 @@ public class UIView extends FrameView implements Observer {
 		
 		javax.swing.JMenuItem saveAsMenuItem = new javax.swing.JMenuItem();
 		saveAsMenuItem.setIcon(new ImageIcon(resourceMap.getString("saveAsMenuItem.icon")));
-		saveAsMenuItem.setName("saveMenuItem"); // NOI18N
+		saveAsMenuItem.setText("Enregistrer sous"); // TODO put in a resource file
+		saveAsMenuItem.setName("saveMenuItem");
 		saveAsMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				saveMenuItemActionPerformed(evt);
@@ -170,7 +171,52 @@ public class UIView extends FrameView implements Observer {
 		saveMenu.add(saveAsMenuItem);
 		
 		menuBar.add(saveMenu);
+		
+		// Zoom
+		javax.swing.JMenu zoomMenu = new javax.swing.JMenu();
+		zoomMenu.setIcon(new ImageIcon(resourceMap.getString("zoomMenu.icon")));
+		zoomMenu.setName("zoomMenuItem");
+		
+		javax.swing.JMenuItem zoomNormalMenuItem = new javax.swing.JMenuItem();
+		zoomNormalMenuItem.setIcon(new ImageIcon(resourceMap.getString("zoomNormalMenuItem.icon")));
+		zoomNormalMenuItem.setText("Taille normale"); // TODO put in a resource file
+		zoomNormalMenuItem.setName("zoomNormalMenuItem");
+		/*
+		zoomNormalMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				saveMenuItemActionPerformed(evt);
+			}
+		}); */
+		zoomMenu.add(zoomNormalMenuItem);
+		
+		javax.swing.JMenuItem zoomInMenuItem = new javax.swing.JMenuItem();
+		zoomInMenuItem.setIcon(new ImageIcon(resourceMap.getString("zoomInMenuItem.icon")));
+		zoomInMenuItem.setText("Zoom avant"); // TODO put in a resource file
+		zoomInMenuItem.setName("zoomInMenuItem");
+		/*
+		zoomInMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				saveMenuItemActionPerformed(evt);
+			}
+		}); */
+		zoomMenu.add(zoomInMenuItem);
+		
+		javax.swing.JMenuItem zoomOutMenuItem = new javax.swing.JMenuItem();
+		zoomOutMenuItem.setIcon(new ImageIcon(resourceMap.getString("zoomOutMenuItem.icon")));
+		zoomOutMenuItem.setText("Zoom arrière"); // TODO put in a resource file
+		zoomOutMenuItem.setName("zoomOutMenuItem");
+		/*
+		zoomOutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				saveMenuItemActionPerformed(evt);
+			}
+		});
+		*/
+		zoomMenu.add(zoomOutMenuItem);
+		
+		menuBar.add(zoomMenu);
 
+		
 		// Quit
 		javax.swing.JMenuItem quitMenuItem = new javax.swing.JMenuItem();
 		quitMenuItem.addActionListener(new java.awt.event.ActionListener() {
