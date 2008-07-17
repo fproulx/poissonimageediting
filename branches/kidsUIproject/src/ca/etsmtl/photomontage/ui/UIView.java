@@ -317,9 +317,6 @@ public class UIView extends FrameView implements Observer {
 			// add new frames
 			for (ImageFrame frame : container.getFrames()) {
 				if (!mdiframes.contains(frame)) {
-					// ajouter item dans le menu window
-					frame.setMenuItem(new WindowItem(frame, mdi));
-					UIView.WindowsMenu.add(frame.getMenuItem());
 
 					// ajouter le frame dans le desktop et activer le frame
 					mdi.add(frame);
