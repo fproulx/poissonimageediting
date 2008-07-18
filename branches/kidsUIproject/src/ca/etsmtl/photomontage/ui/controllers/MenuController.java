@@ -51,22 +51,31 @@ public class MenuController {
 		//creation du filechooser pour ouvrir une image
 		String filename = File.separator + "Users"; //TODO path default...
 		JFileChooser fc = new JFileChooser(new File(filename));
-		fc.showOpenDialog(null);
+		int returnValue = fc.showOpenDialog(null);
 
-		try {
-			//Lire l'image avec un ImageIO et l'ajouter au image browser
-			File file = fc.getSelectedFile();
-			if (file.exists() && file.canRead() && file.isFile()) {
-				image = ImageIO.read(file);
-				browser.addImage(image, file.getCanonicalPath());
+		if (returnValue == JFileChooser.APPROVE_OPTION) {
+			
+			try {
+				//Lire l'image avec un ImageIO et l'ajouter au image browser
+				
+				File file = fc.getSelectedFile();
+				if (file.exists() && file.canRead() && file.isFile()) {
+					image = ImageIO.read(file);
+					browser.addImage(image, file.getCanonicalPath());
+				}
+			} catch (Exception e) {
+				//message d'erreur
+				JOptionPane.showMessageDialog(null,
+					    "Error while open the image.",
+					    "Error while opening",
+					    JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			//message d'erreur
+		} else {
 			JOptionPane.showMessageDialog(null,
-				    "Error while open the image.",
-				    "Error while opening",
-				    JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
+				    "Vous avez cancelé l'opération",
+				    "Ouvrir",
+				    JOptionPane.WARNING_MESSAGE);
 		}
 
 		return image;
