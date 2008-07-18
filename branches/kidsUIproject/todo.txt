@@ -1,10 +1,9 @@
 ﻿Tâches
 ======
 obligatoire
-- Toute
 - Mettre une image plus friendly dans le About Dialog
-- Poursuivre l'intégration des icônes
-- Recréer des icônes tango plus gros à partir des .SVG
+- Implémenter les tooltips de pablo
+- Faire un New qui ouvre une page blanche pour transformer le premier menuItem en vrai Menu
 - panes de gauche.. Panel component?
 
 aaahh..
