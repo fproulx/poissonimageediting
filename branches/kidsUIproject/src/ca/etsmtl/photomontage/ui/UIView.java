@@ -26,6 +26,7 @@ import java.util.Observer;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneLayout;
 
@@ -50,6 +51,7 @@ public class UIView extends FrameView implements Observer {
 	private javax.swing.JDesktopPane mdi;
 	private javax.swing.JMenuBar menuBar;
 	private javax.swing.JPanel rightpanel;
+	private javax.swing.JTabbedPane tabbedPane = new javax.swing.JTabbedPane();
 
 	private JDialog aboutBox;
 
@@ -359,12 +361,18 @@ public class UIView extends FrameView implements Observer {
 					f.getImageHolder().setFilename(path);
 					f.setModified(false);
 				}
-			}.start();	
+			}.start();
 		}
 	}
 	
 	private void quitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
-		UIApp.getApplication().exit();
+		int returnValue = JOptionPane.showConfirmDialog(null,
+			    "Êtes-vous sûr de vouloir quitter?",
+			    "Quitter",
+			    JOptionPane.YES_NO_OPTION);
+		if (returnValue == JOptionPane.YES_OPTION) {
+			UIApp.getApplication().exit();
+		}
 	}
 
 	/**
