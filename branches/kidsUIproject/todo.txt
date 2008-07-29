@@ -3,10 +3,11 @@
 obligatoire
 - Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
 - Implémenter les tooltips de pablo
+-- ne pas oublier d'en mettre un dans la drop zone et dans le image browser pour expliquer le workflow
 - Implémenter l'aide
 
 aaahh..
-- le zoom
+- le zoom (checker comment le imageBrowser fait son scaled image ça pourrais aider!)
 
 peut-être
 - Il faudrait tout mettre en francais ou tout en anglais dans l'interface
