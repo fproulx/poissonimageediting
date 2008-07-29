@@ -46,7 +46,6 @@ import com.developpez.gfx.swing.drag.GhostGlassPane;
 public class UIView extends FrameView implements Observer {
 	
 	// Variables declaration
-	private javax.swing.JPanel browser;
 	private javax.swing.JPanel mainPanel;
 	private javax.swing.JDesktopPane mdi;
 	private javax.swing.JMenuBar menuBar;
@@ -123,7 +122,6 @@ public class UIView extends FrameView implements Observer {
 		// initialize major UI components
 		mainPanel = new javax.swing.JPanel();
 		mdi = new javax.swing.JDesktopPane();
-		browser = new javax.swing.JPanel();
 		rightpanel = new javax.swing.JPanel();
 		tabbedPane = new javax.swing.JTabbedPane();
 		
@@ -293,31 +291,14 @@ public class UIView extends FrameView implements Observer {
 		
 		// Layout and panel setup
 		// ----------------------
+		// TODO there is a little annoying gray spacer between mainpanel and the tabbed pane, find it and get rid of it
 		
 		mainPanel.setName("mainPanel"); // NOI18N
 
-		browser.setAutoscrolls(true);
-		browser.setName("browser"); // NOI18N
-		browser.setPreferredSize(new java.awt.Dimension(200, 0));
-
-		org.jdesktop.layout.GroupLayout browserLayout = new org.jdesktop.layout.GroupLayout(
-				browser);
-		browser.setLayout(browserLayout);
-		browserLayout.setHorizontalGroup(browserLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 200,
-				Short.MAX_VALUE));
-		browserLayout.setVerticalGroup(browserLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(0, 380,
-				Short.MAX_VALUE));
-
 		mdi.setName("mdi"); // NOI18N
 		
-		// Tabbed Pane
-		tabbedPane.addTab("", new ImageIcon(resourceMap.getString("selectionTabbedPane.icon")), rightpanel);
-		tabbedPane.addTab("", new ImageIcon(resourceMap.getString("imagesTabbedPane.icon")), browser);
-		
 		rightpanel.setName("rightpanel"); // NOI18N
-
+		
 		org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
 		mainPanel.setLayout(mainPanelLayout);
 		
@@ -325,25 +306,17 @@ public class UIView extends FrameView implements Observer {
 						.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
 						.add(mainPanelLayout
 										.createSequentialGroup()
-										.add(browser,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(
-												org.jdesktop.layout.LayoutStyle.RELATED)
 										.add(mdi)
 										.addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-										.add(rightpanel,
+										.add(tabbedPane,
 												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
 												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)));
 		mainPanelLayout.setVerticalGroup(mainPanelLayout.createParallelGroup(
-				org.jdesktop.layout.GroupLayout.LEADING).add(rightpanel,
+				org.jdesktop.layout.GroupLayout.LEADING).add(tabbedPane,
 				org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 				org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				.add(org.jdesktop.layout.GroupLayout.TRAILING, mdi).add(
-						browser, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-						380, Short.MAX_VALUE));
+				.add(org.jdesktop.layout.GroupLayout.TRAILING, mdi));
 
 		setComponent(mainPanel);
 		setMenuBar(menuBar);
@@ -356,8 +329,7 @@ public class UIView extends FrameView implements Observer {
 		imageBrowserScrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		imageBrowserScrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
 
-		browser.setLayout(new BorderLayout());
-		browser.add(imageBrowserScrollpane);
+		tabbedPane.addTab(null, new ImageIcon(resourceMap.getString("imagesTabbedPane.icon")), imageBrowserScrollpane, "Banque d'images"); //TODO extract tooltip in resource file
 		
 		// paramétriser le imageframe et ajouter à l'interface
 		selectionBrowser = new SelectionBrowser();
@@ -368,6 +340,9 @@ public class UIView extends FrameView implements Observer {
 		selectionBrowserScrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
 		rightpanel.setLayout(new BorderLayout());
 		rightpanel.add(selectionBrowserScrollpane);
+		
+		tabbedPane.addTab(null, new ImageIcon(resourceMap.getString("selectionTabbedPane.icon")), rightpanel, "Découpage"); //TODO extract tooltip in resource file
+		
 	}
 
 	private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
