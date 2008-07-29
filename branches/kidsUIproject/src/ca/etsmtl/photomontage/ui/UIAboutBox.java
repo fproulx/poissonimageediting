@@ -80,6 +80,7 @@ public class UIAboutBox extends javax.swing.JDialog {
 				.getInstance(ca.etsmtl.photomontage.ui.UIApp.class).getContext().getActionMap(
 						UIAboutBox.class, this);
 		closeButton.setAction(actionMap.get("closeAboutBox")); // NOI18N
+		closeButton.setText(resourceMap.getString("closeAboutBox.Action.text"));
 
 		appTitleLabel.setFont(appTitleLabel.getFont().deriveFont(
 				appTitleLabel.getFont().getStyle() | java.awt.Font.BOLD,
@@ -205,6 +206,7 @@ public class UIAboutBox extends javax.swing.JDialog {
 												closeButton).addContainerGap()));
 
 		pack();
+
 	}// </editor-fold>//GEN-END:initComponents
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables

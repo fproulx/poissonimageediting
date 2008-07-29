@@ -2,8 +2,8 @@
 ======
 obligatoire
 - Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
-- Mettre une image plus friendly dans le About Dialog
 - Implémenter les tooltips de pablo
+- Implémenter l'aide
 
 aaahh..
 - le zoom
@@ -12,8 +12,10 @@ peut-être
 - Il faudrait tout mettre en francais ou tout en anglais dans l'interface
 - Faire une icône style pressed
 - La feature nouvelle image est vraiment poche à cause du blanc
+- progress bar pour l'operation de photo montage
 
 Fait 
+- Mettre une image plus friendly dans le About Dialog
 - Tabbed pane à droite au lieu de deux panes à gauche et à droite
 - Gros icônes cutes
 - Confirmation de quitter sur le bouton quitter
