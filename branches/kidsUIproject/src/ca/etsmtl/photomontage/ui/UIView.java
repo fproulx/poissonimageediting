@@ -134,16 +134,36 @@ public class UIView extends FrameView implements Observer {
 		menuBar = new javax.swing.JMenuBar();
 		menuBar.setName("menuBar"); // NOI18N
 
-		// Open Menu
-		javax.swing.JMenuItem openFileMenuItem = new javax.swing.JMenuItem();
-		openFileMenuItem.setIcon(new ImageIcon(resourceMap.getString("fileMenu.icon")));
-		openFileMenuItem.setName("openFileMenuItem"); // NOI18N
-		openFileMenuItem.addActionListener(new java.awt.event.ActionListener() {
+		// Document Menu
+		javax.swing.JMenu documentMenu = new javax.swing.JMenu();
+		documentMenu.setIcon(new ImageIcon(resourceMap.getString("documentMenu.icon")));
+		documentMenu.setName("documentMenu");
+		
+		// Nouveau
+		javax.swing.JMenuItem newMenuItem = new javax.swing.JMenuItem();
+		newMenuItem.setIcon(new ImageIcon(resourceMap.getString("newMenuItem.icon")));
+		newMenuItem.setName("newMenuItem"); // NOI18N
+		newMenuItem.setText("Nouveau"); // TODO put in a resource file
+		newMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				//openFileMenuItemActionPerformed(evt);
+			}
+		});
+		documentMenu.add(newMenuItem);
+		
+		// Ouvrir
+		javax.swing.JMenuItem openMenuItem = new javax.swing.JMenuItem();
+		openMenuItem.setIcon(new ImageIcon(resourceMap.getString("openMenuItem.icon")));
+		openMenuItem.setName("openMenuItem"); // NOI18N
+		openMenuItem.setText("Ouvrir"); // TODO put in a resource file
+		openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				openFileMenuItemActionPerformed(evt);
 			}
 		});
-		menuBar.add(openFileMenuItem);
+		documentMenu.add(openMenuItem);
+		
+		menuBar.add(documentMenu);
 
 		// Save Menu
 		javax.swing.JMenu saveMenu = new javax.swing.JMenu();
