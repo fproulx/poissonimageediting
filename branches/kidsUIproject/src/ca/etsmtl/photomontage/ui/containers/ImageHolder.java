@@ -85,7 +85,7 @@ public class ImageHolder {
 
 	/**
 	 * 
-	 * @return l'image original
+	 * @return l'image originale
 	 */
 	public BufferedImage getImage() {
 		return original;
@@ -93,7 +93,7 @@ public class ImageHolder {
 
 	/**
 	 * 
-	 * @return l'image redimensionn�
+	 * @return l'image redimensionnée
 	 */
 	public BufferedImage getScaledImage() {
 		return scaledImage;
