@@ -137,7 +137,8 @@ public class UIView extends FrameView implements Observer {
 		javax.swing.JMenu documentMenu = new javax.swing.JMenu();
 		documentMenu.setIcon(new ImageIcon(resourceMap.getString("documentMenu.icon")));
 		documentMenu.setName("documentMenu");
-		documentMenu.setToolTipText("<html>Ajouter une image vide ou importer une image <br>dans la banque d'images.</html>"); // TODO put in a resource file
+		// TODO put in a resource file
+		documentMenu.setToolTipText("<html>Ajouter une image vide ou importer une image <br>dans la banque d'images</html>"); 
 		
 		// Nouveau
 		javax.swing.JMenuItem newMenuItem = new javax.swing.JMenuItem();
@@ -169,6 +170,9 @@ public class UIView extends FrameView implements Observer {
 		javax.swing.JMenu saveMenu = new javax.swing.JMenu();
 		saveMenu.setIcon(new ImageIcon(resourceMap.getString("saveMenu.icon")));
 		saveMenu.setName("saveMenuItem"); // NOI18N
+		// TODO put in a resource file
+		saveMenu.setToolTipText("Sauvegarder votre création"); 
+
 		
 		// Save
 		javax.swing.JMenuItem saveMenuItem = new javax.swing.JMenuItem();
@@ -200,6 +204,9 @@ public class UIView extends FrameView implements Observer {
 		javax.swing.JMenu zoomMenu = new javax.swing.JMenu();
 		zoomMenu.setIcon(new ImageIcon(resourceMap.getString("zoomMenu.icon")));
 		zoomMenu.setName("zoomMenuItem");
+		// TODO put in a resource file
+		zoomMenu.setToolTipText("Modifier la taille de l'image sélectionnée"); 
+
 		
 		// Zoom normal
 		javax.swing.JMenuItem zoomNormalMenuItem = new javax.swing.JMenuItem();
@@ -247,7 +254,8 @@ public class UIView extends FrameView implements Observer {
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
 		helpMenu.setIcon(new ImageIcon(resourceMap.getString("helpMenu.icon"))); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
-
+		// TODO put in a resource file
+		helpMenu.setToolTipText("Obtenir de l'aide ou des informations supplémentaires"); 
 
 		
 		// Help
@@ -287,6 +295,9 @@ public class UIView extends FrameView implements Observer {
 			}
 		});
 		quitMenuItem.setIcon(new ImageIcon(resourceMap.getString("quitMenuItem.icon"))); // NOI18N
+		// TODO put in a resource file
+		quitMenuItem.setToolTipText("Quitter le logiciel"); 
+
 
 		menuBar.add(quitMenuItem);
 		
@@ -323,14 +334,23 @@ public class UIView extends FrameView implements Observer {
 		setMenuBar(menuBar);
 
 		// paramétriser le imageframe et ajouter à l'interface
-		imagebrowser = new ImageBrowser(container);
+
+		//TODO extract tooltip in resource file
+		String tooltipBrowserPane = "<html>Cliquez sur une image pour l'ajouter à votre surface de travail.<br/>" +
+									"Pour ajouter des images à cette zone aller dans le menu document.</html>";
+		// TODO once tooltip is in a resource file, get rid of the alternate constructor for ImageBrowser
+		imagebrowser = new ImageBrowser(container, tooltipBrowserPane);
+		imagebrowser.setToolTipText(tooltipBrowserPane);
 		JScrollPane imageBrowserScrollpane = new JScrollPane(imagebrowser);
 		imageBrowserScrollpane.setLayout(new ScrollPaneLayout());
 		imageBrowserScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		imageBrowserScrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		imageBrowserScrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
+		
+		imageBrowserScrollpane.setToolTipText(tooltipBrowserPane);
 
-		tabbedPane.addTab(null, new ImageIcon(resourceMap.getString("imagesTabbedPane.icon")), imageBrowserScrollpane, "Banque d'images"); //TODO extract tooltip in resource file
+		//TODO extract tooltip in resource file
+		tabbedPane.addTab(null, new ImageIcon(resourceMap.getString("imagesTabbedPane.icon")), imageBrowserScrollpane, "Banque d'images");
 		
 		// paramétriser le imageframe et ajouter à l'interface
 		selectionBrowser = new SelectionBrowser();
@@ -341,7 +361,9 @@ public class UIView extends FrameView implements Observer {
 		selectionBrowserScrollpane.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
 		rightpanel.setLayout(new BorderLayout());
 		rightpanel.add(selectionBrowserScrollpane);
-		
+		//TODO extract tooltip in resource file
+		selectionBrowserScrollpane.setToolTipText("<html>Déposer les images découpés ici.<br/>Prendre les images découpés et les déposer sur l'image de destination désirée pour le montage photo.</html>");
+				
 		tabbedPane.addTab(null, new ImageIcon(resourceMap.getString("selectionTabbedPane.icon")), rightpanel, "Bac de découpage"); //TODO extract tooltip in resource file
 		
 	}

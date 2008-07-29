@@ -67,6 +67,7 @@ public class ImageBrowser extends JComponent {
 	public static int currentSize = 175;
 
 	private ImageFramesContainer container;
+	private String tooltip;
 	
 	// FIXME I changed this so I would load the program quicker
 	//private static String DEFAULT_PATH = "images/";
@@ -78,6 +79,7 @@ public class ImageBrowser extends JComponent {
 	 */
 	public ImageBrowser(ImageFramesContainer container) {
 		this.container = container;
+		tooltip = "";
 
 		setOpaque(true);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -95,6 +97,37 @@ public class ImageBrowser extends JComponent {
 		for (int i = 0; i < images.size(); ++i) {
 			JLabel label = new JLabel();
 			label.setIcon(new ImageIcon(images.get(i).createScaledImage(currentSize)));
+			label.setToolTipText(tooltip);
+
+			// add listener for select image
+			label.addMouseListener(new ImageBrowserMouseListener(images.get(i),
+					container));
+
+			add(label);
+		}
+	}
+	
+	// TODO extract common part of the two constructors in an init() method
+	public ImageBrowser(ImageFramesContainer container, String tooltip) {
+		this.container = container;
+		this.tooltip = tooltip;
+
+		setOpaque(true);
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+		loadImages();
+
+		// For each image:
+		// - set the icon at the current thumbnail size
+		// - create/set a custom effect that will move/scale the
+		// images. Note that the main reason for the custom effect
+		// is that scaling effects typically redraw the actual component
+		// instead of using image tricks. In this case, image tricks are
+		// just fine. So the custom effect is purely an optimization here.
+		for (int i = 0; i < images.size(); ++i) {
+			JLabel label = new JLabel();
+			label.setIcon(new ImageIcon(images.get(i).createScaledImage(currentSize)));
+			label.setToolTipText(tooltip);
 
 			// add listener for select image
 			label.addMouseListener(new ImageBrowserMouseListener(images.get(i),
@@ -139,6 +172,7 @@ public class ImageBrowser extends JComponent {
 
 		JLabel label = new JLabel();
 		label.setIcon(new ImageIcon(holder.getScaledImage()));
+		label.setToolTipText(tooltip);
 
 		// add listener for select image
 		label.addMouseListener(new ImageBrowserMouseListener(holder, container));
