@@ -137,6 +137,7 @@ public class UIView extends FrameView implements Observer {
 		javax.swing.JMenu documentMenu = new javax.swing.JMenu();
 		documentMenu.setIcon(new ImageIcon(resourceMap.getString("documentMenu.icon")));
 		documentMenu.setName("documentMenu");
+		documentMenu.setToolTipText("<html>Ajouter une image vide ou importer une image <br>dans la banque d'images.</html>"); // TODO put in a resource file
 		
 		// Nouveau
 		javax.swing.JMenuItem newMenuItem = new javax.swing.JMenuItem();
@@ -341,7 +342,7 @@ public class UIView extends FrameView implements Observer {
 		rightpanel.setLayout(new BorderLayout());
 		rightpanel.add(selectionBrowserScrollpane);
 		
-		tabbedPane.addTab(null, new ImageIcon(resourceMap.getString("selectionTabbedPane.icon")), rightpanel, "Découpage"); //TODO extract tooltip in resource file
+		tabbedPane.addTab(null, new ImageIcon(resourceMap.getString("selectionTabbedPane.icon")), rightpanel, "Bac de découpage"); //TODO extract tooltip in resource file
 		
 	}
 
