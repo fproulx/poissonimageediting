@@ -51,7 +51,7 @@ public class UIView extends FrameView implements Observer {
 	private javax.swing.JDesktopPane mdi;
 	private javax.swing.JMenuBar menuBar;
 	private javax.swing.JPanel rightpanel;
-	private javax.swing.JTabbedPane tabbedPane = new javax.swing.JTabbedPane();
+	private javax.swing.JTabbedPane tabbedPane;
 
 	private JDialog aboutBox;
 
@@ -125,6 +125,7 @@ public class UIView extends FrameView implements Observer {
 		mdi = new javax.swing.JDesktopPane();
 		browser = new javax.swing.JPanel();
 		rightpanel = new javax.swing.JPanel();
+		tabbedPane = new javax.swing.JTabbedPane();
 		
 		// Menu code
 		// ---------
@@ -310,7 +311,11 @@ public class UIView extends FrameView implements Observer {
 				Short.MAX_VALUE));
 
 		mdi.setName("mdi"); // NOI18N
-
+		
+		// Tabbed Pane
+		tabbedPane.addTab("", new ImageIcon(resourceMap.getString("selectionTabbedPane.icon")), rightpanel);
+		tabbedPane.addTab("", new ImageIcon(resourceMap.getString("imagesTabbedPane.icon")), browser);
+		
 		rightpanel.setName("rightpanel"); // NOI18N
 
 		org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
