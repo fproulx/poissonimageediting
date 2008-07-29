@@ -31,12 +31,23 @@ import net.sourceforge.napkinlaf.*;
  */
 public class UIApp extends SingleFrameApplication {
 
+	// Flag that change to look and feel to give it a more prototyping feeling
+	private final boolean prototypingUI = false;
+	
 	/**
 	 * At startup create and show the main frame of the application.
 	 */
 	@Override
 	protected void startup() {
 		
+		if (prototypingUI) {
+			initializeNapkinLookAndFeel(); 
+		}
+		
+		show(new UIView(this));
+	}
+
+	private void initializeNapkinLookAndFeel() {
 		// Load napkin look and feel to enforce a prototyping feeling to our app
 		// see http://headrush.typepad.com/creating_passionate_users/2006/12/dont_make_the_d.html
 		// for the rationale behind this.
@@ -48,9 +59,7 @@ public class UIApp extends SingleFrameApplication {
 		} catch (UnsupportedLookAndFeelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		
-		show(new UIView(this));
+		}
 	}
 
 	/**
