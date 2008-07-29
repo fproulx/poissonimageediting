@@ -1,16 +1,23 @@
 ﻿Tâches
 ======
 obligatoire
+- Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
 - Mettre une image plus friendly dans le About Dialog
 - Implémenter les tooltips de pablo
-- Faire un New qui ouvre une page blanche pour transformer le premier menuItem en vrai Menu
 - panes de gauche.. Panel component?
 
 aaahh..
 - le zoom
 
 peut-être
+- Il faudrait tout mettre en francais ou tout en anglais dans l'interface
 - Faire une icône style pressed
+
+Fait 
+- Gros icônes cutes
+- Confirmation de quitter sur le bouton quitter
+- Napkin look and feel (finalement retiré)
+- Faire un New qui ouvre une page blanche pour transformer le premier menuItem en vrai Menu
 
 Références
 ==========

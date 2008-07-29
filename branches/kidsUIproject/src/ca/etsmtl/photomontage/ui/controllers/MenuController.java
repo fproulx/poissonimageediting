@@ -17,6 +17,8 @@
 
 package ca.etsmtl.photomontage.ui.controllers;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,18 +40,21 @@ import ca.etsmtl.photomontage.ui.ImageBrowser;
  */
 public class MenuController {
 
+	private static final int NEW_DOCUMENT_DEFAULT_HEIGHT = 300;
+	private static final int NEW_DOCUMENT_DEFAULT_WIDTH = 400;
+
 	/**
 	 * Ouverture d'une image
 	 * 
 	 * @param browser est le conteneur d'images pour l'ajouter
 	 * @return l'image ouverte
 	 */
-	public BufferedImage openFile(ImageBrowser browser) {
+	public BufferedImage openImage(ImageBrowser browser) {
 
 		BufferedImage image = null;
 
 		//creation du filechooser pour ouvrir une image
-		String filename = File.separator + "Users"; //TODO path default...
+		String filename = File.separator + "Users"; //TODO Have it open in $home
 		JFileChooser fc = new JFileChooser(new File(filename));
 		int returnValue = fc.showOpenDialog(null);
 
@@ -78,6 +83,30 @@ public class MenuController {
 				    JOptionPane.WARNING_MESSAGE);
 		}
 
+		return image;
+	}
+	
+	/**
+	 * Nouvelle image
+	 * 
+	 * @param browser est le conteneur d'images pour l'ajouter
+	 * @return la nouvelle image
+	 */
+	public BufferedImage newImage(ImageBrowser browser) {
+
+		// Create a new image using default width and height
+		BufferedImage image = new BufferedImage(NEW_DOCUMENT_DEFAULT_WIDTH,NEW_DOCUMENT_DEFAULT_HEIGHT,BufferedImage.TYPE_INT_RGB);
+	
+		// Fill image with white
+		// TODO there is probably a better way to do it, anyone?
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, NEW_DOCUMENT_DEFAULT_WIDTH, NEW_DOCUMENT_DEFAULT_HEIGHT);
+		
+		// Add to image browser
+		// TODO it should be added directly to workspace probably
+		browser.addImage(image, null);
+		
 		return image;
 	}
 

@@ -146,7 +146,7 @@ public class UIView extends FrameView implements Observer {
 		newMenuItem.setText("Nouveau"); // TODO put in a resource file
 		newMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//openFileMenuItemActionPerformed(evt);
+				newMenuItemActionPerformed(evt);
 			}
 		});
 		documentMenu.add(newMenuItem);
@@ -158,7 +158,7 @@ public class UIView extends FrameView implements Observer {
 		openMenuItem.setText("Ouvrir"); // TODO put in a resource file
 		openMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				openFileMenuItemActionPerformed(evt);
+				openMenuItemActionPerformed(evt);
 			}
 		});
 		documentMenu.add(openMenuItem);
@@ -365,10 +365,14 @@ public class UIView extends FrameView implements Observer {
 		rightpanel.add(selectionBrowserScrollpane);
 	}
 
-	private void openFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
-		menuCtrl.openFile(imagebrowser);
+	private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
+		menuCtrl.openImage(imagebrowser);
 	}
 
+	private void newMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
+		menuCtrl.newImage(imagebrowser);
+	}
+	
 	private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 		if (mdi.getSelectedFrame() != null) {
 			new Thread() {
