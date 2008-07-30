@@ -2,8 +2,6 @@
 ======
 obligatoire
 - Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
-- Implémenter les tooltips de pablo
--- ne pas oublier d'en mettre un dans la drop zone et dans le image browser pour expliquer le workflow
 - Implémenter l'aide
 
 aaahh..
@@ -16,6 +14,7 @@ peut-être
 - progress bar pour l'operation de photo montage
 
 Fait 
+- Implémenter les tooltips de pablo
 - Mettre une image plus friendly dans le About Dialog
 - Tabbed pane à droite au lieu de deux panes à gauche et à droite
 - Gros icônes cutes
