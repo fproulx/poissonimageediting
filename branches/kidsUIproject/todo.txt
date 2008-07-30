@@ -40,9 +40,11 @@ Icons from the GNOME project
 http://www.gnome.org
 Trouvés au /usr/share/icons ou /usr/share/pixmaps
 
-
 Gnome Human Interface Guidelines (Quit vs Exit issue)
 http://library.gnome.org/devel/hig-book/stable/menus-standard.html.en#the-file-menu
 
 Java API
 http://java.sun.com/api/
+
+JMenu action
+http://forums.sun.com/thread.jspa?threadID=5318781&tstart=61

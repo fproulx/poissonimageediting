@@ -19,6 +19,8 @@ package ca.etsmtl.photomontage.ui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -288,12 +290,14 @@ public class UIView extends FrameView implements Observer {
 		menuBar.add(helpMenu);
 		
 		// Quit
-		javax.swing.JMenuItem quitMenuItem = new javax.swing.JMenuItem();
-		quitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				quitMenuItemActionPerformed(evt);
-			}
-		});
+		javax.swing.JMenu quitMenuItem = new javax.swing.JMenu();
+		// workaround to avoid using a JMenuItem (that caused problems)
+		// TODO add keyboard listener that will listen to a <Enter>
+	    quitMenuItem.addMouseListener(new MouseAdapter() {
+	    	public void mousePressed( final MouseEvent e ) {
+	    		quitMenuItemActionPerformed();
+	    	}
+	    });
 		quitMenuItem.setIcon(new ImageIcon(resourceMap.getString("quitMenuItem.icon"))); // NOI18N
 		// TODO put in a resource file
 		quitMenuItem.setToolTipText("Quitter le logiciel"); 
@@ -392,7 +396,7 @@ public class UIView extends FrameView implements Observer {
 		}
 	}
 	
-	private void quitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
+	private void quitMenuItemActionPerformed() {
 		int returnValue = JOptionPane.showConfirmDialog(null,
 			    "Êtes-vous sûr de vouloir quitter?",
 			    "Quitter",
