@@ -39,6 +39,7 @@ import org.jdesktop.application.SingleFrameApplication;
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
 import ca.etsmtl.photomontage.ui.containers.WindowItem;
 import ca.etsmtl.photomontage.ui.controllers.MenuController;
+import ca.etsmtl.photomontage.ui.exceptions.OperationCancelledByUserException;
 
 import com.developpez.gfx.swing.drag.GhostGlassPane;
 
@@ -195,7 +196,7 @@ public class UIView extends FrameView implements Observer {
 		saveAsMenuItem.setName("saveMenuItem");
 		saveAsMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				saveMenuItemActionPerformed(evt);
+				saveAsMenuItemActionPerformed(evt);
 			}
 		});
 		saveMenu.add(saveAsMenuItem);
@@ -386,7 +387,28 @@ public class UIView extends FrameView implements Observer {
 				public void run() {
 					//saving...
 					ImageFrame f = (ImageFrame) mdi.getSelectedFrame();
-					String path = menuCtrl.saveFile(f.getImageHolder().getImage());
+					String path = null;
+					
+					try {
+						path = menuCtrl.saveImage(f.getImageHolder().getImage(), f.getImageHolder().getFilename());
+					
+					} catch (OperationCancelledByUserException e) {}
+					
+					//set path and change image state
+					f.getImageHolder().setFilename(path);
+					f.setModified(false);
+				}
+			}.start();
+		}
+	}
+	
+	private void saveAsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
+		if (mdi.getSelectedFrame() != null) {
+			new Thread() {
+				public void run() {
+					//saving...
+					ImageFrame f = (ImageFrame) mdi.getSelectedFrame();
+					String path = menuCtrl.saveImageAs(f.getImageHolder().getImage());
 					
 					//set path and change image state
 					f.getImageHolder().setFilename(path);

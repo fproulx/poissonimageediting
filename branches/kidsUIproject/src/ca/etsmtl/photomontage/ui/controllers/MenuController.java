@@ -26,8 +26,12 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ca.etsmtl.photomontage.ui.ImageBrowser;
+import ca.etsmtl.photomontage.ui.UIApp;
+import ca.etsmtl.photomontage.ui.exceptions.OperationCancelledByUserException;
 
 
 /**
@@ -56,6 +60,9 @@ public class MenuController {
 		//creation du filechooser pour ouvrir une image
 		String filename = File.separator + "Users"; //TODO Have it open in $home
 		JFileChooser fc = new JFileChooser(new File(filename));
+		FileFilter filter = new FileNameExtensionFilter("Image files", "gif", "jpeg", "jpg", "png");
+		fc.setFileFilter(filter);
+		
 		int returnValue = fc.showOpenDialog(null);
 
 		if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -113,18 +120,67 @@ public class MenuController {
 	/**
 	 * Sauvegarde de l'image sur le disque
 	 * 
+	 * @param image The image to save to disk
+	 * @param filename Current filename of the image
+	 * @return path where the image was saved
+	 * @throws OperationCancelledByUserException 
+	 */
+	public String saveImage(BufferedImage image, String filename) throws OperationCancelledByUserException {
+		
+		// We save in .png so if the files is a png we ask for overwrite confirmation
+		if (filename.toLowerCase().endsWith(".png")) {
+			// ask before overwriting
+			int returnValue = JOptionPane.showConfirmDialog(null,
+				    "Êtes-vous sûr de vouloir sauvegarder? Ceci écrasera l'image originale.",
+				    "Écraser",
+				    JOptionPane.YES_NO_OPTION);
+			if (returnValue == JOptionPane.NO_OPTION) {
+				throw new OperationCancelledByUserException();
+			}				
+		} else {
+			// strip extension and add .png
+			
+			int i = filename.lastIndexOf('.');
+			if (i > 0 &&  i < filename.length() - 1) {
+				filename = filename.substring(0, i);
+			} 
+
+			// at this point, either there was no . so we stripped the extension
+			filename = filename + ".png";
+		}
+
+		// Proceed with the save
+		File myfile = new File(filename);
+		try {
+			ImageIO.write(image, "PNG", myfile);
+			return myfile.getAbsolutePath();
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null,
+				    "Un problème a été rencontré lors de la sauvegarde de l'image",
+				    "Problème de sauvegarde",
+				    JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Sauvegarde de l'image sur le disque
+	 * 
 	 * @param image a sauvegarder sur le disque
 	 * @return path ou l'image a ete sauvegarder
 	 */
-	public String saveFile(BufferedImage image) {
+	public String saveImageAs(BufferedImage image) {
 		//creation du filechooser pour sauvegarder une image
 		String filename = File.separator + "Users";
+		FileFilter filter = new FileNameExtensionFilter("Image files", "gif", "jpeg", "jpg", "png");
 		JFileChooser fc = new JFileChooser(filename);
+		fc.setFileFilter(filter);
 		
 		//changer le type de dialog pour la sauvegarde
 		fc.setDialogType(JFileChooser.SAVE_DIALOG);
 		fc.setMultiSelectionEnabled(false);
-		fc.setDialogTitle("Untitled");
+		fc.setDialogTitle("Enregistrer sous...");
 
 		//code de retour
 		int returnVal = fc.showSaveDialog(null);
@@ -138,12 +194,11 @@ public class MenuController {
 			}
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null,
-				    "Error while saving the new image.",
-				    "Error while saving",
+				    "Un problème a été rencontré lors de la sauvegarde de l'image",
+				    "Problème de sauvegarde",
 				    JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		} 
-		
-		return "";
+		return null;
 	}
 }

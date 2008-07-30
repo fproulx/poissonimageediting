@@ -1,7 +1,6 @@
 ﻿Tâches
 ======
 obligatoire
-- Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
 - Implémenter l'aide
 
 aaahh..
@@ -14,6 +13,7 @@ peut-être
 - progress bar pour l'operation de photo montage
 
 Fait 
+- Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
 - Implémenter les tooltips de pablo
 - Mettre une image plus friendly dans le About Dialog
 - Tabbed pane à droite au lieu de deux panes à gauche et à droite
@@ -21,6 +21,11 @@ Fait
 - Confirmation de quitter sur le bouton quitter
 - Napkin look and feel (finalement retiré)
 - Faire un New qui ouvre une page blanche pour transformer le premier menuItem en vrai Menu
+
+Release notes
+=============
+- Le logiciel ne sauvegarde qu'en PNG et il semblerait que certain logiciels aurait de la difficulté à les lire
+- Le logiciel ne peux pas ouvrir de fichiers autre que JPEG
 
 Références
 ==========
