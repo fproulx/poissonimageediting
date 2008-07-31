@@ -56,4 +56,3 @@ http://forums.sun.com/thread.jspa?threadID=5318781&tstart=61
 
 Exception handling
 http://www.javaworld.com/javaworld/jw-08-2001/jw-0803-exceptions.html
-http://www.javaworld.com/javaworld/jw-08-2001/jw-0803-exceptions.html
