@@ -56,6 +56,7 @@ public class UIView extends FrameView implements Observer {
 	private javax.swing.JTabbedPane tabbedPane;
 
 	private JDialog aboutBox;
+	private JDialog helpBox;
 
 	// image frame container
 	private ImageFramesContainer container = new ImageFramesContainer();
@@ -80,6 +81,21 @@ public class UIView extends FrameView implements Observer {
 		initComponents();
 	}
 
+	/**
+	 * Show Help Box for our application
+	 * 
+	 * @param e
+	 */
+	@Action
+	public void showHelpBox(ActionEvent e) {
+		if (helpBox == null) {
+			JFrame mainFrame = UIApp.getApplication().getMainFrame();
+			helpBox = new UIHelpBox(mainFrame);
+			helpBox.setLocationRelativeTo(mainFrame);
+		}
+		UIApp.getApplication().show(helpBox);
+	}
+	
 	/**
 	 * Show About Box for our application
 	 * 
@@ -266,14 +282,11 @@ public class UIView extends FrameView implements Observer {
 		helpMenuItem.setIcon(new ImageIcon(resourceMap.getString("helpMenuItem.icon")));
 		helpMenuItem.setText("Aide"); // TODO put in a resource file
 		helpMenuItem.setName("helpMenuItem");
-		/*
 		helpMenuItem.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				// TODO insert action, for ex:
-				// saveMenuItemActionPerformed(evt);
+				showHelpBox(evt);
 			}
 		});
-		*/
 		helpMenu.add(helpMenuItem);
 		
 		// About
