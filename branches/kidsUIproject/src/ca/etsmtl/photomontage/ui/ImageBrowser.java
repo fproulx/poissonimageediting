@@ -70,8 +70,7 @@ public class ImageBrowser extends JComponent {
 	private String tooltip;
 	
 	// FIXME I changed this so I would load the program quicker
-	//private static String DEFAULT_PATH = "images/";
-	private static String DEFAULT_PATH = "images2/";
+	private static String DEFAULT_PATH = "images/";
 
 	/** 
 	 * Creates a new instance of ImageBrowser 

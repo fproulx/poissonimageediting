@@ -7,12 +7,12 @@ aaahh..
 - le zoom (checker comment le imageBrowser fait son scaled image ça pourrais aider!)
 
 peut-être
-- Il faudrait tout mettre en francais ou tout en anglais dans l'interface
 - Faire une icône style pressed
 - La feature nouvelle image est vraiment poche à cause du blanc
 - progress bar pour l'operation de photo montage
 
 Fait 
+- L'interface est toute en français maintenant
 - Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
 - Implémenter les tooltips de pablo
 - Mettre une image plus friendly dans le About Dialog
