@@ -27,6 +27,10 @@ import java.util.concurrent.Executors;
 import javax.swing.JDesktopPane;
 import javax.swing.SwingUtilities;
 
+import ca.etsmtl.photomontage.exceptions.ComputationException;
+import ca.etsmtl.photomontage.exceptions.InvalidDestinationPositionException;
+import ca.etsmtl.photomontage.exceptions.InvalidMaskException;
+import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
 import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 import ca.etsmtl.photomontage.ui.ImageFrame;
 import ca.etsmtl.photomontage.ui.ImagePanel;
@@ -147,14 +151,33 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
 	        			// Replace the image with the photomontage
 	        			ImageHolder newImageHolder = new ImageHolder(output, frame.getImageHolder().getFilename());
 	        			frame.setImageHolder(newImageHolder);
-	        			
-        			} catch (final Exception e) {
+	        		
+	        		// FIXME exceptions should be translated in PhotoMontage instead of here!
+					} catch (final ComputationException e) {
         				SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
-								UIApp.showException(e);
+								UIApp.showException(new ComputationException("Une erreur de calcul s'est produite. Réessayez de nouveau avec un masque différent."));
 							}
         				});
-					} 
+					} catch (final InvalidSourceImageSizeException e) {
+        				SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								UIApp.showException(new InvalidSourceImageSizeException("Il y a eu un problème avec l'image source, recommencer votre photomontage. Si le problème persiste, contactez les développeurs."));
+							}
+        				});
+					} catch (final InvalidDestinationPositionException e) {
+        				SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								UIApp.showException(new InvalidDestinationPositionException("Vous devez déposer votre découpage à l'intérieur de l'image de destination."));
+							}
+        				});
+					} catch (final InvalidMaskException e) {
+        				SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								UIApp.showException(new InvalidMaskException("Il y a eu un problème avec le masque de l'image découpée, recommencer votre photomontage. Si le problème persiste, contactez les développeurs."));
+							}
+        				});
+					}
         		}
         	});
         }

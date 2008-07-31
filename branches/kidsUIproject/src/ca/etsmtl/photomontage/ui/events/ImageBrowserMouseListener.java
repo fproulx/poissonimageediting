@@ -26,7 +26,7 @@ import ca.etsmtl.photomontage.ui.containers.ImageHolder;
 
 
 /**
- * Classe ImageBrowserMouseListener est l'impl�mentation les �v�nements de la
+ * Classe ImageBrowserMouseListener est l'implémentation les événements de la
  * souris sur le paneau de l'image browser
  * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel

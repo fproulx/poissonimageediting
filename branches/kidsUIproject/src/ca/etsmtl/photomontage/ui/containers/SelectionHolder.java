@@ -90,7 +90,7 @@ public class SelectionHolder {
 
 	/**
 	 * 
-	 * @return l'image redimensionn�
+	 * @return l'image redimensionné
 	 */
 	public BufferedImage getScaledImage() {
 		return scaledSrcImage;

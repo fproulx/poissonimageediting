@@ -84,7 +84,7 @@ public class UIApp extends SingleFrameApplication {
 	 * @param t
 	 */
 	public static void showException(final Throwable t) {
-		JOptionPane.showMessageDialog(null, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(null, t.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**

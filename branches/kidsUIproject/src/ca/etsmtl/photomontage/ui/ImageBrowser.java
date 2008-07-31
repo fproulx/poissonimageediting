@@ -152,12 +152,12 @@ public class ImageBrowser extends JComponent {
 						BufferedImage image = ImageIO.read(path);
 						images.add(new ImageHolder(image, path.getCanonicalPath()));
 					} catch (Exception e) {
-						System.out.println("Problem loading images: " + e);
+						System.out.println("Erreur lors du chargement des images: " + e);
 					}
 				}
 			});
 		} catch (Exception e) {
-			System.out.println("Problem loading images: " + e);
+			System.out.println("Erreur lors du chargement des images: " + e);
 		}
 	}
 

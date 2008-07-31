@@ -24,7 +24,7 @@ import ca.etsmtl.photomontage.ui.ImageFrame;
 
 
 /**
- * Classe WindowItem est utilis� pour le lien avec le JMenuItem du menu Window
+ * Classe WindowItem est utilisé pour le lien avec le JMenuItem du menu Window
  * 
  * @author Olivier Bilodeau <olivier.bilodeau.1@gmail.com>, Kim Lebel
  *         <lebel.kim@gmail.com>, Jean-Philippe Plante

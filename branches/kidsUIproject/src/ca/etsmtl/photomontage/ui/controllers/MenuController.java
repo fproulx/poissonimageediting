@@ -42,6 +42,7 @@ import ca.etsmtl.photomontage.ui.exceptions.OperationCancelledByUserException;
  *         <jphilippeplante@gmail.com>, Francois Proulx
  *         <francois.proulx@gmail.com>
  */
+// TODO in my opinion there should be no UI coupling in this class, filechoosers should be done before and error messages should be sent as exceptions 
 public class MenuController {
 
 	private static final int NEW_DOCUMENT_DEFAULT_HEIGHT = 300;
@@ -78,8 +79,8 @@ public class MenuController {
 			} catch (Exception e) {
 				//message d'erreur
 				JOptionPane.showMessageDialog(null,
-					    "Error while open the image.",
-					    "Error while opening",
+					    "Un problème a été rencontré lors de l'ouverture de l'image. Veuillez vérifier que votre image ne soit pas corrompue et que ce soit une image de type Jpeg (extension .jpg ou .jpeg)",
+					    "Problème lors de l'ouverture d'une image",
 					    JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 			}
