@@ -1,7 +1,6 @@
 ﻿Tâches
 ======
 obligatoire
-- Implémenter l'aide
 
 aaahh..
 - le zoom (checker comment le imageBrowser fait son scaled image ça pourrais aider!)
@@ -12,6 +11,7 @@ peut-être
 - progress bar pour l'operation de photo montage
 
 Fait 
+- L'aide
 - L'interface est toute en français maintenant
 - Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
 - Implémenter les tooltips de pablo

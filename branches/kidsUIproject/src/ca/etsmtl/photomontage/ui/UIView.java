@@ -267,7 +267,7 @@ public class UIView extends FrameView implements Observer {
 		*/
 		zoomMenu.add(zoomOutMenuItem);
 		
-		menuBar.add(zoomMenu);
+		//menuBar.add(zoomMenu);
 
 		// Help menu
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
