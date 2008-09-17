@@ -32,6 +32,14 @@ package org.jdesktop.tools.io;
 
 import java.io.File;
 
+/**
+ * File Tree walker interface. Used as an anonymous class.
+ */
 public interface FileTreeWalk {
+	
+	/**
+	 * Stub method that will be called by each object on FileTreeWalker's path 
+	 * @param path A File object to load
+	 */
     public void walk(File path);
 }

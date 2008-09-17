@@ -35,9 +35,16 @@ import java.io.File;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+/**
+ * Allow to specify unix-like expressions to filter files
+ */
 public class UnixGlobFileFilter implements FileFilter {
     private Pattern pattern;
 
+    /**
+     * Initialise the file filter.
+     * @param filter Glob string
+     */
     public UnixGlobFileFilter(String filter) {
         pattern = Pattern.compile(globToRegex(filter));
     }

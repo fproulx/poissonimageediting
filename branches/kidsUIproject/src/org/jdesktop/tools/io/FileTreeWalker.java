@@ -34,6 +34,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 
+/**
+ * Enumerate files using an optional filter pattern 
+ */
 public class FileTreeWalker {
     private File path;
     private static final FileFilter directoryFilter = new FileFilter() {
@@ -43,6 +46,11 @@ public class FileTreeWalker {
     };
     private FileFilter filter;
 
+    /**
+     * Setup FileTreeWalker to enumerate files on a specific path accepting any files (no filter)
+     * @param path Path holding files to enumerate
+     * @throws IOException Path doesn't exist or is a file
+     */
     public FileTreeWalker(File path) throws IOException {
         this(path, new FileFilter() {
             public boolean accept(File pathname) {
@@ -50,7 +58,13 @@ public class FileTreeWalker {
             }
         });
     }
-
+    
+    /**
+     * Setup FileTreeWalker to enumerate files on a specific path using a FileFilter pattern
+     * @param path Path holding files to enumerate
+     * @param filter Pattern that filters files
+     * @throws IOException Path doesn't exist or is a file
+     */
     public FileTreeWalker(File path, FileFilter filter) throws IOException {
         if (path == null || !path.exists() || path.isFile()) {
             throw new IOException("Path " + path + " is not a valid directory.");
@@ -59,6 +73,10 @@ public class FileTreeWalker {
         this.filter = filter;
     }
 
+    /**
+     * Method to be overloaded that will touch each files
+     * @param walk 
+     */
     public void walk(FileTreeWalk walk) {
         walkDirectory(walk, path);
     }

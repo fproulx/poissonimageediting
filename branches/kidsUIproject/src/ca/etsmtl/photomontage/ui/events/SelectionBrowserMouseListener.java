@@ -34,7 +34,6 @@ import ca.etsmtl.photomontage.exceptions.InvalidSourceImageSizeException;
 import ca.etsmtl.photomontage.poisson.PoissonPhotomontage;
 import ca.etsmtl.photomontage.ui.ImageFrame;
 import ca.etsmtl.photomontage.ui.ImagePanel;
-import ca.etsmtl.photomontage.ui.SelectionBrowser;
 import ca.etsmtl.photomontage.ui.UIApp;
 import ca.etsmtl.photomontage.ui.UIView;
 import ca.etsmtl.photomontage.ui.containers.ImageHolder;
@@ -96,12 +95,11 @@ public class SelectionBrowserMouseListener extends GhostDropAdapter {
         glassPane.setVisible(false);
         glassPane.setImage(null);
 
-        // WARNING !!!! This is a big stinky HACK
+        // FIXME: WARNING !!!! This is a big stinky HACK
         
         // Get ahold of the source and destination components for the drag-drop event
         UIView appView = (UIView) UIApp.getApplication().getMainView();
         JDesktopPane desktop = appView.getImageFramesDesktop();
-        SelectionBrowser selectionBrowser = appView.getSelectionBrowser();
         
         // Convert the point relative to the Desktop area
         //Point desktopConvertedPoint = SwingUtilities.convertPoint(selectionBrowser, eventPoint, desktop);

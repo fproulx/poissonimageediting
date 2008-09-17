@@ -30,7 +30,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ca.etsmtl.photomontage.ui.ImageBrowser;
-import ca.etsmtl.photomontage.ui.UIApp;
 import ca.etsmtl.photomontage.ui.exceptions.OperationCancelledByUserException;
 
 

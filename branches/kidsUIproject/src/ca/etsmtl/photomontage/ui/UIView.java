@@ -37,7 +37,6 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.SingleFrameApplication;
 
 import ca.etsmtl.photomontage.ui.containers.ImageFramesContainer;
-import ca.etsmtl.photomontage.ui.containers.WindowItem;
 import ca.etsmtl.photomontage.ui.controllers.MenuController;
 import ca.etsmtl.photomontage.ui.exceptions.OperationCancelledByUserException;
 

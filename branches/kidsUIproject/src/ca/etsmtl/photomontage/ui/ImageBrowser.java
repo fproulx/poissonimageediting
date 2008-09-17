@@ -107,6 +107,11 @@ public class ImageBrowser extends JComponent {
 	}
 	
 	// TODO extract common part of the two constructors in an init() method
+	/**
+	 * Instantiate an ImageBrowser
+	 * @param container TODO is container the one who holds me or do I hold the container?
+	 * @param tooltip String to show as a tooltip when the mouse is idle over this visual component
+	 */
 	public ImageBrowser(ImageFramesContainer container, String tooltip) {
 		this.container = container;
 		this.tooltip = tooltip;
