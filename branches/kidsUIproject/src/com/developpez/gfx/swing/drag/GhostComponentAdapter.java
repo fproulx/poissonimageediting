@@ -8,8 +8,18 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.SwingUtilities;
 
+/**
+ * Adapter class that handles events related to the translucent drag and drop.
+ * TODO not sure about this javadoc 
+ * TODO this class doesn't seem to be defined in this project. Consider removal? But before we must make sure we are not doing something stupid in our reimplementation of this class (like why do we have ImageFrameMouseListener and SelectionBrowserMouseListener, should it be merged here?)
+ */
 public class GhostComponentAdapter extends GhostDropAdapter
 {
+	/**
+	 * Instantiate a GhostComponentAdapter
+	 * @param glassPane a glasspane where the transparent drag and drop is drawn 
+	 * @param action TODO !? remove?
+	 */
     public GhostComponentAdapter(GhostGlassPane glassPane, String action) {
         super(glassPane, action);
     }

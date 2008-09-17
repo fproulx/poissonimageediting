@@ -7,10 +7,17 @@ import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.SwingUtilities;
 
+/**
+ * MouseMotionAdapter with specific behaviour related to the transparent drag and drop
+ */
 public class GhostMotionAdapter extends MouseMotionAdapter
 {
     private GhostGlassPane glassPane;
 
+    /**
+     * Public constructor
+     * @param glassPane Glasspane on which you want the adapter to tell it where to paint the drag effect 
+     */
 	public GhostMotionAdapter(GhostGlassPane glassPane) {
 		this.glassPane = glassPane;
 	}

@@ -11,10 +11,19 @@ import java.net.MalformedURLException;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 
+/**
+ * TODO fix Javadoc: not sure about this one 
+ */
 public class GhostPictureAdapter extends GhostDropAdapter
 {
 	private BufferedImage image;
 
+	/**
+	 * Public constructor
+	 * @param glassPane pane where the drawing takes place
+	 * @param action action fired on drop
+	 * @param picture TODO picture string?
+	 */
 	public GhostPictureAdapter(GhostGlassPane glassPane, String action, String picture) {
 	   super(glassPane, action);
 	   try {
