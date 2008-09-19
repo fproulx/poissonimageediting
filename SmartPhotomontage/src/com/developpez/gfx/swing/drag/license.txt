@@ -1,4 +1,0 @@
-From http://gfx.developpez.com/tutoriel/java/swing/drag/
-"Les sources présentées sur cette page sont libres de droits, et vous pouvez les utiliser à votre convenance."
-
-It means: These sources are free of rights
