@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>PoissonImageEditing</name>
+	<name>KidzUI</name>
 	<comment></comment>
 	<projects>
+		<project>dragnghost</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
