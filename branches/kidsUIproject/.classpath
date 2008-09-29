@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="lib/napkinlaf.jar"/>
 	<classpathentry kind="lib" path="lib/napkinlaf-swingset2.jar"/>
 	<classpathentry kind="lib" path="lib/dragnghost.jar"/>
+	<classpathentry kind="lib" path="lib/jdesktop-io-tools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
