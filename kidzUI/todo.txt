@@ -1,0 +1,58 @@
+﻿Tâches
+======
+obligatoire
+
+aaahh..
+- le zoom (checker comment le imageBrowser fait son scaled image ça pourrais aider!)
+
+peut-être
+- Faire une icône style pressed
+- La feature nouvelle image est vraiment poche à cause du blanc
+- progress bar pour l'operation de photo montage
+
+Fait 
+- L'aide
+- L'interface est toute en français maintenant
+- Save qui fait Save pas "Save As" avec un Overwrite dialog "are you sure?"
+- Implémenter les tooltips de pablo
+- Mettre une image plus friendly dans le About Dialog
+- Tabbed pane à droite au lieu de deux panes à gauche et à droite
+- Gros icônes cutes
+- Confirmation de quitter sur le bouton quitter
+- Napkin look and feel (finalement retiré)
+- Faire un New qui ouvre une page blanche pour transformer le premier menuItem en vrai Menu
+
+Release notes
+=============
+- Le logiciel ne sauvegarde qu'en PNG et il semblerait que certain logiciels aurait de la difficulté à les lire
+- Le logiciel ne peux pas ouvrir de fichiers autre que JPEG
+
+Références
+==========
+Don't make the Demo look done, consulté le 3 juillet 2008
+http://headrush.typepad.com/creating_passionate_users/2006/12/dont_make_the_d.html
+
+Napkin look and feel, consulté le 3 juillet 2008
+http://napkinlaf.sourceforge.net/
+
+Java Swing Components
+http://java.sun.com/docs/books/tutorial/uiswing/components/index.html
+
+Icons tango
+http://tango.freedesktop.org/Tango_Icon_Library
+
+Icons from the GNOME project
+http://www.gnome.org
+Trouvés au /usr/share/icons ou /usr/share/pixmaps
+
+Gnome Human Interface Guidelines (Quit vs Exit issue)
+http://library.gnome.org/devel/hig-book/stable/menus-standard.html.en#the-file-menu
+
+Java API
+http://java.sun.com/api/
+
+JMenu action
+http://forums.sun.com/thread.jspa?threadID=5318781&tstart=61
+
+Exception handling
+http://www.javaworld.com/javaworld/jw-08-2001/jw-0803-exceptions.html

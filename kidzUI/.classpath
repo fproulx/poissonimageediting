@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/appframework-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jlapack.jar"/>
+	<classpathentry kind="lib" path="lib/mtj.jar"/>
+	<classpathentry kind="lib" path="lib/swing-layout-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/swing-worker.jar"/>
+	<classpathentry kind="lib" path="lib/napkinlaf.jar"/>
+	<classpathentry kind="lib" path="lib/napkinlaf-swingset2.jar"/>
+	<classpathentry kind="lib" path="lib/dragnghost.jar"/>
+	<classpathentry kind="lib" path="lib/jdesktop-io-tools.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/libphotomontage"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
